@@ -1,0 +1,41 @@
+{
+  "$schema": "./node_modules/@angular/cli/lib/config/schema.json",
+  "version": 1,
+  "cli": {
+    "packageManager": "npm"
+  },
+  "newProjectRoot": "projects",
+  "schematics": {
+    "@schematics/angular:component": {
+      "style": "scss"
+    }
+  },
+  "projects": {
+    "@connected-ng/components": {
+      "projectType": "library",
+      "root": "projects/connected-ng/components",
+      "sourceRoot": "projects/connected-ng/components/src",
+      "prefix": "cn",
+      "architect": {
+        "build": {
+          "builder": "@angular/build:ng-packagr",
+          "configurations": {
+            "production": {
+              "tsConfig": "projects/connected-ng/components/tsconfig.lib.prod.json"
+            },
+            "development": {
+              "tsConfig": "projects/connected-ng/components/tsconfig.lib.json"
+            }
+          },
+          "defaultConfiguration": "production"
+        },
+        "test": {
+          "builder": "@angular/build:unit-test",
+          "options": {
+            "tsConfig": "projects/connected-ng/components/tsconfig.spec.json"
+          }
+        }
+      }
+    }
+  }
+}
