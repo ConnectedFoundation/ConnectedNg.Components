@@ -1,0 +1,23 @@
+<div class="tabs-header">
+  <nav mat-tab-nav-bar mat-stretch-tabs="false" mat-align-tabs="start" [tabPanel]="tabPanel">
+    @for (document of activeDocuments(); track document) {
+      <a
+        mat-tab-link
+        (click)="documentService.selectDocument(document)"
+        [active]="this.selectedDocument()?.equals(document)"
+      >
+        <span>{{ document.title }}</span>
+        <span
+          style="align-self: end"
+          (click)="documentService.closeDocument(document); $event.stopPropagation()"
+        >
+          X
+        </span>
+      </a>
+    }
+  </nav>
+</div>
+<mat-tab-nav-panel #tabPanel></mat-tab-nav-panel>
+<div class="editor-content">
+  <ng-template [cdkPortalOutlet]="editorPortal()"></ng-template>
+</div>

@@ -1,0 +1,36 @@
+<div style="height: 100%; display: flex; flex-direction: column">
+  <div style="flex-grow: 1">
+    <as-split [gutterSize]="2" direction="horizontal">
+      @if (layoutService.leftPane().hasPortal() && layoutService.leftPane().visible()) {
+        <as-split-area [size]="15" unit="percent">
+          <cf-ide-pane-content [pane]="layoutService.leftPane()">
+            <ng-template [cdkPortalOutlet]="layoutService.leftPane().portal()"></ng-template>
+          </cf-ide-pane-content>
+        </as-split-area>
+      }
+      <as-split-area [size]="'*'">
+        <as-split [gutterSize]="2" direction="vertical">
+          <as-split-area [size]="'*'">
+            <cf-ide-document-editor></cf-ide-document-editor>
+          </as-split-area>
+          @if (layoutService.bottomPane().hasPortal() && layoutService.bottomPane().visible()) {
+            <as-split-area [size]="15">
+              <cf-ide-pane-content [pane]="layoutService.bottomPane()">
+                <ng-template [cdkPortalOutlet]="layoutService.bottomPane().portal()"></ng-template>
+              </cf-ide-pane-content>
+            </as-split-area>
+          }
+        </as-split>
+      </as-split-area>
+      @if (layoutService.rightPane().hasPortal() && layoutService.rightPane().visible()) {
+        <as-split-area [size]="15">
+          <cf-ide-pane-content [pane]="layoutService.rightPane()">
+            <ng-template [cdkPortalOutlet]="layoutService.rightPane().portal()"></ng-template>
+          </cf-ide-pane-content>
+        </as-split-area>
+      }
+    </as-split>
+  </div>
+  <mat-divider [inset]="true"></mat-divider>
+  <div style="min-height: 1rem">Status bar</div>
+</div>

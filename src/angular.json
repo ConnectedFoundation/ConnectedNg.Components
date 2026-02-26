@@ -1,9 +1,6 @@
 {
   "$schema": "./node_modules/@angular/cli/lib/config/schema.json",
   "version": 1,
-  "cli": {
-    "packageManager": "npm"
-  },
   "newProjectRoot": "projects",
   "schematics": {
     "@schematics/angular:component": {
@@ -15,7 +12,7 @@
       "projectType": "library",
       "root": "projects/connected-ng/components",
       "sourceRoot": "projects/connected-ng/components/src",
-      "prefix": "cn",
+      "prefix": "cf",
       "architect": {
         "build": {
           "builder": "@angular/build:ng-packagr",
@@ -36,6 +33,12 @@
           }
         }
       }
+    }
+  },
+  "cli": {
+    "analytics": false,
+    "cache": {
+      "enabled": false
     }
   }
 }
