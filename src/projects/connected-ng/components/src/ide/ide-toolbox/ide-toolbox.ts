@@ -4,11 +4,9 @@ import { FormsModule } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatIconModule } from '@angular/material/icon';
-import { DndModule } from 'ngx-drag-drop';
 import { Subscription } from 'rxjs';
 import { IdeDocument, IdeDocumentService } from '../services/document-service';
 import { IdeToolboxItemService, IdeToolboxItem as ServiceToolboxItem } from '../services/toolbox-item-service';
-import { IdeToolboxStateService } from '../services/toolbox-state-service';
 
 export interface IdeToolboxItem {
   id: string;
@@ -24,8 +22,7 @@ export interface IdeToolboxItem {
     FormsModule,
     MatFormFieldModule,
     MatInputModule,
-    MatIconModule,
-    DndModule
+    MatIconModule
   ],
   templateUrl: './ide-toolbox.html',
   styleUrl: './ide-toolbox.scss',
@@ -44,7 +41,6 @@ export class IdeToolbox<T extends IdeToolboxItem = IdeToolboxItem> implements On
 
   private documentService = inject(IdeDocumentService, { optional: true });
   private toolboxItemService = inject(IdeToolboxItemService, { optional: true });
-  private toolboxStateService = inject(IdeToolboxStateService);
   private subscriptions = new Subscription();
 
   private internalItems = signal<T[]>([]);
@@ -95,7 +91,6 @@ export class IdeToolbox<T extends IdeToolboxItem = IdeToolboxItem> implements On
     // Track hasItems changes and notify state service
     effect(() => {
       const hasItems = this.hasItems();
-      this.toolboxStateService.setHasItems(hasItems);
     });
   }
 
