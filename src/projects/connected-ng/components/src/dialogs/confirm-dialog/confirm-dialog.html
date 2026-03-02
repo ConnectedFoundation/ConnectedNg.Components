@@ -1,6 +1,6 @@
-<h2 mat-dialog-title>{{ data.title }}</h2>
+<h2 mat-dialog-title>{{ title() }}</h2>
 <mat-dialog-content>
-  {{ data.message }}
+  {{ message() }}
 </mat-dialog-content>
 <mat-dialog-actions>
   <button matButton (click)="dialogRef.close(false)">Cancel</button>
