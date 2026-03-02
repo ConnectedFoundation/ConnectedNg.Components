@@ -1,41 +1,64 @@
-import { Injectable } from '@angular/core';
-import { Subject } from 'rxjs';
+import { inject, Injectable, InjectionToken } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Observable } from 'rxjs';
+import { configurationValue, UrlService, EventService, EventKey } from '@connected-ng/core';
+
+// Selection Service Configuration
+export const SELECTION_SERVICE_CONFIG = new InjectionToken<SelectionServiceConfiguration>('SELECTION_SERVICE_CONFIG');
+
+export class SelectionServiceConfiguration {
+  baseUrl = configurationValue.required<string>('Selection service base URL');
+}
+
+// DTOs matching Connected.Ide backend
+export interface ISelectDto {
+  session: string;
+  project: string;
+  item: string;
+  currentEditor?: string;
+  type: string;
+}
+
+export interface IDeselectDto {
+  session: string;
+  project: string;
+  item: string;
+  currentEditor?: string;
+  type: string;
+}
 
 @Injectable({
   providedIn: 'root',
 })
 export class SelectionService {
-  private itemSelectedSubject = new Subject<ItemSelectedArgs>();
+  private http = inject(HttpClient);
+  private urlService = inject(UrlService);
+  private configuration = inject(SELECTION_SERVICE_CONFIG);
+  private events = inject(EventService);
 
-  // Expose as observables (read-only)
-  itemSelected$ = this.itemSelectedSubject.asObservable();
+  private static readonly serviceUrl = 'services/ide/selection';
 
-  selectItem(item: SelectableItem, sender: any) {
-    this.itemSelectedSubject.next(new ItemSelectedArgs(item, sender));
+  // Backend event observables (SignalR events from backend)
+  $selected?: Observable<ISelectDto>;
+  $deselected?: Observable<IDeselectDto>;
+
+  constructor() {
+    // Hook up backend events
+    this.$selected = this.events.on<ISelectDto>(`${SelectionService.serviceUrl}/selected` as EventKey);
+    this.$deselected = this.events.on<IDeselectDto>(`${SelectionService.serviceUrl}/deselected` as EventKey);
+  }
+
+  select(dto: ISelectDto): Observable<void> {
+    return this.http.post<void>(
+      this.urlService.generateUrl(this.configuration.baseUrl(), `${SelectionService.serviceUrl}/select`),
+      dto
+    );
+  }
+
+  deselect(dto: IDeselectDto): Observable<void> {
+    return this.http.post<void>(
+      this.urlService.generateUrl(this.configuration.baseUrl(), `${SelectionService.serviceUrl}/deselect`),
+      dto
+    );
   }
 }
-
-export class SelectableItem {
-  id: string;
-  type: string;
-  data: any;
-  project: string;
-
-  constructor(id: string, type: string, project: string, data?: any) {
-    this.id = id;
-    this.type = type;
-    this.project = project;
-    this.data = data;
-  }
-}
-
-export class ItemSelectedArgs {
-  item: SelectableItem;
-  sender: any;
-
-  constructor(item: SelectableItem, sender: any) {
-    this.item = item;
-    this.sender = sender;
-  }
-}
-

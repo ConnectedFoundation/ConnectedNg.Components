@@ -1,0 +1,28 @@
+<div class="sidebar-container">
+  <mat-tab-group
+    class="sidebar-tabs"
+    [disableRipple]="true"
+    headerPosition="below"
+    [animationDuration]="animationDuration()"
+    [(selectedIndex)]="selectedIndex"
+  >
+    @for (tab of activeTabs(); track tab.id) {
+    <mat-tab
+      [label]="tab.label"
+      [disabled]="tab.disabled"
+    >
+      <ng-template matTabLabel>
+        <mat-icon class="tab-icon">{{ tab.icon }}</mat-icon>
+        <span class="tab-label">{{ tab.label }}</span>
+      </ng-template>
+      <div class="tab-content">
+        @if (tab.template) {
+        <ng-container *ngTemplateOutlet="tab.template"></ng-container>
+        } @else if (tab.component) {
+        <ng-container *ngComponentOutlet="tab.component"></ng-container>
+        }
+      </div>
+    </mat-tab>
+    }
+  </mat-tab-group>
+</div>

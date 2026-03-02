@@ -1,19 +1,24 @@
 <div class="tabs-header">
-  <nav mat-tab-nav-bar mat-stretch-tabs="false" mat-align-tabs="start" [tabPanel]="tabPanel">
+  <nav
+    mat-tab-nav-bar
+    mat-stretch-tabs="false"
+    mat-align-tabs="start"
+    [tabPanel]="tabPanel"
+  >
     @for (document of activeDocuments(); track document) {
-      <a
-        mat-tab-link
-        (click)="documentService.selectDocument(document)"
-        [active]="this.selectedDocument()?.equals(document)"
+    <a
+      mat-tab-link
+      (click)="selectDocument(document)"
+      [active]="isDocumentSelected(document)"
+    >
+      <span>{{ document.name }}</span>
+      <span
+        style="align-self: end"
+        (click)="onCloseDocument(document); $event.stopPropagation()"
       >
-        <span>{{ document.title }}</span>
-        <span
-          style="align-self: end"
-          (click)="documentService.closeDocument(document); $event.stopPropagation()"
-        >
-          X
-        </span>
-      </a>
+        X
+      </span>
+    </a>
     }
   </nav>
 </div>

@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, input } from '@angular/core';
 import { MatDividerModule } from '@angular/material/divider';
 import { AngularSplitModule } from 'angular-split';
 import { CdkPortalOutlet } from "@angular/cdk/portal";
@@ -20,4 +20,5 @@ import { IdeDocumentEditor } from "./ide-document-editor/ide-document-editor";
 })
 export class Ide {
   layoutService = inject(IdeLayoutService);
+  session = input.required<string>();
 }

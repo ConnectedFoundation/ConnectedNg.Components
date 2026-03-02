@@ -5,25 +5,22 @@ import {
   computed,
   contentChildren,
   effect,
+  inject,
   input,
+  OnDestroy,
+  OnInit,
   output,
   signal,
   untracked,
 } from '@angular/core';
 import { NgTemplateOutlet } from '@angular/common';
 import { IdeExplorerTemplateDirective } from './ide-explorer-template';
+import { IdeExplorerItemService, IExplorerItem } from '../services/explorer-item-service';
+import { SelectionService, ISelectDto } from '../services/selection-service';
 
 export type ExplorerId = string;
 
-export interface IdeExplorerMeta {
-  id: ExplorerId;
-  parentId: ExplorerId | null;
-  templateKey: string;
-  sortKey?: number | string;
-  isDraggable?: boolean;
-}
-
-export interface ExplorerNode<TItem> {
+export interface ExplorerNode<TItem = IExplorerItem> {
   id: ExplorerId;
   item: TItem;
   templateKey: string;
@@ -31,7 +28,7 @@ export interface ExplorerNode<TItem> {
   isDraggable: boolean;
 }
 
-export interface ExplorerDropContext<TItem> {
+export interface ExplorerDropContext<TItem = IExplorerItem> {
   /** The node being dragged */
   draggedNode: ExplorerNode<TItem>;
   /** The parent node where the item will be dropped (null if dropped at root level) */
@@ -52,7 +49,7 @@ export interface IdeExplorerMoveEvent {
   newIndex: number;
 }
 
-export interface IdeExplorerSelectionItem<TItem> {
+export interface IdeExplorerSelectionItem<TItem = IExplorerItem> {
   id: ExplorerId;
   item: TItem;
 }
@@ -65,10 +62,10 @@ export interface IdeExplorerSelectionItem<TItem> {
   templateUrl: './ide-explorer.html',
   styleUrl: './ide-explorer.scss',
 })
-export class IdeExplorer<TItem> {
+export class IdeExplorer<TItem extends IExplorerItem = IExplorerItem> implements OnInit, OnDestroy {
   // ---------------- Inputs ----------------
-  data = input.required<TItem[]>();
-  metaFunction = input.required<(item: TItem) => IdeExplorerMeta>();
+  session = input.required<string>();
+  context = input.required<string>();
 
   /**
    * Validation function to control whether a drop operation is allowed.
@@ -103,6 +100,13 @@ export class IdeExplorer<TItem> {
   // ---------------- Template mapping ----------------
   private templateDirectives = contentChildren(IdeExplorerTemplateDirective);
 
+  // ---------------- Services ----------------
+  private explorerItemService = inject(IdeExplorerItemService);
+  private selectionService = inject(SelectionService);
+
+  // ---------------- Internal state ----------------
+  private items = signal<TItem[]>([]);
+
   private templateMap = computed(() => {
     let map = new Map<string, TemplateRef<any>>();
 
@@ -133,9 +137,25 @@ export class IdeExplorer<TItem> {
   private isCurrentDropValid = signal<boolean>(false);
   private autoExpandTimeoutHandle: number | null = null;
 
+  ngOnInit() {
+    this.loadExplorerItems();
+  }
+
+  ngOnDestroy() {
+    this.clearAutoExpandTimeout();
+  }
+
+  private loadExplorerItems() {
+    this.explorerItemService.query({
+      context: this.context()
+    }).subscribe(items => {
+      this.items.set(items as TItem[]);
+    });
+  }
+
   constructor() {
     effect(() => {
-      let nodes = this.buildTreeFromFlatData(this.data(), this.metaFunction());
+      let nodes = this.buildTreeFromFlatData(this.items());
 
       untracked(() => {
         this.rootNodes.set(nodes);
@@ -174,6 +194,32 @@ export class IdeExplorer<TItem> {
           this.expandedNodeIds.set(expanded);
         }
       });
+    });
+
+    // Trigger selection service when active item changes
+    effect(() => {
+      const activeId = this.activeNodeId();
+
+      if (!activeId) {
+        return;
+      }
+
+      const nodes = this.rootNodes();
+      const activeNode = this.findNodeById(nodes, activeId);
+
+      if (!activeNode) {
+        return;
+      }
+
+      const selectDto: ISelectDto = {
+        session: this.session(),
+        project: activeNode.item.project,
+        item: activeNode.item.id,
+        currentEditor: 'IdeExplorer',
+        type: activeNode.item.type
+      };
+
+      this.selectionService.select(selectDto).subscribe();
     });
   }
 
@@ -622,26 +668,27 @@ export class IdeExplorer<TItem> {
   }
 
   // ---------------- Tree building ----------------
-  private buildTreeFromFlatData(items: TItem[], metaFunction: (item: TItem) => IdeExplorerMeta): ExplorerNode<TItem>[] {
+  private buildTreeFromFlatData(items: TItem[]): ExplorerNode<TItem>[] {
     let nodeById = new Map<ExplorerId, ExplorerNode<TItem>>();
     let parentById = new Map<ExplorerId, ExplorerId | null>();
     let sortKeyById = new Map<ExplorerId, number | string | undefined>();
 
     for (let item of items) {
-      let meta = metaFunction(item);
-      let id = String(meta.id);
-      let parentId = meta.parentId == null ? null : String(meta.parentId);
+      let id = String(item.id);
+      let parentId = item.parent == null ? null : String(item.parent);
+      let sortKey = (item as any).sortKey;
+      let isDraggable = (item as any).isDraggable;
 
       nodeById.set(id, {
         id: id,
         item,
-        templateKey: meta.templateKey,
+        templateKey: item.type,
         children: [],
-        isDraggable: meta.isDraggable !== false,
+        isDraggable: isDraggable !== false,
       });
 
       parentById.set(id, parentId);
-      sortKeyById.set(id, meta.sortKey);
+      sortKeyById.set(id, sortKey);
     }
 
     let rootNodes: ExplorerNode<TItem>[] = [];

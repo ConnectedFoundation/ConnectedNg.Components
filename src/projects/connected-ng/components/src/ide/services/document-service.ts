@@ -1,65 +1,115 @@
-import { inject, Injectable } from '@angular/core';
-import { Subject } from 'rxjs';
-import { SelectionService } from './selection-service';
+import { inject, Injectable, InjectionToken } from '@angular/core';
+import { HttpClient, HttpParams } from '@angular/common/http';
+import { Observable } from 'rxjs';
+import { map, share, tap } from 'rxjs/operators';
+import { configurationValue, UrlService, EventService, EventKey } from '@connected-ng/core';
+
+// Document Service Configuration
+export const DOCUMENT_SERVICE_CONFIG = new InjectionToken<DocumentServiceConfiguration>('DOCUMENT_SERVICE_CONFIG');
+
+export class DocumentServiceConfiguration {
+  baseUrl = configurationValue.required<string>('Document service base URL');
+}
+
+// DTOs matching Connected.Ide backend
+export interface IDocumentQueryDto {
+  project?: string;
+  documentType?: string;
+}
+
+export interface IActivateDocumentDto {
+  project: string;
+  document: string;
+}
+
+export interface ICloseDocumentDto {
+  session: string;
+  project: string;
+  document: string;
+}
 
 @Injectable({
   providedIn: 'root',
 })
 export class IdeDocumentService {
-  private selectionService = inject(SelectionService);
+  private http = inject(HttpClient);
+  private urlService = inject(UrlService);
+  private configuration = inject(DOCUMENT_SERVICE_CONFIG);
+  private events = inject(EventService);
 
-  // Use Subject for events
-  private documentClosedSubject = new Subject<IdeDocument>();
-  private documentSelectedSubject = new Subject<IdeDocument>();
-  private _selectedDocument?: IdeDocument;
+  private static readonly serviceUrl = 'services/ide/documents';
 
-  // Expose as observables (read-only)
-  documentClosed$ = this.documentClosedSubject.asObservable();
-  documentSelected$ = this.documentSelectedSubject.asObservable();
+  // Backend event observables (SignalR events from backend)
+  $activated?: Observable<IdeDocument>;
+  $deactivated?: Observable<IdeDocument>;
 
-  get selectedDocument(): IdeDocument | undefined {
-    return this._selectedDocument;
+  private _activeDocument?: IdeDocument;
+
+  constructor() {
+    // Hook up backend events
+    this.$activated = this.events.on<any>(`${IdeDocumentService.serviceUrl}/activated` as EventKey).pipe(map(e => { return { id: e.document, project: e.project, name: e.name, type: e.type, session: e.session } as IdeDocument }), share());
+    this.$deactivated = this.events.on<any>(`${IdeDocumentService.serviceUrl}/deactivated` as EventKey).pipe(map(e => { return { id: e.document, project: e.project, name: e.name, type: e.type, session: e.session } as IdeDocument }), share());
   }
 
-  selectDocument(document: IdeDocument) {
-    this._selectedDocument = document;
-    this.selectionService.selectItem(document, this);
-    this.documentSelectedSubject.next(document);
+  get activeDocument(): IdeDocument | undefined {
+    return this._activeDocument;
   }
 
-  closeDocument(document: IdeDocument) {
-    this.documentClosedSubject.next(document);
+  query(dto?: IDocumentQueryDto): Observable<IdeDocument[]> {
+    let params = new HttpParams();
+
+    if (dto?.project) {
+      params = params.append('project', dto.project);
+    }
+    if (dto?.documentType) {
+      params = params.append('documentType', dto.documentType);
+    }
+
+    return this.http.get<IdeDocument[]>(
+      this.urlService.generateUrl(this.configuration.baseUrl(), `${IdeDocumentService.serviceUrl}/query`),
+      { params }
+    );
+  }
+
+  activate(dto: IActivateDocumentDto): Observable<void> {
+    return this.http.post<void>(
+      this.urlService.generateUrl(this.configuration.baseUrl(), `${IdeDocumentService.serviceUrl}/activate`),
+      dto
+    );
+  }
+
+  close(dto: ICloseDocumentDto): Observable<void> {
+    return this.http.post<void>(
+      this.urlService.generateUrl(this.configuration.baseUrl(), `${IdeDocumentService.serviceUrl}/close`),
+      dto
+    );
+  }
+
+  selectActive(): Observable<IdeDocument | null> {
+    return this.http.get<IdeDocument | null>(
+      this.urlService.generateUrl(this.configuration.baseUrl(), `${IdeDocumentService.serviceUrl}/active`)
+    ).pipe(
+      tap(document => {
+        if (document) {
+          this._activeDocument = document;
+        }
+      })
+    );
   }
 }
 
-export class IdeDocument {
+// Backend IDocument interface from Connected.Ide (IEditorItem)
+export interface IdeDocument {
   id: string;
   type: string;
-  data: any;
+  name: string;
   project: string;
-  title: string;
-  editor: string;
-
-  constructor(id: string, type: string, project: string, title: string, editor: string, data?: any) {
-    this.id = id;
-    this.type = type;
-    this.project = project;
-    this.data = data;
-    this.title = title;
-    this.editor = editor;
-  }
-
-  equals(other: IdeDocument): boolean {
-    return this.id == other.id && this.type == other.type && this.project == other.project && this.editor == this.editor;;
-  }
 }
 
-export class IdeDocumentNode extends IdeDocument {
-  parent?: string;
-
-  constructor(id: string, type: string, project: string, title: string, parent?: string, data?: any) {
-    super(id, type, project, title, data);
-
-    this.parent = parent;
-  }
+export function documentsEqual(doc1: IdeDocument, doc2: IdeDocument): boolean {
+  return (
+    doc1.id === doc2.id &&
+    doc1.type === doc2.type &&
+    doc1.project === doc2.project
+  );
 }

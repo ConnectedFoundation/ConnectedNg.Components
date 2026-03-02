@@ -9,6 +9,9 @@
     "paths": {
       "@connected-ng/components": [
         "./dist/connected-ng/components"
+      ],
+      "@connected-ng/core": [
+        "./dist/connected-ng/core"
       ]
     },
     "strict": true,

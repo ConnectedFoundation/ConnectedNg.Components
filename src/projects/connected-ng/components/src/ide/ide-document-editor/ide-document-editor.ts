@@ -1,6 +1,6 @@
-import { Component, ComponentRef, computed, effect, inject, Injector, signal, StaticProvider, viewChild } from '@angular/core';
+import { Component, ComponentRef, computed, effect, inject, Injector, input, signal, StaticProvider, viewChild } from '@angular/core';
 import { MatTabsModule } from '@angular/material/tabs';
-import { IdeDocumentService as IdeDocumentService, IdeDocument } from '../services/document-service';
+import { IdeDocumentService as IdeDocumentService, IdeDocument, documentsEqual } from '../services/document-service';
 import { CdkPortalOutlet, ComponentPortal } from '@angular/cdk/portal';
 import { IdeEditorService } from '../services/ide-editor-service';
 
@@ -11,6 +11,7 @@ import { IdeEditorService } from '../services/ide-editor-service';
   styleUrl: './ide-document-editor.scss',
 })
 export class IdeDocumentEditor {
+  session = input.required<string>();
   portalOutlet = viewChild<CdkPortalOutlet>(CdkPortalOutlet);
 
   documentService = inject(IdeDocumentService);
@@ -57,8 +58,8 @@ export class IdeDocumentEditor {
   }
 
   ngOnInit() {
-    this.documentService.documentSelected$.subscribe(e => this.selectDocument(e));
-    this.documentService.documentClosed$.subscribe(e => this.closeDocument(e));
+    this.documentService.$activated?.subscribe((e: IdeDocument) => this.selectDocument(e));
+    this.documentService.$deactivated?.subscribe((e: IdeDocument) => this.closeDocument(e));
   }
 
   selectDocument(document: IdeDocument) {
@@ -69,7 +70,7 @@ export class IdeDocumentEditor {
       return;
     }
 
-    let existing = this.activeDocuments().find(e => e.equals(document));
+    let existing = this.activeDocuments().find(e => documentsEqual(e, document));
 
     if (existing)
       this.selectedDocument.set(existing as IdeDocument);
@@ -80,14 +81,27 @@ export class IdeDocumentEditor {
   }
 
   closeDocument(document: IdeDocument) {
-    let existing = this.activeDocuments().find(e => e.equals(document));
+    let existing = this.activeDocuments().find(e => documentsEqual(e, document));
     if (existing) {
-      if (this.selectedDocument() && this.selectedDocument()?.equals(document)) {
+      if (this.selectedDocument() && documentsEqual(this.selectedDocument()!, document)) {
         this.selectedDocument.set(undefined);
       }
 
-      this.activeDocuments.set(this.activeDocuments().filter(e => !e.equals(document)));
+      this.activeDocuments.set(this.activeDocuments().filter(e => !documentsEqual(e, document)));
     }
+  }
+
+  onCloseDocument(document: IdeDocument) {
+    this.documentService.close({
+      session: this.session(),
+      project: document.project,
+      document: document.id
+    }).subscribe();
+  }
+
+  isDocumentSelected(document: IdeDocument): boolean {
+    const selected = this.selectedDocument();
+    return selected ? documentsEqual(selected, document) : false;
   }
 }
 
