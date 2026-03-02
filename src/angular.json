@@ -12,7 +12,7 @@
       "projectType": "library",
       "root": "projects/connected-ng/components",
       "sourceRoot": "projects/connected-ng/components/src",
-      "prefix": "cf",
+      "prefix": "cn",
       "architect": {
         "build": {
           "builder": "@angular/build:ng-packagr",
