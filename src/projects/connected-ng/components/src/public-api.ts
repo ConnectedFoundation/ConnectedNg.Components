@@ -1,5 +1,8 @@
 export { ConfirmDialog } from './dialogs/confirm-dialog/confirm-dialog';
 export { DialogService } from './dialogs/dialog-service';
+export { Notification, NotificationType } from './notification/notification/notification';
+export { NotificationService } from './notification/notification-service';
+
 // export { Ide } from './ide/ide';
 // export { IdeExplorer } from './ide/ide-explorer/ide-explorer';
 // export type { ExplorerDropContext, ExplorerNode, IdeExplorerMoveEvent, IdeExplorerSelectionItem } from './ide/ide-explorer/ide-explorer';

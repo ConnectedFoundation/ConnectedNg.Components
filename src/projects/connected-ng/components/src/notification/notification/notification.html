@@ -1,0 +1,27 @@
+<div class="notification-wrapper" 
+	[class.bg-success]="type() === NotificationType.Success"
+	[class.bg-danger]="type() === NotificationType.Error" 
+	[class.bg-info]="type() === NotificationType.Info"
+	>
+	<div class="notification-icon">
+		<mat-icon
+			class="material-symbols-outlined"
+			[fontIcon]="
+				type() === NotificationType.Success ? 'check_circle' :
+				type() === NotificationType.Error   ? 'error' :
+				type() === NotificationType.Info    ? 'info' : 'info'
+			"
+			[attr.aria-label]="
+				type() === NotificationType.Success ? 'Success' :
+				type() === NotificationType.Error   ? 'Error' :
+				type() === NotificationType.Info    ? 'Info' : 'Info'
+			"
+		></mat-icon>
+	</div>
+	<div class="notification-label">{{message()}}</div>
+	<div class="notification-cta">
+		<button mat-icon-button (click)="snackBarRef.dismiss()">
+			<mat-icon class="material-symbols-outlined" fontIcon="close"></mat-icon>
+		</button>
+	</div>
+</div>
