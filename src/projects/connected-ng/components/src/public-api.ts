@@ -20,3 +20,7 @@ export { NotificationService } from './notification/notification-service';
 // export * from './ide/services/explorer-item-service';
 // export * from './ide/services/ide-editor-service';
 export { ComponentsConfigurationProvider as ConfigurationProvider } from './services/service-configuration-initializer';
+export * from './code-lists/code-list-list/code-list-list';
+export * from './code-lists/code-list-action-item/code-list-action-item';
+export * from './code-lists/code-list-list-item/code-list-list-item';
+export * from './code-lists/code-action';
