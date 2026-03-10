@@ -1,0 +1,12 @@
+<div class="d-flex items-center">
+  @if(icon()){
+  <mat-icon
+    class="material-symbols-outlined w-300 sm mr-1"
+    aria-hidden="true"
+  >
+    {{icon()}}
+  </mat-icon>
+  }
+  <a class="anim-underline"> {{label()}} </a>
+</div>
+<div class="text-sm text-secondary">{{description()}}</div>
