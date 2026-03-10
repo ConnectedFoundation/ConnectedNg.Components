@@ -1,0 +1,10 @@
+<div
+  class="container"
+  [style.paddingBottom.px]="actionBarHeight"
+>
+  <ng-content />
+</div>
+<cn-floating-action-bar
+  #actionBar
+  [actions]="actions()"
+></cn-floating-action-bar>
