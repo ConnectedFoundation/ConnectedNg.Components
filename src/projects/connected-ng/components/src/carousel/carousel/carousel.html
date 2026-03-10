@@ -1,0 +1,21 @@
+<div class="carousel-container">
+  <div
+    #carouselContainer
+    class="carousel-content"
+    (scroll)="onScroll($event)"
+  >
+    <ng-content />
+  </div>
+
+  @if (showIndicators()) {
+  <div class="carousel-indicators">
+    @for (index of getIndicatorArray(); track index) {
+    <div
+      class="indicator"
+      [class.active]="currentIndex() === index"
+      [attr.aria-label]="'Slide ' + (index + 1)"
+    ></div>
+    }
+  </div>
+  }
+</div>
