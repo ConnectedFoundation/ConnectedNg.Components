@@ -1,0 +1,38 @@
+<div>
+  <div
+    class="collapse"
+    [class.show]="isExpanded()"
+  >
+    <div
+      (click)="onClick()"
+      class="grid mt-2 pt-2"
+    >
+      <ng-container *ngTemplateOutlet="itemTemplate(); context: templateContext()"></ng-container>
+    </div>
+    <div class="collapsed-group">
+      <div class="collapsed-content">
+        @if(isExpanded()){
+        <ng-container
+          *ngTemplateOutlet="detailTemplate(); context: templateContext()"
+        ></ng-container>
+        }
+      </div>
+    </div>
+  </div>
+</div>
+
+<ng-template>
+  <div
+    class="grid bt-1 my-4 pt-4 px-3 text-sm"
+    style="--columns: 4"
+  >
+    <!-- @for(action of actions(); track action){
+    <cn-action-tile
+      [icon]="action.icon"
+      [label]="action.label"
+      [description]="action.description"
+      (click)="action.action(this)"
+    ></cn-action-tile>
+    } -->
+  </div>
+</ng-template>

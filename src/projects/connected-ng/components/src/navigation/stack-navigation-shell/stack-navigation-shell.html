@@ -1,0 +1,11 @@
+@for(page of this.navigationContext.stack(); track page){
+<cn-stack-page
+  [style.display]="page == this.navigationContext.activePage()? '':'none'"
+  [isRoot]="page == this.rootPage()"
+  [component]="page.component"
+  [data]="page.data"
+  [title]="page!.title"
+  [pageInfo]="page!"
+>
+</cn-stack-page>
+}

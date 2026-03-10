@@ -1,0 +1,15 @@
+<mat-list>
+  @for(item of items(); track item;){
+  <mat-list-item class="list-item-border selection-indicator-hidden">
+    @if(itemDetailTemplate()){
+    <cn-expandable-list-item
+      [itemTemplate]="itemTemplate()"
+      [item]="item"
+      [detailTemplate]="itemDetailTemplate()"
+    ></cn-expandable-list-item>
+    }@else{
+    <ng-container *ngTemplateOutlet="itemTemplate(); context: templateContext(item)"></ng-container>
+    }
+  </mat-list-item>
+  }
+</mat-list>
