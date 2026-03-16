@@ -13,7 +13,7 @@ export class NotificationService {
       data: { type: NotificationType.Success, message }
     });
   }
-  
+
   error(message: string): void {
     this.snackBar.openFromComponent(Notification, {
       data: { type: NotificationType.Error, message }
