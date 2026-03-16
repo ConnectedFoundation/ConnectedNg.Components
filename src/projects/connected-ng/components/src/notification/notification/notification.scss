@@ -18,23 +18,29 @@
     0px 3px 5px -1px rgba(0, 0, 0, 0.2),
     0px 6px 10px 0px rgba(0, 0, 0, 0.14),
     0px 1px 18px 0px rgba(0, 0, 0, 0.12);
+  background-color: var(--mat-sys-surface-container-low) !important;
+  color: var(--mat-sys-on-surface-variant) !important;
+  border-color: var(--mat-sys-outline-variant) !important;
 
   &.bg-danger {
     background-color: hsl(3 100% 90% / 1) !important;
     color: hsl(3 100% 15% / 1) !important;
     border-color: hsl(3 100% 25% / 0.5) !important;
   }
-
   &.bg-info {
     background-color: hsl(194 90% 90% / 1) !important;
     color: hsl(194 90% 15% / 1) !important;
     border-color: hsl(194 90% 25% / 0.5) !important;
   }
-
   &.bg-success {
     background-color: hsl(140 53% 90% / 1) !important;
     color: hsl(140 53% 15% / 1) !important;
     border-color: hsl(140 53% 25% / 0.5) !important;
+  }
+  &.bg-warning {
+    background-color: hsl(25 100% 90% / 1) !important;
+    color: hsl(25 100% 15% / 1) !important;
+    border-color: hsl(25 100% 25% / 0.5) !important;
   }
 }
 
