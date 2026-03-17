@@ -1,7 +1,9 @@
 import { inject, Injectable, InjectionToken } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { map, Observable, share } from 'rxjs';
 import { configurationValue, UrlService } from '@connected-ng/core';
+import { EditorItem } from './dtos/editor-item';
+import { ProjectServiceConfiguration } from './project-service';
 
 // Toolbox Item Service Configuration
 export const TOOLBOX_ITEM_SERVICE_CONFIG = new InjectionToken<ToolboxItemServiceConfiguration>('TOOLBOX_ITEM_SERVICE_CONFIG');
@@ -11,7 +13,7 @@ export class ToolboxItemServiceConfiguration {
 }
 
 // DTOs matching Connected.Ide backend
-export interface IToolboxItemQueryDto {
+export interface ToolboxItemQueryDto {
   editor?: string;
   document?: string;
   project?: string;
@@ -27,7 +29,7 @@ export class IdeToolboxItemService {
 
   private static readonly serviceUrl = 'services/ide/toolbox-items';
 
-  query(dto?: IToolboxItemQueryDto): Observable<IdeToolboxItem[]> {
+  query(dto?: ToolboxItemQueryDto): Observable<IdeToolboxItem[]> {
     let params = new HttpParams();
 
     if (dto?.editor) {
@@ -43,22 +45,26 @@ export class IdeToolboxItemService {
     return this.http.get<IdeToolboxItem[]>(
       this.urlService.generateUrl(this.configuration.baseUrl(), `${IdeToolboxItemService.serviceUrl}/query`),
       { params }
-    );
+    ).pipe(map(e => {
+      e.forEach(f => f.relatedItem = { id: dto?.document ?? '', project: dto?.project ?? '', type: '' });
+      return e
+    }), share());
   }
 }
 
 export class IdeToolboxItem {
   name: string;
   description: string;
-  key: string;
+  id: string;
+  relatedItem?: EditorItem;
 
-  constructor(name: string, description: string, key: string) {
+  constructor(name: string, description: string, id: string) {
     this.name = name;
     this.description = description;
-    this.key = key;
+    this.id = id;
   }
 
   equals(other: IdeToolboxItem): boolean {
-    return this.key === other.key;
+    return this.id === other.id;
   }
 }

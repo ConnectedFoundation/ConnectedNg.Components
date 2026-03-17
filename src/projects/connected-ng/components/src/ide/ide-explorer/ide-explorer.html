@@ -1,65 +1,67 @@
 <div class="cfExplorer">
   <div class="cfExplorerDropList cfExplorerDropListRoot">
     @for (node of rootNodes(); track trackNodeById(node)) {
-      <div
-        class="cfExplorerRow"
-        [class]="getDragOverClass(node.id)"
-        [draggable]="node.isDraggable"
-        (dragstart)="onDragStart($event, node)"
-        (dragover)="onDragOver($event, node)"
-        (dragleave)="onDragLeave($event)"
-        (drop)="onDrop($event, node)"
-        (dragend)="onDragEnd()"
-        (click)="handleClick(node, $event)"
-        (dblclick)="handleDoubleClick(node, $event)"
-        [attr.data-node-id]="node.id"
-        [attr.data-active]="activeNodeId() === node.id ? 'true' : null"
-        [attr.data-selected]="isNodeSelected(node.id) ? 'true' : null"
-        [style.paddingLeft.px]="nodeIndentationPixels() * 0"
-        [style.fontWeight]="activeNodeId() === node.id ? '700' : null"
-        [style.cursor]="getRowCursorStyleForNode(node.id, node.isDraggable)"
+    <div
+      class="cfExplorerRow"
+      [class]="getDragOverClass(node.id)"
+      [draggable]="node.isDraggable"
+      (dragstart)="onDragStart($event, node)"
+      (dragover)="onDragOver($event, node)"
+      (dragleave)="onDragLeave($event)"
+      (drop)="onDrop($event, node)"
+      (dragend)="onDragEnd()"
+      (click)="handleClick(node, $event)"
+      (dblclick)="handleDoubleClick(node, $event)"
+      [attr.data-node-id]="node.id"
+      [attr.data-active]="activeNodeId() === node.id ? 'true' : null"
+      [attr.data-selected]="isNodeSelected(node.id) ? 'true' : null"
+      [style.paddingLeft.px]="nodeIndentationPixels() * 0"
+      [style.fontWeight]="activeNodeId() === node.id ? '700' : null"
+      [style.cursor]="getRowCursorStyleForNode(node.id, node.isDraggable)"
+    >
+      @if (node.children.length > 0) {
+      <button
+        type="button"
+        class="cfExplorerExpandButton"
+        (click)="toggleNodeExpansion(node, $event)"
+        [attr.aria-expanded]="isNodeExpanded(node.id)"
+        [attr.data-expanded]="isNodeExpanded(node.id) ? 'true' : null"
+        draggable="false"
       >
-        @if (node.children.length > 0) {
-          <button
-            type="button"
-            class="cfExplorerExpandButton"
-            (click)="toggleNodeExpansion(node, $event)"
-            [attr.aria-expanded]="isNodeExpanded(node.id)"
-            [attr.data-expanded]="isNodeExpanded(node.id) ? 'true' : null"
-            draggable="false"
-          >
-            <ng-container
-              [ngTemplateOutlet]="expandControlTemplate() ?? defaultExpandControlTemplate"
-              [ngTemplateOutletContext]="{
+        <ng-container
+          [ngTemplateOutlet]="expandControlTemplate() ?? defaultExpandControlTemplate"
+          [ngTemplateOutletContext]="{
                 node: node,
                 depth: 0,
                 expanded: isNodeExpanded(node.id),
               }"
-            ></ng-container>
-          </button>
-        } @else {
-          <span class="cfExplorerExpandButtonPlaceholder"></span>
-        }
-        <ng-container
-          [ngTemplateOutlet]="resolveTemplate(node.templateKey) ?? defaultItemTemplate"
-          [ngTemplateOutletContext]="{ $implicit: node.item, node: node, depth: 0 }"
         ></ng-container>
-      </div>
-
-      @if (isNodeExpanded(node.id) && node.children.length > 0) {
-        @for (childNode of node.children; track trackNodeById(childNode)) {
-          <ng-container
-            [ngTemplateOutlet]="recursiveNodeTemplate"
-            [ngTemplateOutletContext]="{ node: childNode, depth: 1 }"
-          ></ng-container>
-        }
+      </button>
+      } @else {
+      <span class="cfExplorerExpandButtonPlaceholder"></span>
       }
-    }
+      <ng-container
+        [ngTemplateOutlet]="resolveTemplate(node.templateKey) ?? defaultItemTemplate"
+        [ngTemplateOutletContext]="{ $implicit: node.item, node: node, depth: 0 }"
+      ></ng-container>
+    </div>
+
+    @if (isNodeExpanded(node.id) && node.children.length > 0) { @for (childNode of node.children;
+    track trackNodeById(childNode)) {
+    <ng-container
+      [ngTemplateOutlet]="recursiveNodeTemplate"
+      [ngTemplateOutletContext]="{ node: childNode, depth: 1 }"
+    ></ng-container>
+    } } }
   </div>
 </div>
 
 <!-- Recursive renderer -->
-<ng-template #recursiveNodeTemplate let-node="node" let-depth="depth">
+<ng-template
+  #recursiveNodeTemplate
+  let-node="node"
+  let-depth="depth"
+>
   <div
     class="cfExplorerRow"
     [class]="getDragOverClass(node.id)"
@@ -79,25 +81,25 @@
     [style.cursor]="getRowCursorStyleForNode(node.id, node.isDraggable)"
   >
     @if (node.children.length > 0) {
-      <button
-        type="button"
-        class="cfExplorerExpandButton"
-        (click)="toggleNodeExpansion(node, $event)"
-        [attr.aria-expanded]="isNodeExpanded(node.id)"
-        [attr.data-expanded]="isNodeExpanded(node.id) ? 'true' : null"
-        draggable="false"
-      >
-        <ng-container
-          [ngTemplateOutlet]="expandControlTemplate() ?? defaultExpandControlTemplate"
-          [ngTemplateOutletContext]="{
+    <button
+      type="button"
+      class="cfExplorerExpandButton"
+      (click)="toggleNodeExpansion(node, $event)"
+      [attr.aria-expanded]="isNodeExpanded(node.id)"
+      [attr.data-expanded]="isNodeExpanded(node.id) ? 'true' : null"
+      draggable="false"
+    >
+      <ng-container
+        [ngTemplateOutlet]="expandControlTemplate() ?? defaultExpandControlTemplate"
+        [ngTemplateOutletContext]="{
             node: node,
             depth: depth,
             expanded: isNodeExpanded(node.id),
           }"
-        ></ng-container>
-      </button>
+      ></ng-container>
+    </button>
     } @else {
-      <span class="cfExplorerExpandButtonPlaceholder"></span>
+    <span class="cfExplorerExpandButtonPlaceholder"></span>
     }
     <ng-container
       [ngTemplateOutlet]="resolveTemplate(node.templateKey) ?? defaultItemTemplate"
@@ -105,20 +107,26 @@
     ></ng-container>
   </div>
 
-  @if (isNodeExpanded(node.id) && node.children.length > 0) {
-    @for (childNode of node.children; track trackNodeById(childNode)) {
-      <ng-container
-        [ngTemplateOutlet]="recursiveNodeTemplate"
-        [ngTemplateOutletContext]="{ node: childNode, depth: depth + 1 }"
-      ></ng-container>
-    }
-  }
+  @if (isNodeExpanded(node.id) && node.children.length > 0) { @for (childNode of node.children;
+  track trackNodeById(childNode)) {
+  <ng-container
+    [ngTemplateOutlet]="recursiveNodeTemplate"
+    [ngTemplateOutletContext]="{ node: childNode, depth: depth + 1 }"
+  ></ng-container>
+  } }
 </ng-template>
 
-<ng-template #defaultItemTemplate let-item let-node="node">
-  <span class="cfExplorerDefaultLabel">{{ node.id }}</span>
+<ng-template
+  #defaultItemTemplate
+  let-item
+  let-node="node"
+>
+  <span class="cfExplorerDefaultLabel">{{ node.item.name }}</span>
 </ng-template>
 
-<ng-template #defaultExpandControlTemplate let-expanded="expanded">
+<ng-template
+  #defaultExpandControlTemplate
+  let-expanded="expanded"
+>
   <span class="cfExplorerDefaultExpandControl">{{ expanded ? '▾' : '▸' }}</span>
 </ng-template>

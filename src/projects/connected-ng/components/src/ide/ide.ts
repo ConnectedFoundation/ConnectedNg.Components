@@ -20,5 +20,5 @@ import { IdeDocumentEditor } from "./ide-document-editor/ide-document-editor";
 })
 export class Ide {
   layoutService = inject(IdeLayoutService);
-  session = input.required<string>();
+  context = input<string>();
 }

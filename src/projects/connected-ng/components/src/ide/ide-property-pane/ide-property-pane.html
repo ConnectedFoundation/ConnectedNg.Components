@@ -1,0 +1,88 @@
+<div class="ide-property-pane">
+  <!-- No Selection State -->
+  @if (!hasSelectedItem()) {
+  <div class="empty-state">
+    <mat-icon>properties</mat-icon>
+    <p>Select an item to view its properties</p>
+  </div>
+  }
+
+  <!-- Loading State -->
+  @if (isLoading()) {
+  <div class="loading-state">
+    <mat-icon class="spinner">schedule</mat-icon>
+    <p>Loading properties...</p>
+  </div>
+  }
+
+  <!-- Error State -->
+  @if (errorMessage()) {
+  <div class="error-state">
+    <mat-icon>error</mat-icon>
+    <p>{{ errorMessage() }}</p>
+  </div>
+  }
+
+  <!-- Properties Grid -->
+  @if (hasSelectedItem() && hasProperties() && !isLoading()) {
+  <div class="properties-container">
+    @for (property of properties(); track trackByPropertyName($index, property)) {
+    <div
+      class="property-row"
+      [class.read-only]="property.isReadOnly"
+    >
+      <div class="property-label">
+        <label [title]="property.propertyType">{{ property.name }}</label>
+      </div>
+      <div class="property-input">
+        @switch (getPropertyEditor(property)) { @case ('text') {
+        <mat-form-field
+          appearance="outline"
+          subscriptSizing="dynamic"
+        >
+          <input
+            matInput
+            type="text"
+            [formControl]="getPropertyControl(property.name)"
+            placeholder="Enter value"
+          />
+        </mat-form-field>
+        } @case ('number') {
+        <mat-form-field
+          appearance="outline"
+          subscriptSizing="dynamic"
+        >
+          <input
+            matInput
+            type="number"
+            [formControl]="getPropertyControl(property.name)"
+            placeholder="Enter number"
+          />
+        </mat-form-field>
+        } @case ('checkbox') {
+        <mat-checkbox [formControl]="getPropertyControl(property.name)"> </mat-checkbox>
+        } @case ('dropdown') {
+        <mat-form-field
+          appearance="outline"
+          subscriptSizing="dynamic"
+        >
+          <mat-select [formControl]="getPropertyControl(property.name)">
+            <mat-option value="">-- Select --</mat-option>
+            <!-- Options would need to be provided via metadata -->
+          </mat-select>
+        </mat-form-field>
+        } }
+      </div>
+    </div>
+    }
+  </div>
+  }
+
+  <!-- No Properties State -->
+  @if (hasSelectedItem() && !hasProperties() && !isLoading()) {
+  <div class="empty-state">
+    <mat-icon>folder_open</mat-icon>
+    <p>No properties available for this item</p>
+  </div>
+  }
+</div>

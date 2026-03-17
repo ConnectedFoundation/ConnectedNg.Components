@@ -14,9 +14,10 @@ import {
   untracked,
 } from '@angular/core';
 import { NgTemplateOutlet } from '@angular/common';
+import { Subscription } from 'rxjs';
 import { IdeExplorerTemplateDirective } from './ide-explorer-template';
 import { IdeExplorerItemService, IExplorerItem } from '../services/explorer-item-service';
-import { SelectionService, ISelectDto } from '../services/selection-service';
+import { SelectionService, SelectedItem } from '../services/selection-service';
 
 export type ExplorerId = string;
 
@@ -64,7 +65,6 @@ export interface IdeExplorerSelectionItem<TItem = IExplorerItem> {
 })
 export class IdeExplorer<TItem extends IExplorerItem = IExplorerItem> implements OnInit, OnDestroy {
   // ---------------- Inputs ----------------
-  session = input.required<string>();
   context = input.required<string>();
 
   /**
@@ -116,7 +116,7 @@ export class IdeExplorer<TItem extends IExplorerItem = IExplorerItem> implements
 
     return map;
   });
-
+  stringify(data: any) { return JSON.stringify(data) }
   resolveTemplate(templateKey: string): TemplateRef<any> | undefined {
     return this.templateMap().get(templateKey);
   }
@@ -136,16 +136,38 @@ export class IdeExplorer<TItem extends IExplorerItem = IExplorerItem> implements
   private dropPosition = signal<'before' | 'after' | 'inside' | null>(null);
   private isCurrentDropValid = signal<boolean>(false);
   private autoExpandTimeoutHandle: number | null = null;
+  private subscriptions = new Subscription();
 
   ngOnInit() {
     this.loadExplorerItems();
+
+    // Listen to selection service and select matching items
+    if (this.selectionService.$selected) {
+      this.subscriptions.add(
+        this.selectionService.$selected.subscribe(selected => {
+          if (!selected?.id) return;
+
+          // Only respond to selections from other editors
+          if (selected.currentEditor === 'IdeExplorer') return;
+
+          // Find the node with matching ID
+          const node = this.findNodeById(this.rootNodes(), selected.id);
+          if (node) {
+            // Set as active node
+            this.activeNodeId.set(node.id);
+            this.activeItemChanged.emit({ id: node.id, item: node.item });
+          }
+        })
+      );
+    }
   }
 
   ngOnDestroy() {
+    this.subscriptions.unsubscribe();
     this.clearAutoExpandTimeout();
   }
 
-  private loadExplorerItems() {
+  loadExplorerItems() {
     this.explorerItemService.query({
       context: this.context()
     }).subscribe(items => {
@@ -211,15 +233,14 @@ export class IdeExplorer<TItem extends IExplorerItem = IExplorerItem> implements
         return;
       }
 
-      const selectDto: ISelectDto = {
-        session: this.session(),
-        project: activeNode.item.project,
-        item: activeNode.item.id,
+      const selectDto: SelectedItem = {
+        id: activeNode.item.id,
         currentEditor: 'IdeExplorer',
-        type: activeNode.item.type
+        type: activeNode.item.type,
+        context: this.context()
       };
 
-      this.selectionService.select(selectDto).subscribe();
+      this.selectionService.select(selectDto);
     });
   }
 

@@ -1,8 +1,8 @@
 import { inject, Injectable, InjectionToken } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, ReplaySubject, Subject } from 'rxjs';
 import { map, share, tap } from 'rxjs/operators';
-import { configurationValue, UrlService, EventService, EventKey } from '@connected-ng/core';
+import { configurationValue, UrlService, EventService, EventKey, queryParamsMapper } from '@connected-ng/core';
 
 // Document Service Configuration
 export const DOCUMENT_SERVICE_CONFIG = new InjectionToken<DocumentServiceConfiguration>('DOCUMENT_SERVICE_CONFIG');
@@ -13,19 +13,16 @@ export class DocumentServiceConfiguration {
 
 // DTOs matching Connected.Ide backend
 export interface IDocumentQueryDto {
-  project?: string;
   documentType?: string;
 }
 
-export interface IActivateDocumentDto {
-  project: string;
-  document: string;
+export interface ISelectDocumentDto {
+  id: string;
+  context?: string;
 }
 
 export interface ICloseDocumentDto {
-  session: string;
-  project: string;
-  document: string;
+  id: string;
 }
 
 @Injectable({
@@ -35,66 +32,31 @@ export class IdeDocumentService {
   private http = inject(HttpClient);
   private urlService = inject(UrlService);
   private configuration = inject(DOCUMENT_SERVICE_CONFIG);
-  private events = inject(EventService);
 
   private static readonly serviceUrl = 'services/ide/documents';
 
   // Backend event observables (SignalR events from backend)
-  $activated?: Observable<IdeDocument>;
-  $deactivated?: Observable<IdeDocument>;
-
-  private _activeDocument?: IdeDocument;
-
-  constructor() {
-    // Hook up backend events
-    this.$activated = this.events.on<any>(`${IdeDocumentService.serviceUrl}/activated` as EventKey).pipe(map(e => { return { id: e.document, project: e.project, name: e.name, type: e.type, session: e.session } as IdeDocument }), share());
-    this.$deactivated = this.events.on<any>(`${IdeDocumentService.serviceUrl}/deactivated` as EventKey).pipe(map(e => { return { id: e.document, project: e.project, name: e.name, type: e.type, session: e.session } as IdeDocument }), share());
-  }
-
-  get activeDocument(): IdeDocument | undefined {
-    return this._activeDocument;
-  }
+  activatedSubject = new ReplaySubject<IdeDocument>();
+  deactivatedSubject = new Subject<IdeDocument>();
+  $activated?: Observable<IdeDocument> = this.activatedSubject.asObservable();
+  $deactivated?: Observable<IdeDocument> = this.deactivatedSubject.asObservable();
 
   query(dto?: IDocumentQueryDto): Observable<IdeDocument[]> {
-    let params = new HttpParams();
-
-    if (dto?.project) {
-      params = params.append('project', dto.project);
-    }
-    if (dto?.documentType) {
-      params = params.append('documentType', dto.documentType);
-    }
-
     return this.http.get<IdeDocument[]>(
       this.urlService.generateUrl(this.configuration.baseUrl(), `${IdeDocumentService.serviceUrl}/query`),
-      { params }
+      { params: queryParamsMapper(dto) }
     );
   }
 
-  activate(dto: IActivateDocumentDto): Observable<void> {
-    return this.http.post<void>(
-      this.urlService.generateUrl(this.configuration.baseUrl(), `${IdeDocumentService.serviceUrl}/activate`),
-      dto
+  select(dto: ISelectDocumentDto) {
+    return this.http.get<IdeDocument | undefined>(
+      this.urlService.generateUrl(this.configuration.baseUrl(), `${IdeDocumentService.serviceUrl}/select`),
+      { params: queryParamsMapper(dto) }
     );
   }
 
-  close(dto: ICloseDocumentDto): Observable<void> {
-    return this.http.post<void>(
-      this.urlService.generateUrl(this.configuration.baseUrl(), `${IdeDocumentService.serviceUrl}/close`),
-      dto
-    );
-  }
-
-  selectActive(): Observable<IdeDocument | null> {
-    return this.http.get<IdeDocument | null>(
-      this.urlService.generateUrl(this.configuration.baseUrl(), `${IdeDocumentService.serviceUrl}/active`)
-    ).pipe(
-      tap(document => {
-        if (document) {
-          this._activeDocument = document;
-        }
-      })
-    );
+  close(dto: IdeDocument): void {
+    this.deactivatedSubject.next(dto);
   }
 }
 

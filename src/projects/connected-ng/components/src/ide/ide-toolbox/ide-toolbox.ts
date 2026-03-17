@@ -6,14 +6,8 @@ import { MatInputModule } from '@angular/material/input';
 import { MatIconModule } from '@angular/material/icon';
 import { Subscription } from 'rxjs';
 import { IdeDocument, IdeDocumentService } from '../services/document-service';
-import { IdeToolboxItemService, IdeToolboxItem as ServiceToolboxItem } from '../services/toolbox-item-service';
-
-export interface IdeToolboxItem {
-  id: string;
-  title: string;
-  icon?: string;
-  data?: any;
-}
+import { IdeToolboxItemService, IdeToolboxItem } from '../services/toolbox-item-service';
+import { SelectedItem, SelectionService } from '../services/selection-service';
 
 @Component({
   selector: 'cf-ide-toolbox',
@@ -28,9 +22,6 @@ export interface IdeToolboxItem {
   styleUrl: './ide-toolbox.scss',
 })
 export class IdeToolbox<T extends IdeToolboxItem = IdeToolboxItem> implements OnInit, OnDestroy {
-  // If items input is provided, use those (presentational mode)
-  // If items input is not provided, query from service (standalone mode)
-  items = input<T[]>();
   searchPlaceholder = input<string>('Search...');
   itemTemplate = input<TemplateRef<{ $implicit: T }>>();
   filterFn = input<(item: T, searchText: string) => boolean>();
@@ -39,8 +30,8 @@ export class IdeToolbox<T extends IdeToolboxItem = IdeToolboxItem> implements On
   itemSelected = output<T>();
   noItemsAvailable = output<void>();
 
-  private documentService = inject(IdeDocumentService, { optional: true });
-  private toolboxItemService = inject(IdeToolboxItemService, { optional: true });
+  private toolboxItemService = inject(IdeToolboxItemService);
+  private selectionService = inject(SelectionService);
   private subscriptions = new Subscription();
 
   private internalItems = signal<T[]>([]);
@@ -48,10 +39,6 @@ export class IdeToolbox<T extends IdeToolboxItem = IdeToolboxItem> implements On
 
   // Use provided items input or internal items loaded from service
   private effectiveItems = computed(() => {
-    const providedItems = this.items();
-    if (providedItems !== undefined) {
-      return providedItems;
-    }
     return this.internalItems();
   });
 
@@ -73,7 +60,7 @@ export class IdeToolbox<T extends IdeToolboxItem = IdeToolboxItem> implements On
         filtered = items.filter(item => customFilter(item, search));
       } else {
         filtered = items.filter(item =>
-          item.title.toLowerCase().includes(search)
+          item.name.toLowerCase().includes(search)
         );
       }
     }
@@ -84,21 +71,11 @@ export class IdeToolbox<T extends IdeToolboxItem = IdeToolboxItem> implements On
       return [...filtered].sort(customSort);
     }
 
-    return [...filtered].sort((a, b) => a.title.localeCompare(b.title));
+    return [...filtered].sort((a, b) => a.name.localeCompare(b.name));
   });
 
-  constructor() {
-    // Track hasItems changes and notify state service
-    effect(() => {
-      const hasItems = this.hasItems();
-    });
-  }
-
   ngOnInit() {
-    // Only set up standalone mode if items input is not provided
-    if (this.items() === undefined) {
-      this.initializeStandaloneMode();
-    }
+    this.initializeStandaloneMode();
   }
 
   ngOnDestroy() {
@@ -107,22 +84,17 @@ export class IdeToolbox<T extends IdeToolboxItem = IdeToolboxItem> implements On
 
   private initializeStandaloneMode() {
     // Subscribe to document activation events
-    if (this.documentService?.$activated) {
+    if (this.selectionService?.$selected) {
       this.subscriptions.add(
-        this.documentService.$activated.subscribe(document => {
+        this.selectionService.$selected.subscribe(document => {
           this.loadToolboxItems(document);
         })
       );
     }
-
-    // Load items for current active document if available
-    const activeDoc = this.documentService?.activeDocument;
-    if (activeDoc) {
-      this.loadToolboxItems(activeDoc);
-    }
   }
+
   //TODO map appropriate type to subject
-  private loadToolboxItems(document: any) {
+  private loadToolboxItems(document: SelectedItem) {
     if (!this.toolboxItemService) {
       return;
     }
@@ -130,14 +102,14 @@ export class IdeToolbox<T extends IdeToolboxItem = IdeToolboxItem> implements On
     this.toolboxItemService.query({
       document: document.id,
       project: document.project,
-      editor: '' //TODO wire up editor from IdeEditor
+      editor: 'Toolbox'
     }).subscribe(serviceItems => {
       // Convert service items to toolbox items
       const toolboxItems = serviceItems.map(item => ({
-        id: item.key,
-        title: item.name,
-        icon: undefined,
-        data: item
+        id: item.id,
+        description: item.description,
+        name: item.name,
+        relatedItem: document
       } as T));
 
       this.internalItems.set(toolboxItems);

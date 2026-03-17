@@ -20,7 +20,7 @@
           direction="vertical"
         >
           <as-split-area [size]="'*'">
-            <cf-ide-document-editor [session]="session()"></cf-ide-document-editor>
+            <cf-ide-document-editor [context]="context()"></cf-ide-document-editor>
           </as-split-area>
           @if (layoutService.bottomPane().hasPortal() && layoutService.bottomPane().visible()) {
           <as-split-area [size]="15">

@@ -5,10 +5,10 @@
     mat-align-tabs="start"
     [tabPanel]="tabPanel"
   >
-    @for (document of activeDocuments(); track document) {
+    @for (document of activeEditorInstances(); track document) {
     <a
       mat-tab-link
-      (click)="selectDocument(document)"
+      (click)="onTabClick(document)"
       [active]="isDocumentSelected(document)"
     >
       <span>{{ document.name }}</span>
