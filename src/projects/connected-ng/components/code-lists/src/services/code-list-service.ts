@@ -3,6 +3,7 @@ import { EmptyPage, StackPageInfo } from '@connected-ng/components';
 
 export interface CodeListStackPageInfo extends StackPageInfo<undefined> {
   title: string;
+  icon?: string;
 }
 
 @Injectable({

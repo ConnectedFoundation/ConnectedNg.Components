@@ -52,7 +52,12 @@ export class CodeListSelectBox<T = any> implements ControlValueAccessor, Validat
 
   addedItems = signal<T[]>([]);
   allItems = computed(() => [...this.items(), ...this.addedItems()]);
-  selectedItem = signal<T | null>(null);
+  private _value = signal<any>(undefined);
+  selectedItem = computed<T | null>(() => {
+    let item = this._value() != null ? (this.allItems().find(i => this.keySelector()(i) == this._value()) ?? null) : null
+    return item;
+  }
+  );
   isDisabled = signal(false);
 
   searchFn = (term: string, item: T): boolean =>
@@ -65,9 +70,7 @@ export class CodeListSelectBox<T = any> implements ControlValueAccessor, Validat
   private _onTouched: () => void = () => { };
 
   writeValue(value: any): void {
-    this.selectedItem.set(
-      value != null ? (this.allItems().find(i => this.keySelector()(i) === value) ?? null) : null
-    );
+    this._value.set(value ?? null);
   }
 
   registerOnChange(fn: any): void { this._onChange = fn; }
@@ -79,7 +82,7 @@ export class CodeListSelectBox<T = any> implements ControlValueAccessor, Validat
   }
 
   onSelectionChange(item: T | null): void {
-    this.selectedItem.set(item ?? null);
+    this._value.set(item != null ? this.keySelector()(item) : null);
     this._onChange(item != null ? this.keySelector()(item) : null);
     this._onTouched();
   }

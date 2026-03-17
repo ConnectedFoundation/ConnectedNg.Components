@@ -1,6 +1,6 @@
 <div #parent>
   @for(parent of navigationContext.stack(); track parent){ @if(parent !=
-  navigationContext.activePage() && parent.headerComponent){ Hello
+  navigationContext.activePage() && parent.headerComponent){
   <ng-container *ngComponentOutlet="parent.headerComponent; injector: injector"></ng-container>
   } }
 </div>
