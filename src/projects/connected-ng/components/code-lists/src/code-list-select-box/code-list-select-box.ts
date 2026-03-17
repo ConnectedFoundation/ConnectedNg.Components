@@ -1,27 +1,24 @@
-import { Component, input, signal, computed, effect, Type, ViewContainerRef, viewChild, forwardRef, inject, TemplateRef, output, model, ElementRef, OnDestroy, ChangeDetectorRef } from '@angular/core';
-import { ControlValueAccessor, NG_VALUE_ACCESSOR, NG_VALIDATORS, Validator, AbstractControl, ValidationErrors, FormControl, ReactiveFormsModule } from '@angular/forms';
-import { MatAutocompleteModule, MatAutocompleteSelectedEvent, MatAutocomplete } from '@angular/material/autocomplete';
-import { MatInputModule } from '@angular/material/input';
+import { Component, input, signal, computed, Type, ViewContainerRef, viewChild, forwardRef, inject, TemplateRef } from '@angular/core';
+import { ControlValueAccessor, NG_VALUE_ACCESSOR, NG_VALIDATORS, Validator, AbstractControl, ValidationErrors } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog, MatDialogModule, MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { CommonModule } from '@angular/common';
+import { MtxSelectModule } from '@ng-matero/extensions/select';
 import { FormBase, FormResult } from '@connected-ng/components/forms';
-import { firstValueFrom, Subject, takeUntil } from 'rxjs';
+import { firstValueFrom } from 'rxjs';
 
 @Component({
   selector: 'cn-code-list-select-box',
   standalone: true,
   imports: [
     CommonModule,
-    ReactiveFormsModule,
-    MatAutocompleteModule,
-    MatInputModule,
     MatFormFieldModule,
     MatIconModule,
     MatButtonModule,
-    MatDialogModule
+    MatDialogModule,
+    MtxSelectModule
   ],
   templateUrl: './code-list-select-box.html',
   styleUrl: './code-list-select-box.scss',
@@ -38,264 +35,76 @@ import { firstValueFrom, Subject, takeUntil } from 'rxjs';
     }
   ]
 })
-export class CodeListSelectBox<T = any> implements ControlValueAccessor, Validator, OnDestroy {
-  // Services
+export class CodeListSelectBox<T = any> implements ControlValueAccessor, Validator {
   private dialog = inject(MatDialog);
-  private cdr = inject(ChangeDetectorRef);
 
-  // Inputs
   items = input.required<T[]>();
-  addedItems = signal<T[]>([]);
   keySelector = input.required<(item: T) => any>();
   displayMemberSelector = input<(item: T) => string>((item: T) => String(item));
   placeholder = input<string>('Select an item');
   label = input<string>('');
   required = input<boolean>(false);
-  disabled = input<boolean>(false);
-  showSelectionAsPlaceholder = input<boolean>(true);
   insertFormComponent = input<Type<FormBase<unknown>>>();
-  insertFormResultMapper = input<((result: FormResult) => Promise<T | undefined>)>();
+  insertFormResultMapper = input<(result: FormResult) => Promise<T | undefined>>();
   insertFormInputs = input<any>({});
   insertFormTitle = input<string>('Add New Item');
   itemTemplate = input<TemplateRef<any>>();
 
-  // Two-way binding support
-  model = model<any>(null);
+  addedItems = signal<T[]>([]);
+  allItems = computed(() => [...this.items(), ...this.addedItems()]);
+  selectedItem = signal<T | null>(null);
+  isDisabled = signal(false);
 
-  // ViewChild for autocomplete panel
-  autocomplete = viewChild<MatAutocomplete>('auto');
+  searchFn = (term: string, item: T): boolean =>
+    this.displayMemberSelector()(item).toLowerCase().includes(term.toLowerCase());
 
-  // Form control for the input
-  searchControl = new FormControl<string>('');
+  compareWithFn = (a: T, b: T): boolean =>
+    a != null && b != null && this.keySelector()(a) === this.keySelector()(b);
 
-  // State
-  selectedValue = signal<T | null>(null);
-  filterText = signal<string>('');
-  touched = signal<boolean>(false);
-  private destroy$ = new Subject<void>();
-
-  // Filtered options based on filter text
-  filteredOptions = computed(() => {
-    const items = [...this.items(), ...this.addedItems()];
-    const filter = this.filterText().toLowerCase();
-
-    if (!filter) {
-      return items;
-    }
-
-    const display = this.displayMemberSelector();
-    return items.filter(item =>
-      display(item).toLowerCase().includes(filter)
-    );
-  });
-
-  // Computed placeholder that shows selected value when showSelectionAsPlaceholder is true
-  computedPlaceholder = computed(() => {
-    if (this.showSelectionAsPlaceholder()) {
-      const selected = this.selectedValue();
-      if (selected) {
-        return this.displayMemberSelector()(selected);
-      }
-    }
-    return this.placeholder();
-  });
-
-  // ControlValueAccessor callbacks
   private _onChange: (value: any) => void = () => { };
   private _onTouched: () => void = () => { };
 
-  constructor() {
-    // Subscribe to search control value changes for filtering
-    this.searchControl.valueChanges
-      .pipe(takeUntil(this.destroy$))
-      .subscribe(value => {
-        this.filterText.set(value || '');
-      });
-
-    // Sync model input with internal state
-    effect(() => {
-      const modelValue = this.model();
-      if (modelValue !== null && modelValue !== undefined) {
-        const keySelector = this.keySelector();
-        const item = this.items().find(item => keySelector(item) === modelValue);
-
-        if (item && item !== this.selectedValue()) {
-          this.selectedValue.set(item);
-          this._updateDisplayValue();
-        }
-      } else if ((modelValue === null || modelValue === undefined) && this.selectedValue() !== null) {
-        this.selectedValue.set(null);
-        this.searchControl.setValue('', { emitEvent: false });
-      }
-    });
-
-    // Handle disabled state
-    effect(() => {
-      if (this.disabled()) {
-        this.searchControl.disable({ emitEvent: false });
-      } else {
-        this.searchControl.enable({ emitEvent: false });
-      }
-    });
-  }
-
-  ngOnDestroy(): void {
-    this.destroy$.next();
-    this.destroy$.complete();
-  }
-
-  // ControlValueAccessor implementation
   writeValue(value: any): void {
-    if (value === null || value === undefined) {
-      this.selectedValue.set(null);
-      this.searchControl.setValue('', { emitEvent: false });
-      return;
-    }
-
-    const keySelector = this.keySelector();
-    const item = this.items().find(item => keySelector(item) === value);
-
-    if (item) {
-      this.selectedValue.set(item);
-      this._updateDisplayValue();
-    }
+    this.selectedItem.set(
+      value != null ? (this.allItems().find(i => this.keySelector()(i) === value) ?? null) : null
+    );
   }
 
-  registerOnChange(fn: any): void {
-    this._onChange = fn;
-  }
+  registerOnChange(fn: any): void { this._onChange = fn; }
+  registerOnTouched(fn: any): void { this._onTouched = fn; }
+  setDisabledState(isDisabled: boolean): void { this.isDisabled.set(isDisabled); }
 
-  registerOnTouched(fn: any): void {
-    this._onTouched = fn;
-  }
-
-  setDisabledState(isDisabled: boolean): void {
-    // Handled via effect in constructor
-  }
-
-  // Validator implementation
   validate(control: AbstractControl): ValidationErrors | null {
-    if (this.required() && !this.selectedValue()) {
-      return { required: true };
-    }
-    return null;
+    return this.required() && this.selectedItem() == null ? { required: true } : null;
   }
 
-  // Event handlers
-  onOptionSelected(event: MatAutocompleteSelectedEvent): void {
-    const item = event.option.value as T;
-    const key = this.keySelector()(item);
-    const displayValue = this.displayMemberSelector()(item);
-
-    // IMMEDIATELY show the new value in the input to prevent any visual blink
-    // This hides the placeholder temporarily
-    this.searchControl.setValue(displayValue, { emitEvent: false });
-
-    // Now update signals
-    this.selectedValue.set(item);
-    this.filterText.set('');
-
-    // Force change detection so placeholder updates with new value
-    this.cdr.detectChanges();
-
-    // Finally, move to placeholder mode if needed (now placeholder shows correct value)
-    if (this.showSelectionAsPlaceholder()) {
-      this.searchControl.setValue('', { emitEvent: false });
-    }
-
-    // Trigger model change and form callbacks
-    this._onChange(key);
-    this.model.set(key);
-    this._markAsTouched();
+  onSelectionChange(item: T | null): void {
+    this.selectedItem.set(item ?? null);
+    this._onChange(item != null ? this.keySelector()(item) : null);
+    this._onTouched();
   }
 
-  onFocus(): void {
-    // Clear search to show all options
-    this.searchControl.setValue('', { emitEvent: true });
+  onTouched(): void {
+    this._onTouched();
   }
 
-  onBlur(): void {
-    // Don't update display if autocomplete panel is still open
-    // (user is in the process of selecting an option)
-    const auto = this.autocomplete();
-    if (auto?.isOpen) {
-      return;
-    }
-    this._markAsTouched();
-    this._updateDisplayValue();
-  }
-
-  private _updateDisplayValue(): void {
-    const selected = this.selectedValue();
-
-    // If showSelectionAsPlaceholder is enabled, keep input empty and show selection in placeholder
-    if (this.showSelectionAsPlaceholder()) {
-      this.searchControl.setValue('', { emitEvent: false });
-      return;
-    }
-
-    // Otherwise, show the display value in the input field
-    if (selected) {
-      const displayValue = this.displayMemberSelector()(selected);
-      this.searchControl.setValue(displayValue, { emitEvent: false });
-    } else {
-      this.searchControl.setValue('', { emitEvent: false });
-    }
-  }
-
-  private _markAsTouched(): void {
-    if (!this.touched()) {
-      this.touched.set(true);
-      this._onTouched();
-    }
-  }
-
-  // Insert form dialog
   async openInsertDialog(): Promise<void> {
-    if (this.disabled()) {
-      return;
-    }
-
     const formComponent = this.insertFormComponent();
-    if (!formComponent) {
-      console.warn('No insert form component provided');
-      return;
+    if (!formComponent || this.isDisabled()) return;
+
+    const result = await firstValueFrom(
+      this.dialog.open(InsertFormDialogWrapper, {
+        width: 'fit-content',
+        data: { formComponent, formInputs: this.insertFormInputs(), title: this.insertFormTitle() }
+      }).afterClosed()
+    );
+
+    if (result?.success) {
+      const newItem = await this.insertFormResultMapper()!(result as FormResult);
+      if (newItem == null) return;
+      this.addedItems.update(items => [...items, newItem]);
+      this.onSelectionChange(newItem);
     }
-
-    const dialogRef = this.dialog.open(InsertFormDialogWrapper, {
-      width: 'fit-content',
-      data: {
-        formComponent,
-        formInputs: this.insertFormInputs(),
-        title: this.insertFormTitle()
-      }
-    });
-
-    const result = await firstValueFrom(dialogRef.afterClosed());
-
-    if (result.success) {
-      const newItem = (await this.insertFormResultMapper()!(result as FormResult)) ?? undefined;
-
-      if (newItem === undefined)
-        return;
-
-      this.addedItems.update((items) => {
-        items.push(newItem!);
-        return items;
-      });
-
-      setTimeout(() => {
-        const mockEvent = {
-          option: { value: newItem }
-        } as MatAutocompleteSelectedEvent;
-        this.onOptionSelected(mockEvent);
-      }, 100);
-    }
-  }
-
-  // Template helper
-  trackByKey(index: number, item: T): any {
-    return this.keySelector()(item);
   }
 }
 

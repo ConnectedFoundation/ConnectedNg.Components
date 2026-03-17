@@ -1,47 +1,49 @@
-<mat-form-field
-  class="code-list-select-box"
-  [class.disabled]="disabled()"
->
+<mat-form-field class="code-list-select-box">
   @if (label()) {
   <mat-label>{{ label() }}</mat-label>
   }
 
-  <input
-    matInput
-    type="text"
-    [placeholder]="computedPlaceholder()"
-    [formControl]="searchControl"
-    (focus)="onFocus()"
-    (blur)="onBlur()"
-    [matAutocomplete]="auto"
+  <mtx-select
+    [items]="allItems()"
+    [value]="selectedItem()"
+    [placeholder]="placeholder()"
+    [disabled]="isDisabled()"
     [required]="required()"
-  />
-
-  @if (insertFormComponent()) {
-  <mat-icon
-    matIconSuffix
-    (click)="openInsertDialog()"
-    [class.disabled]="disabled()"
-    class="add-icon"
+    [searchFn]="searchFn"
+    [compareWith]="compareWithFn"
+    [clearable]="!required()"
+    (change)="onSelectionChange($event)"
+    (blur)="onTouched()"
   >
-    add
-  </mat-icon>
-  }
-
-  <mat-autocomplete
-    #auto="matAutocomplete"
-    (optionSelected)="onOptionSelected($event)"
-  >
-    @for (item of filteredOptions(); track trackByKey($index, item)) {
-    <mat-option [value]="item">
+    <ng-template
+      ng-label-tmp
+      let-item="item"
+    >
       @if (itemTemplate()) {
       <ng-container
         *ngTemplateOutlet="itemTemplate()!; context: { $implicit: item }"
       ></ng-container>
       } @else { {{ displayMemberSelector()(item) }} }
-    </mat-option>
-    } @if (filteredOptions().length === 0) {
-    <mat-option disabled> No items found </mat-option>
-    }
-  </mat-autocomplete>
+    </ng-template>
+
+    <ng-template
+      ng-option-tmp
+      let-item="item"
+    >
+      @if (itemTemplate()) {
+      <ng-container
+        *ngTemplateOutlet="itemTemplate()!; context: { $implicit: item }"
+      ></ng-container>
+      } @else { {{ displayMemberSelector()(item) }} }
+    </ng-template>
+  </mtx-select>
+
+  @if (insertFormComponent()) {
+  <mat-icon
+    matIconSuffix
+    (click)="openInsertDialog()"
+    class="add-icon"
+    >add</mat-icon
+  >
+  }
 </mat-form-field>

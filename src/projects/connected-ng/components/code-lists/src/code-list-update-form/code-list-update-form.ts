@@ -69,8 +69,9 @@ export class CodeListUpdateForm<TDto extends object> extends FormBase<TDto> {
         container.clear();
         metadata.fields.forEach(field => {
           const componentRef = container.createComponent(field.component);
-          componentRef.setInput('fieldConfig', field.inputs.fieldConfig);
-          componentRef.setInput('control', field.inputs.control);
+          Object.entries(field.inputs).forEach(([key, value]) => {
+            componentRef.setInput(key, value);
+          });
         });
       }
     });
