@@ -1,7 +1,5 @@
 export { ConfirmDialog } from './dialogs/confirm-dialog/confirm-dialog';
 export { DialogService } from './dialogs/dialog-service';
-export { Notification, NotificationType } from './notification/notification/notification';
-export { NotificationService } from './notification/notification-service';
 export * from './ide/services/editor-property-service';
 export { ComponentsConfigurationProvider as ConfigurationProvider } from './services/service-configuration-initializer';
 export * from './navigation/stack-page/stack-page';
