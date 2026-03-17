@@ -14,5 +14,3 @@ export * from './lists/list/list';
 export * from './lists/expandable-list-item/expandable-list-item';
 export * from './action-tile/action-tile';
 export * from './action-bar-component/action-bar-component';
-export * from './busy-service/busy-indicator-structural-directive';
-export * from './busy-service/busy-service';
