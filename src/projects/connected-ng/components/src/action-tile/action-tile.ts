@@ -1,5 +1,8 @@
-import { Component, input } from '@angular/core';
+import { Component, computed, input } from '@angular/core';
 import { MatIcon } from '@angular/material/icon';
+
+export type ItemAction = (item: any) => void;
+export type UrlParameter = string | ((item: any) => string);
 
 export interface ActionDescription {
   icon?: string;
@@ -8,7 +11,8 @@ export interface ActionDescription {
 }
 
 export interface ActionDescriptionWithAction extends ActionDescription {
-  action: () => void;
+  action?: () => void;
+  url?: UrlParameter;
 }
 
 @Component({
@@ -22,4 +26,13 @@ export class ActionTile {
 
   label = input.required<string>();
   description = input<string | undefined>('');
+  url = input<UrlParameter | undefined>();
+
+  urlString = computed(() => {
+    const urlValue = this.url();
+    if (typeof urlValue === 'function') {
+      return urlValue({});
+    }
+    return urlValue;
+  });
 }

@@ -7,6 +7,9 @@
   "compileOnSave": false,
   "compilerOptions": {
     "paths": {
+      "@connected-ng/components/*": [
+        "./dist/connected-ng/components/*"
+      ],
       "@connected-ng/components": [
         "./dist/connected-ng/components"
       ],

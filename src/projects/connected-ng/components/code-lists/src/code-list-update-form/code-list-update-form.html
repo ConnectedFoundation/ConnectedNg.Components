@@ -1,0 +1,21 @@
+<cn-action-bar-component [actions]="displayedActions()">
+  <form
+    [formGroup]="form"
+    (ngSubmit)="onSubmit()"
+  >
+    <h2>{{ title() }}</h2>
+
+    <div
+      class="grid mt-2 pt-2"
+      style="--columns: 4"
+    >
+      <ng-container #formFieldsContainer></ng-container>
+    </div>
+
+    @if (form.invalid && form.touched) {
+    <div class="form-errors">
+      <p>Please correct the errors above before submitting.</p>
+    </div>
+    }
+  </form>
+</cn-action-bar-component>

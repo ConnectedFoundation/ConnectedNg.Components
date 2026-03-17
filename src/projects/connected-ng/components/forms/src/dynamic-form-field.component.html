@@ -1,0 +1,64 @@
+@if (fieldConfig().inputType === 'checkbox') {
+  <mat-checkbox
+    [id]="fieldConfig().propertyName"
+    [formControl]="control()"
+  >
+    {{ fieldConfig().label }}
+  </mat-checkbox>
+  @if (fieldConfig().description) {
+    <mat-hint>{{ fieldConfig().description }}</mat-hint>
+  }
+} @else {
+  <mat-form-field appearance="outline">
+    <mat-label>{{ fieldConfig().label }}</mat-label>
+
+    @if (fieldConfig().inputType === 'textarea') {
+      <textarea
+        matInput
+        [id]="fieldConfig().propertyName"
+        [formControl]="control()"
+        [placeholder]="fieldConfig().placeholder || ''"
+        [minlength]="fieldConfig().minLength ?? null"
+        [maxlength]="fieldConfig().maxLength ?? null"
+        rows="4"
+      ></textarea>
+    } @else {
+      <input
+        matInput
+        [id]="fieldConfig().propertyName"
+        [type]="fieldConfig().inputType"
+        [formControl]="control()"
+        [placeholder]="fieldConfig().placeholder || ''"
+        [minlength]="fieldConfig().minLength ?? null"
+        [maxlength]="fieldConfig().maxLength ?? null"
+        [min]="fieldConfig().min"
+        [max]="fieldConfig().max"
+      />
+    }
+
+    @if (fieldConfig().description) {
+      <mat-hint>{{ fieldConfig().description }}</mat-hint>
+    }
+
+    @if (control().invalid && control().touched) {
+      @if (control().errors?.['required']) {
+        <mat-error>{{ fieldConfig().label }} is required</mat-error>
+      }
+      @if (control().errors?.['minlength']) {
+        <mat-error>Minimum length is {{ fieldConfig().minLength }}</mat-error>
+      }
+      @if (control().errors?.['maxlength']) {
+        <mat-error>Maximum length is {{ fieldConfig().maxLength }}</mat-error>
+      }
+      @if (control().errors?.['min']) {
+        <mat-error>Minimum value is {{ fieldConfig().min }}</mat-error>
+      }
+      @if (control().errors?.['max']) {
+        <mat-error>Maximum value is {{ fieldConfig().max }}</mat-error>
+      }
+      @if (control().errors?.['email']) {
+        <mat-error>Invalid email format</mat-error>
+      }
+    }
+  </mat-form-field>
+}

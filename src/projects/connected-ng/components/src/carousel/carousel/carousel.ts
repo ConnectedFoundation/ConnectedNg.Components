@@ -3,7 +3,7 @@ import { CarouselItem } from '../carousel-item/carousel-item';
 
 @Component({
   selector: 'cn-carousel',
-  imports: [],
+  imports: [CarouselItem],
   templateUrl: './carousel.html',
   styleUrl: './carousel.scss',
 })

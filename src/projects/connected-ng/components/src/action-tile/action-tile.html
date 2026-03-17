@@ -6,7 +6,15 @@
   >
     {{icon()}}
   </mat-icon>
-  }
+  } @if(urlString()) {
+  <a
+    [href]="urlString()"
+    class="anim-underline"
+  >
+    {{label()}}
+  </a>
+  } @else {
   <a class="anim-underline"> {{label()}} </a>
+  }
 </div>
 <div class="text-sm text-secondary">{{description()}}</div>

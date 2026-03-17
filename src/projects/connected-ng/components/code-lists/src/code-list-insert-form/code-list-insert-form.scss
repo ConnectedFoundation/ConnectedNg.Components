@@ -1,0 +1,28 @@
+.insert-form {
+  padding: 1rem;
+
+  h2 {
+    margin-bottom: 1rem;
+  }
+
+  .loading-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 200px;
+  }
+
+  .form-errors {
+    margin-top: 1rem;
+    padding: 1rem;
+    background-color: var(--error-background, #fee);
+    color: var(--error-color, #c00);
+    border-radius: 4px;
+  }
+
+  .grid {
+    display: grid;
+    gap: 1rem;
+    grid-template-columns: repeat(var(--columns, 1), 1fr);
+  }
+}

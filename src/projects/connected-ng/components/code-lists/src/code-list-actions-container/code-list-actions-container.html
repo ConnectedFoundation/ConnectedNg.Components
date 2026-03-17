@@ -1,0 +1,12 @@
+<div class="grid mt-2 pt-2 d-flex">
+  @for(action of internalActions(); track action){
+  <cn-action-tile
+    [description]="action.description"
+    [icon]="action.icon"
+    [label]="action.label"
+    [url]="action.url"
+    (click)="action.action ? action.action() : null"
+  >
+  </cn-action-tile>
+  }
+</div>

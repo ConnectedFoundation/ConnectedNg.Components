@@ -1,5 +1,5 @@
 import { Component, input } from '@angular/core';
-import { ActionDescription, ActionDescriptionWithAction, ActionTile } from '../../action-tile/action-tile';
+import { ActionDescriptionWithAction, ActionTile } from '../../action-tile/action-tile';
 import { Carousel } from "../../carousel/carousel/carousel";
 import { CarouselItem } from "../../carousel/carousel-item/carousel-item";
 

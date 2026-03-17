@@ -1,0 +1,47 @@
+<mat-form-field
+  class="code-list-select-box"
+  [class.disabled]="disabled()"
+>
+  @if (label()) {
+  <mat-label>{{ label() }}</mat-label>
+  }
+
+  <input
+    matInput
+    type="text"
+    [placeholder]="computedPlaceholder()"
+    [formControl]="searchControl"
+    (focus)="onFocus()"
+    (blur)="onBlur()"
+    [matAutocomplete]="auto"
+    [required]="required()"
+  />
+
+  @if (insertFormComponent()) {
+  <mat-icon
+    matIconSuffix
+    (click)="openInsertDialog()"
+    [class.disabled]="disabled()"
+    class="add-icon"
+  >
+    add
+  </mat-icon>
+  }
+
+  <mat-autocomplete
+    #auto="matAutocomplete"
+    (optionSelected)="onOptionSelected($event)"
+  >
+    @for (item of filteredOptions(); track trackByKey($index, item)) {
+    <mat-option [value]="item">
+      @if (itemTemplate()) {
+      <ng-container
+        *ngTemplateOutlet="itemTemplate()!; context: { $implicit: item }"
+      ></ng-container>
+      } @else { {{ displayMemberSelector()(item) }} }
+    </mat-option>
+    } @if (filteredOptions().length === 0) {
+    <mat-option disabled> No items found </mat-option>
+    }
+  </mat-autocomplete>
+</mat-form-field>

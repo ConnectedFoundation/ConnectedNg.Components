@@ -6,7 +6,7 @@
         [description]="action.description"
         [icon]="action.icon"
         [label]="action.label"
-        (click)="action.action()"
+        (click)="action.action?.()"
       ></cn-action-tile>
     </cn-carousel-item>
     }

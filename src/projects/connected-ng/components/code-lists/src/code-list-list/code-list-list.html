@@ -1,0 +1,8 @@
+<cn-list
+  [items]="items()"
+  [itemTemplate]="itemTemplate()"
+  [itemDetailTemplate]="itemActionsTemplate()"
+></cn-list>
+@if(codeListActions()){
+<cn-action-bar-component [actions]="codeListActions()"></cn-action-bar-component>
+}
