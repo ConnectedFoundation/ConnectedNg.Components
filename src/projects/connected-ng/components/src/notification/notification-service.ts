@@ -10,19 +10,22 @@ export class NotificationService {
 
   success(message: string): void {
     this.snackBar.openFromComponent(Notification, {
-      data: { type: NotificationType.Success, message }
+      data: { type: NotificationType.Success, message },
+      duration: 3000
     });
   }
 
   error(message: string): void {
     this.snackBar.openFromComponent(Notification, {
-      data: { type: NotificationType.Error, message }
+      data: { type: NotificationType.Error, message },
+      duration: 3000
     });
   }
 
   info(message: string): void {
     this.snackBar.openFromComponent(Notification, {
-      data: { type: NotificationType.Info, message }
+      data: { type: NotificationType.Info, message },
+      duration: 3000
     });
   }
 }
