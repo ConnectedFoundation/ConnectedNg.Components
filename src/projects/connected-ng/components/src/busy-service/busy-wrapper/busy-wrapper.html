@@ -1,0 +1,25 @@
+<div
+  class="cf-busy"
+  [class.cf-busy--active]="active()"
+>
+  <ng-content></ng-content>
+
+  @if(active()){
+  <div
+    class="cf-busy__overlay"
+    [class.cf-busy__overlay--block]="block()"
+    aria-busy="true"
+  >
+    @if(type() == 'bar'){
+    <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+    } @if(type() === 'spinner'){
+    <div class="cf-busy__center">
+      <mat-progress-spinner
+        mode="indeterminate"
+        diameter="20"
+      ></mat-progress-spinner>
+    </div>
+    }
+  </div>
+  }
+</div>

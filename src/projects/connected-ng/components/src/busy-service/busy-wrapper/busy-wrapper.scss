@@ -1,0 +1,22 @@
+.cf-busy { position: relative; }
+
+.cf-busy__overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 20;
+  opacity: 1;
+  pointer-events: none; /* default: not blocking */
+  background: transparent;
+}
+
+.cf-busy__overlay--block {
+  pointer-events: auto; /* blocks clicks */
+  background: rgba(0, 0, 0, 0.1); /* dim */
+}
+
+.cf-busy__center {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+}
