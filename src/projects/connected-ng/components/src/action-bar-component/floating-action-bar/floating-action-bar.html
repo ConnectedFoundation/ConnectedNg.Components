@@ -1,15 +1,13 @@
-<div class="floating">
-  <cn-carousel>
-    @for(action of actions(); track action){
-    <cn-carousel-item style="height: fit-content; width: fit-content">
-      <cn-action-tile
-        [description]="action.description"
-        [icon]="action.icon"
-        [label]="action.label"
-        [url]="action.url"
-        (click)="action.action?.()"
-      ></cn-action-tile>
-    </cn-carousel-item>
-    }
-  </cn-carousel>
-</div>
+<cn-carousel>
+  @for(action of actions(); track action){
+  <cn-carousel-item style="height: fit-content; width: fit-content">
+    <cn-action-tile
+      [description]="action.description"
+      [icon]="action.icon"
+      [label]="action.label"
+      [url]="action.url"
+      (click)="action.action?.()"
+    ></cn-action-tile>
+  </cn-carousel-item>
+  }
+</cn-carousel>
