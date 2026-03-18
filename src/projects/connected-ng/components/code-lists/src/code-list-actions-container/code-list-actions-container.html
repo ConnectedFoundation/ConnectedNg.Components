@@ -5,7 +5,7 @@
     [icon]="action.icon"
     [label]="action.label"
     [url]="action.url"
-    (click)="action.action ? action.action() : null"
+    (click)="handleItemClick(action, $event)"
   >
   </cn-action-tile>
   }

@@ -21,4 +21,13 @@ export class CodeListActionsContainer {
       this.internalActions.set(this.actions().map(f => convertToAction(f, this.item())));
     });
   }
+
+  handleItemClick(item: ActionDescriptionWithAction, $event: Event) {
+    if (item.action) {
+      $event.preventDefault();
+      $event.stopPropagation();
+      item.action();
+      return;
+    }
+  }
 }
