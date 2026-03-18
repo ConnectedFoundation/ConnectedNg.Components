@@ -1,4 +1,5 @@
 import { ActionDescription, ActionDescriptionWithAction, ItemAction, UrlParameter } from '@connected-ng/components';
+import { Status } from '@connected-ng/core';
 
 export interface CodeListAction {
   itemAction?: (item: any) => void;
@@ -24,11 +25,27 @@ export const createCodeListAction = (actionDescription: ActionDescription, itemA
   return Object.assign(actionDescription, { itemAction, url }) as CodeListAction;
 }
 
+interface ItemWithStatus {
+  status: Status;
+}
 
 export class CodeListActions {
   static editAction(action: ItemAction, url?: UrlParameter): CodeListAction {
     return createCodeListAction({ label: 'Edit', description: 'Edit this code-list item', icon: 'edit' }, action, url);
   };
+
+  static recordStatusAction(action: ItemAction): CodeListAction {
+    return createCodeListAction({ label: 'Edit', description: 'Edit this code-list item', icon: 'edit' }, action);
+  };
+
+  static getStatusChangeAction(item: ItemWithStatus, action: ((item:unknown) => void)): CodeListAction  {  
+    if (item.status === Status.Enabled) {
+      return { label: 'Disable', itemAction: (item: ItemWithStatus) => action({ ...item, status: Status.Disabled }) };
+    }
+    else {
+      return { label: 'Enable', itemAction: (item: ItemWithStatus) => action({ ...item, status: Status.Enabled }) };
+    }
+  }
 
   static relatedCodeListAction(action: ItemAction, url?: UrlParameter): CodeListAction {
     return createCodeListAction({ label: 'Edit connected', description: 'Edit connected code-list', icon: 'edit' }, action, url);

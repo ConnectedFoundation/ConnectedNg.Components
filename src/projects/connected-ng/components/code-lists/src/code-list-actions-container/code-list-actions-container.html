@@ -1,5 +1,5 @@
-<div class="grid mt-2 pt-2 d-flex">
-  @for(action of internalActions(); track action){
+<div class="grid bt-1 mt-2 pt-2 d-flex">
+  @for(action of internalActions(); track action.label){
   <cn-action-tile
     [description]="action.description"
     [icon]="action.icon"
