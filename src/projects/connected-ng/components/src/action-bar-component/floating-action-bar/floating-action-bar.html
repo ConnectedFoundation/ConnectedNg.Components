@@ -6,7 +6,7 @@
       [icon]="action.icon"
       [label]="action.label"
       [url]="action.url"
-      (click)="action.action?.()"
+      (click)="handleItemClick(action, $event)"
     ></cn-action-tile>
   </cn-carousel-item>
   }

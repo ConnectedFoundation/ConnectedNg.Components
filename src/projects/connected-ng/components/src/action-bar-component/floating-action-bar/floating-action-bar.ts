@@ -11,4 +11,13 @@ import { CarouselItem } from "../../carousel/carousel-item/carousel-item";
 })
 export class FloatingActionBar {
   actions = input.required<ActionDescriptionWithAction[]>();
+
+  handleItemClick(item: ActionDescriptionWithAction, $event: Event) {
+    if (item.action) {
+      $event.preventDefault();
+      $event.stopPropagation();
+      item.action();
+      return;
+    }
+  }
 }
