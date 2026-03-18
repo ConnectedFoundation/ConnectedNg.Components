@@ -153,7 +153,7 @@ export class IdeExplorer<TItem extends IExplorerItem = IExplorerItem> implements
           // Find the node with matching ID
           const node = this.findNodeById(this.rootNodes(), selected.id);
           if (node) {
-            // Set as active node
+            // Set as active node (but don't propagate back to selection service)
             this.activeNodeId.set(node.id);
             this.activeItemChanged.emit({ id: node.id, item: node.item });
           }
@@ -217,31 +217,6 @@ export class IdeExplorer<TItem extends IExplorerItem = IExplorerItem> implements
         }
       });
     });
-
-    // Trigger selection service when active item changes
-    effect(() => {
-      const activeId = this.activeNodeId();
-
-      if (!activeId) {
-        return;
-      }
-
-      const nodes = this.rootNodes();
-      const activeNode = this.findNodeById(nodes, activeId);
-
-      if (!activeNode) {
-        return;
-      }
-
-      const selectDto: SelectedItem = {
-        id: activeNode.item.id,
-        currentEditor: 'IdeExplorer',
-        type: activeNode.item.type,
-        context: this.context()
-      };
-
-      this.selectionService.select(selectDto);
-    });
   }
 
   // ---------------- Rendering helpers ----------------
@@ -285,6 +260,15 @@ export class IdeExplorer<TItem extends IExplorerItem = IExplorerItem> implements
     if (!isMultiSelectModifier || !this.isMultiSelectEnabled()) {
       this.activeNodeId.set(node.id);
       this.activeItemChanged.emit({ id: node.id, item: node.item });
+
+      // Notify selection service on user click
+      const selectDto: SelectedItem = {
+        id: node.item.id,
+        currentEditor: 'IdeExplorer',
+        type: node.item.type,
+        context: this.context()
+      };
+      this.selectionService.select(selectDto);
     }
 
     this.updateSelectionFromClick(node.id, event);
@@ -294,6 +278,15 @@ export class IdeExplorer<TItem extends IExplorerItem = IExplorerItem> implements
     this.itemDoubleClicked.emit({ id: node.id, item: node.item });
     this.activeNodeId.set(node.id);
     this.activeItemChanged.emit({ id: node.id, item: node.item });
+
+    // Notify selection service on user double-click
+    const selectDto: SelectedItem = {
+      id: node.item.id,
+      currentEditor: 'IdeExplorer',
+      type: node.item.type,
+      context: this.context()
+    };
+    this.selectionService.select(selectDto);
 
     // Toggle expansion on double-click if node has children
     if (node.children.length > 0) {

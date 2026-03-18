@@ -8,6 +8,7 @@ import { Subscription } from 'rxjs';
 import { IdeDocument, IdeDocumentService } from '../services/document-service';
 import { IdeToolboxItemService, IdeToolboxItem } from '../services/toolbox-item-service';
 import { SelectedItem, SelectionService } from '../services/selection-service';
+import { DndDraggableDirective } from 'ngx-drag-drop';
 
 @Component({
   selector: 'cf-ide-toolbox',
@@ -16,7 +17,8 @@ import { SelectedItem, SelectionService } from '../services/selection-service';
     FormsModule,
     MatFormFieldModule,
     MatInputModule,
-    MatIconModule
+    MatIconModule,
+    DndDraggableDirective
   ],
   templateUrl: './ide-toolbox.html',
   styleUrl: './ide-toolbox.scss',
