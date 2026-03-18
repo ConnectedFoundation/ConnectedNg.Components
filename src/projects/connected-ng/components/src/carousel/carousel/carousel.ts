@@ -1,9 +1,11 @@
 import { Component, ContentChildren, ElementRef, input, output, QueryList, signal, viewChild } from '@angular/core';
 import { CarouselItem } from '../carousel-item/carousel-item';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'cn-carousel',
-  imports: [CarouselItem],
+  standalone: true,
+  imports: [CommonModule],
   templateUrl: './carousel.html',
   styleUrl: './carousel.scss',
 })

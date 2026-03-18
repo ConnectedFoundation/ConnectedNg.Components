@@ -1,3 +1,7 @@
+:host {
+  display: contents;
+}
+
 .carousel-container {
   position: relative;
   margin-bottom: 2rem;
@@ -32,7 +36,7 @@
     }
 
     // Style carousel items to take full width on mobile
-    ::ng-deep app-carousel-item {
+    ::ng-deep ng-carousel-item {
       flex: 0 0 100%;
       min-width: 100%;
       scroll-snap-align: start;
