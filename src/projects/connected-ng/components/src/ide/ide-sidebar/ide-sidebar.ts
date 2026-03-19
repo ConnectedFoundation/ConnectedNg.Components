@@ -21,7 +21,7 @@ export interface IdeSidebarTab {
     MatIconModule
   ],
   templateUrl: './ide-sidebar.html',
-  styleUrl: './ide-sidebar.scss',
+  styleUrls: ['./ide-sidebar.scss', '../ide.scss'],
 })
 export class IdeSidebar {
   tabs = input<IdeSidebarTab[]>([]);

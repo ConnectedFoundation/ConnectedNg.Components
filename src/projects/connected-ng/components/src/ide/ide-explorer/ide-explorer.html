@@ -77,7 +77,7 @@
     [attr.data-active]="activeNodeId() === node.id ? 'true' : null"
     [attr.data-selected]="isNodeSelected(node.id) ? 'true' : null"
     [style.paddingLeft.px]="nodeIndentationPixels() * depth"
-    [style.fontWeight]="activeNodeId() === node.id ? '700' : null"
+    [style.fontWeight]="activeNodeId() === node.id ? '500' : null"
     [style.cursor]="getRowCursorStyleForNode(node.id, node.isDraggable)"
   >
     @if (node.children.length > 0) {

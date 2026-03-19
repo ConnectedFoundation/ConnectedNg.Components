@@ -10,7 +10,7 @@
   <!-- Loading State -->
   @if (isLoading()) {
   <div class="loading-state">
-    <mat-icon class="spinner">schedule</mat-icon>
+    <mat-icon class="spinner">progress_activity</mat-icon>
     <p>Loading properties...</p>
   </div>
   }
@@ -26,20 +26,23 @@
   <!-- Properties Grid -->
   @if (hasSelectedItem() && hasProperties() && !isLoading()) {
   <div class="properties-container">
+    <div class="properties-action-bar">Properties</div>
     @for (property of properties(); track trackByPropertyName($index, property)) {
     <div
       class="property-row"
       [class.read-only]="property.isReadOnly"
     >
-      <div class="property-label">
+      <!-- <div class="property-label">
         <label [title]="property.propertyType">{{ property.name }}</label>
-      </div>
+      </div> -->
       <div class="property-input">
         @switch (getPropertyEditor(property)) { @case ('text') {
         <mat-form-field
           appearance="outline"
           subscriptSizing="dynamic"
+          class="input-parent"
         >
+          <mat-label>{{ property.name }}</mat-label>
           <input
             matInput
             type="text"
@@ -51,6 +54,7 @@
         <mat-form-field
           appearance="outline"
           subscriptSizing="dynamic"
+          class="input-parent"
         >
           <input
             matInput
@@ -81,7 +85,7 @@
   <!-- No Properties State -->
   @if (hasSelectedItem() && !hasProperties() && !isLoading()) {
   <div class="empty-state">
-    <mat-icon>folder_open</mat-icon>
+    <mat-icon>nearby_error</mat-icon>
     <p>No properties available for this item</p>
   </div>
   }

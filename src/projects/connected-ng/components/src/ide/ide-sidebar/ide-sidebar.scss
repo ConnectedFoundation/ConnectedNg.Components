@@ -3,6 +3,8 @@
   flex-direction: column;
   height: 100%;
   overflow: hidden;
+  container-name: sidebar-left;
+  container-type: inline-size;
 }
 
 .sidebar-tabs {
@@ -51,4 +53,15 @@
 .tab-content {
   height: 100%;
   overflow: auto;
+}
+
+@container sidebar-left (width < 245px) {
+  /* Change the flex direction of the .child element. */
+
+  .tab-label {
+    display: none;
+  }
+  ::ng-deep .sidebar-tabs .mat-mdc-tab {
+    min-width: 40px !important;
+  }
 }

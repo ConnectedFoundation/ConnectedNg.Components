@@ -5,10 +5,12 @@ import { CdkPortalOutlet, ComponentPortal } from '@angular/cdk/portal';
 import { IdeEditorService } from '../services/ide-editor-service';
 import { SelectedItem as SelectedItem, SelectionService } from '../services/selection-service';
 import { Subscription } from 'rxjs';
+import { MatIcon } from "@angular/material/icon";
+import { MatButtonModule } from '@angular/material/button';
 
 @Component({
   selector: 'cf-ide-document-editor',
-  imports: [MatTabsModule, CdkPortalOutlet],
+  imports: [MatTabsModule, CdkPortalOutlet, MatIcon, MatButtonModule],
   templateUrl: './ide-document-editor.html',
   styleUrl: './ide-document-editor.scss',
 })

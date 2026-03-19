@@ -4,8 +4,11 @@
 
 .cfExplorer {
   display: block;
-  font-size: 13px;
-  line-height: 22px;
+  font-size: 0.85em;
+  line-height: 2;
+  padding: 0.5em;
+  overflow-y: auto;
+  height: calc(100% - 1px);
 }
 
 .cfExplorerDropList {
@@ -16,6 +19,7 @@
 .cfExplorerRow {
   display: flex;
   align-items: center;
+  border-radius: 0.3rem;
   position: relative;
   user-select: none;
   padding: 0 4px;
@@ -54,25 +58,34 @@
 .cfExplorerExpandButton {
   background: none;
   border: none;
-  padding: 0;
-  margin: 0 4px 0 0;
+  padding: 0 12px;
+  //margin: 0 4px 0 0;
   cursor: pointer;
+  position: relative;
   display: inline-flex;
   align-items: center;
   justify-content: center;
   width: 16px;
   height: 16px;
   flex-shrink: 0;
-  color: inherit;
+  color: light-dark(rgba(0, 0, 0, 0.5), rgba(255, 255, 255, 0.5));
 
   &:hover {
-    background-color: rgba(0, 0, 0, 0.08);
+    //background-color: rgba(0, 0, 0, 0.08);
     border-radius: 2px;
+    color: light-dark(rgba(0, 0, 0, 1), rgba(255, 255, 255, 1));
   }
 
   &:focus {
     outline: none;
   }
+}
+
+.cfExplorerExpandButton:after {
+  content: '';
+  position: absolute;
+  inset: 0 0 0 -1rem;
+  pointer-events: auto;
 }
 
 .cfExplorerExpandButtonPlaceholder {

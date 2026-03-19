@@ -13,3 +13,7 @@
   overflow: auto;
   min-height: 0;
 }
+
+.mat-mdc-tab-link {
+  height: var(--mat-tab-container-height, 41px);
+}

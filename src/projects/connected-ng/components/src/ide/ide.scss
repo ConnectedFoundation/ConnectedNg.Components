@@ -1,0 +1,27 @@
+.status-bar {
+  //background: linear-gradient(90deg, hsla(208, 100%, 97%, 1) 0%, hsla(200, 100%, 87%, 0.5) 100%);
+  border-top: 1px solid var(--mat-sys-outline);
+  font-size: 0.875em;
+  padding: 0.25em 1em;
+  background: light-dark(aliceblue, var(--mat-sys-primary));
+}
+
+// cf-ide-pane-content {
+//   height: 100%;
+//   display: inline-block;
+// }
+
+// @container sidebar-left (width < 240px) {
+//   /* Change the flex direction of the .child element. */
+//   .sidebar-tabs {
+//     background-color: red;
+//   }
+//   .tab-label {
+//     display: none;
+//   }
+//   .sidebar-tabs .mat-mdc-tab {
+//     min-width: 40px !important;
+//     width: 40px !important;
+//     background-color: black;
+//   }
+// }

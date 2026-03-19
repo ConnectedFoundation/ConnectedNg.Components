@@ -12,12 +12,13 @@
       [active]="isDocumentSelected(document)"
     >
       <span>{{ document.name }}</span>
-      <span
-        style="align-self: end"
+      <button
+        matIconButton
+        class="icon-btn-sm ml-2 text-secondary"
         (click)="onCloseDocument(document); $event.stopPropagation()"
       >
-        X
-      </span>
+        <mat-icon>close_small</mat-icon>
+      </button>
     </a>
     }
   </nav>
