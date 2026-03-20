@@ -60,6 +60,7 @@ export class IdeToolboxItem {
   name: string;
   description: string;
   id: string;
+  templateKey?: string;
   relatedItem?: EditorItem;
 
   constructor(name: string, description: string, id: string) {

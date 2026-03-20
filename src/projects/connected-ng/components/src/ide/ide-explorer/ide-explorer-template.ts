@@ -5,6 +5,6 @@ import { Directive, Input, TemplateRef } from '@angular/core';
   standalone: true,
 })
 export class IdeExplorerTemplateDirective {
-  @Input('cfIdeExplorerTemplate') templateKey!: string;
+  @Input('cfIdeExplorerTemplate') templateKey!: string | ((item: any) => boolean);
   constructor(public templateRef: TemplateRef<any>) { }
 }

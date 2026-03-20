@@ -41,7 +41,7 @@
       <span class="cfExplorerExpandButtonPlaceholder"></span>
       }
       <ng-container
-        [ngTemplateOutlet]="resolveTemplate(node.templateKey) ?? defaultItemTemplate"
+        [ngTemplateOutlet]="resolveTemplate(node.templateKey, node.item) ?? defaultItemTemplate"
         [ngTemplateOutletContext]="{ $implicit: node.item, node: node, depth: 0 }"
       ></ng-container>
     </div>
@@ -102,7 +102,7 @@
     <span class="cfExplorerExpandButtonPlaceholder"></span>
     }
     <ng-container
-      [ngTemplateOutlet]="resolveTemplate(node.templateKey) ?? defaultItemTemplate"
+      [ngTemplateOutlet]="resolveTemplate(node.templateKey, node.item) ?? defaultItemTemplate"
       [ngTemplateOutletContext]="{ $implicit: node.item, node: node, depth: depth }"
     ></ng-container>
   </div>

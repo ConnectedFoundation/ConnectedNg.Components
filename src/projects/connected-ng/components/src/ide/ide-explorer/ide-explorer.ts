@@ -85,6 +85,9 @@ export class IdeExplorer<TItem extends IExplorerItem = IExplorerItem> implements
   /** Provide your own expand control template (chevron/icon). Optional. */
   expandControlTemplate = input<TemplateRef<any> | null>(null);
 
+  /** Fallback template used when no string key or function selector matches a node. Optional. */
+  defaultTemplate = input<TemplateRef<any> | null>(null);
+
   isMultiSelectEnabled = input<boolean>(true);
   nodeIndentationPixels = input<number>(16);
   autoExpandHoverDelayMilliseconds = input<number>(450);
@@ -107,18 +110,31 @@ export class IdeExplorer<TItem extends IExplorerItem = IExplorerItem> implements
   // ---------------- Internal state ----------------
   private items = signal<TItem[]>([]);
 
-  private templateMap = computed(() => {
-    let map = new Map<string, TemplateRef<any>>();
+  private templateEntries = computed(() =>
+    this.templateDirectives().map(d => ({ matcher: d.templateKey, templateRef: d.templateRef }))
+  );
 
-    for (let directive of this.templateDirectives()) {
-      map.set(directive.templateKey, directive.templateRef);
+  stringify(data: any) { return JSON.stringify(data) }
+
+  resolveTemplate(templateKey: string, item: TItem): TemplateRef<any> | undefined {
+    const entries = this.templateEntries();
+
+    // Exact string match first
+    for (const entry of entries) {
+      if (typeof entry.matcher === 'string' && entry.matcher === templateKey) {
+        return entry.templateRef;
+      }
     }
 
-    return map;
-  });
-  stringify(data: any) { return JSON.stringify(data) }
-  resolveTemplate(templateKey: string): TemplateRef<any> | undefined {
-    return this.templateMap().get(templateKey);
+    // Function selector match
+    for (const entry of entries) {
+      if (typeof entry.matcher === 'function' && entry.matcher(item)) {
+        return entry.templateRef;
+      }
+    }
+
+    // Fall back to the defaultTemplate input, if provided
+    return this.defaultTemplate() ?? undefined;
   }
 
   // ---------------- State ----------------

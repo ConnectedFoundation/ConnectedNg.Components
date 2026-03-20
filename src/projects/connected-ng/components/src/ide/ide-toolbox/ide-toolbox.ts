@@ -1,4 +1,4 @@
-import { Component, computed, effect, inject, input, OnDestroy, OnInit, output, signal, TemplateRef } from '@angular/core';
+import { Component, computed, contentChildren, effect, inject, input, OnDestroy, OnInit, output, signal, TemplateRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -9,6 +9,7 @@ import { IdeDocument, IdeDocumentService } from '../services/document-service';
 import { IdeToolboxItemService, IdeToolboxItem } from '../services/toolbox-item-service';
 import { SelectedItem, SelectionService } from '../services/selection-service';
 import { DndDraggableDirective } from 'ngx-drag-drop';
+import { IdeToolboxTemplateDirective } from './ide-toolbox-template';
 
 @Component({
   selector: 'cf-ide-toolbox',
@@ -25,12 +26,44 @@ import { DndDraggableDirective } from 'ngx-drag-drop';
 })
 export class IdeToolbox<T extends IdeToolboxItem = IdeToolboxItem> implements OnInit, OnDestroy {
   searchPlaceholder = input<string>('Search...');
-  itemTemplate = input<TemplateRef<{ $implicit: T }>>();
   filterFn = input<(item: T, searchText: string) => boolean>();
   sortFn = input<(a: T, b: T) => number>();
 
+  /** Fallback template used when no string key or function selector matches an item. Optional. */
+  defaultTemplate = input<TemplateRef<any> | null>(null);
+
   itemSelected = output<T>();
   noItemsAvailable = output<void>();
+
+  // ---------------- Template mapping ----------------
+  private templateDirectives = contentChildren(IdeToolboxTemplateDirective);
+
+  private templateEntries = computed(() =>
+    this.templateDirectives().map(d => ({ matcher: d.templateKey, templateRef: d.templateRef }))
+  );
+
+  resolveTemplate(item: T): TemplateRef<any> | undefined {
+    const entries = this.templateEntries();
+
+    // Exact string match against item.id
+    if (item.id) {
+      for (const entry of entries) {
+        if (typeof entry.matcher === 'string' && entry.matcher === item.id) {
+          return entry.templateRef;
+        }
+      }
+    }
+
+    // Function selector match
+    for (const entry of entries) {
+      if (typeof entry.matcher === 'function' && entry.matcher(item)) {
+        return entry.templateRef;
+      }
+    }
+
+    // Fall back to the defaultTemplate input, if provided
+    return this.defaultTemplate() ?? undefined;
+  }
 
   private toolboxItemService = inject(IdeToolboxItemService);
   private selectionService = inject(SelectionService);

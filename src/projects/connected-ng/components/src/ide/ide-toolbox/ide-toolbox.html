@@ -18,8 +18,7 @@
 
   <div class="toolbox-list">
     <div class="toolbox-items">
-      @for (item of filteredItems(); track trackByFn($index, item)) { @if (itemTemplate()) {
-      <!-- Custom template provided -->
+      @for (item of filteredItems(); track trackByFn($index, item)) {
       <div
         class="toolbox-item"
         [dndDraggable]="item"
@@ -27,20 +26,10 @@
         (click)="onItemClick(item)"
       >
         <ng-container
-          *ngTemplateOutlet="itemTemplate()!; context: { $implicit: item }"
+          *ngTemplateOutlet="resolveTemplate(item) ?? defaultItemTemplate; context: { $implicit: item }"
         ></ng-container>
       </div>
-      } @else {
-      <!-- Default template -->
-      <div
-        class="toolbox-item"
-        [dndDraggable]="item"
-        dndEffectAllowed="copy"
-        (click)="onItemClick(item)"
-      >
-        <span class="item-title">{{ item.name }}</span>
-      </div>
-      } } @empty { @if (!hasItems()) {
+      } @empty { @if (!hasItems()) {
       <div class="no-results">
         <mat-icon>inbox</mat-icon>
         <p>No items available</p>
@@ -54,3 +43,10 @@
     </div>
   </div>
 </div>
+
+<ng-template
+  #defaultItemTemplate
+  let-item
+>
+  <span class="item-title">{{ item.name }}</span>
+</ng-template>
