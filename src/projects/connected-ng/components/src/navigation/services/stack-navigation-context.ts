@@ -74,8 +74,8 @@ export class StackNavigationContext {
     }
   }
 
-  push(page: StackPageInfo<unknown>) {
-    this.stack.set([...this.stack(), page]);
+  push(...pages: StackPageInfo<unknown>[]) {
+    this.stack.set([...this.stack(), ...pages]);
     this.updateUrl();
   }
 
