@@ -19,6 +19,9 @@ export * from './ide/services/project-service';
 export * from './ide/services/selection-service';
 export * from './ide/services/toolbox-item-service';
 
+// IDE Utilities
+export * from './ide/ide-item-id';
+
 // IDE DTOs
 export * from './ide/services/dtos/editor-item';
 export * from './ide/services/dtos/editor-item-property';

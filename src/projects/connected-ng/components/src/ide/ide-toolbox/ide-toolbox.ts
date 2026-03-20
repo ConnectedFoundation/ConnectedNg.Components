@@ -104,7 +104,8 @@ export class IdeToolbox<T extends IdeToolboxItem = IdeToolboxItem> implements On
     this.toolboxItemService.query({
       document: document.id,
       project: document.project,
-      editor: 'Toolbox'
+      editor: 'Toolbox',
+      context: document.context
     }).subscribe(serviceItems => {
       // Convert service items to toolbox items
       const toolboxItems = serviceItems.map(item => ({

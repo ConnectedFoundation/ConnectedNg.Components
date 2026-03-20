@@ -17,6 +17,7 @@ export interface ToolboxItemQueryDto {
   editor?: string;
   document?: string;
   project?: string;
+  context?: string;
 }
 
 @Injectable({
@@ -40,6 +41,9 @@ export class IdeToolboxItemService {
     }
     if (dto?.project) {
       params = params.append('project', dto.project);
+    }
+    if (dto?.context) {
+      params = params.append('context', dto.context);
     }
 
     return this.http.get<IdeToolboxItem[]>(
