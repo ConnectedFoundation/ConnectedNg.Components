@@ -2,7 +2,7 @@
   <!-- No Selection State -->
   @if (!hasSelectedItem()) {
   <div class="empty-state">
-    <mat-icon>properties</mat-icon>
+    <mat-icon class="w-300">gesture_select</mat-icon>
     <p>Select an item to view its properties</p>
   </div>
   }
@@ -10,7 +10,7 @@
   <!-- Loading State -->
   @if (isLoading()) {
   <div class="loading-state">
-    <mat-icon class="spinner">sync</mat-icon>
+    <mat-icon class="spinner w-300">progress_activity</mat-icon>
     <p>Loading properties...</p>
   </div>
   }
@@ -18,7 +18,7 @@
   <!-- Error State -->
   @if (errorMessage()) {
   <div class="error-state">
-    <mat-icon>error</mat-icon>
+    <mat-icon class="w-300">error</mat-icon>
     <p>{{ errorMessage() }}</p>
   </div>
   }
@@ -85,7 +85,7 @@
   <!-- No Properties State -->
   @if (hasSelectedItem() && !hasProperties() && !isLoading()) {
   <div class="empty-state">
-    <mat-icon>nearby_error</mat-icon>
+    <mat-icon class="w-300">nearby_error</mat-icon>
     <p>No properties available for this item</p>
   </div>
   }
