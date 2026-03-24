@@ -38,7 +38,7 @@ export class CodeListActions {
     return createCodeListAction({ label: 'Edit', description: 'Edit this code-list item', icon: 'edit' }, action);
   };
 
-  static getStatusChangeAction(item: ItemWithStatus, action: ((item:unknown) => void)): CodeListAction  {  
+  static getStatusChangeAction(item: ItemWithStatus, action: ((item: unknown) => void)): CodeListAction {
     if (item.status === Status.Enabled) {
       return { label: 'Disable', itemAction: (item: ItemWithStatus) => action({ ...item, status: Status.Disabled }) };
     }
@@ -54,4 +54,8 @@ export class CodeListActions {
   static insertItemAction(action: () => void, url?: UrlParameter): ActionDescriptionWithAction {
     return { label: 'New', description: 'Add new entry', icon: 'add', action, url };
   };
+
+  static backAction(action: () => void) {
+    return { label: "Back", description: 'Return to previous screen', icon: 'arrow_back', action };
+  }
 }

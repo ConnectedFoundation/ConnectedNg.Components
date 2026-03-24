@@ -1,0 +1,16 @@
+<cn-code-list-list
+  [items]="codeListService.codeLists()"
+  [itemTemplate]="itemTemplate"
+>
+</cn-code-list-list>
+
+<ng-template
+  #itemTemplate
+  let-item
+>
+  <a
+    href="./{{item.pattern ?? item.key}}"
+    (click)="$event.preventDefault(); openCodeList(item)"
+    >{{item.title}}</a
+  >
+</ng-template>

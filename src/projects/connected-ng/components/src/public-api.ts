@@ -28,11 +28,7 @@ export * from './ide/services/dtos/editor-item';
 export * from './ide/services/dtos/editor-item-property';
 
 export { ComponentsConfigurationProvider as ConfigurationProvider } from './services/service-configuration-initializer';
-export * from './navigation/stack-page/stack-page';
-export * from './navigation/stack-navigation-shell/stack-navigation-shell';
-export * from './navigation/services/stack-navigation-context';
-export { POP_NAVIGATION } from './navigation/services/stack-navigation-context';
-export * from './navigation/stack-component/stack-component';
+
 export * from './action-bar-component/floating-action-bar/floating-action-bar';
 export * from './lists/list/list';
 export * from './lists/expandable-list-item/expandable-list-item';

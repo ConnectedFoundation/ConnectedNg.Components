@@ -1,0 +1,96 @@
+@use '@angular/material' as mat;
+
+.mdc-list-item--with-leading-avatar .mdc-list-item__start,
+[dir='rtl'] .mdc-list-item--with-leading-avatar .mdc-list-item__start {
+  align-self: center;
+  margin-top: 0;
+  margin-left: 0px;
+  margin-right: 12px;
+  width: 48px;
+  min-width: 48px;
+  height: 48px;
+  object-fit: cover;
+  img {
+    width: inherit;
+    height: inherit;
+    object-fit: cover;
+    border-radius: 10000px;
+  }
+}
+
+.profile-menu {
+  flex-direction: column;
+  align-items: center;
+  margin: 1rem 1.5rem;
+  padding: 1rem;
+  width: 230px;
+  border-radius: 1rem;
+  text-align: center;
+  background-color: var(--mat-sys-secondary-container);
+  & .avatar {
+    width: 80px;
+    height: 80px;
+    margin-inline: auto;
+    margin-bottom: 1rem;
+    align-self: center;
+    border-radius: 50%;
+    object-fit: cover;
+  }
+  & .title {
+    font-size: 1rem;
+    font-weight: 500;
+  }
+  & .line {
+    font-size: 0.75rem;
+    color: var(--mat-sys-on-surface-variant);
+  }
+}
+/*END PROFILE*/
+
+.nav-list {
+  @include mat.list-overrides(
+    (
+      list-item-leading-icon-start-space: 12px,
+      list-item-leading-icon-end-space: 12px,
+    )
+  );
+}
+
+.nav-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  align-items: flex-start;
+  padding: 0;
+  width: 100%;
+}
+
+// .mdc-list-item--with-leading-radio.mdc-list-item,
+// .mdc-list-item--with-leading-checkbox.mdc-list-item,
+// .mdc-list-item--with-leading-icon.mdc-list-item,
+// .mdc-list-item--with-leading-avatar.mdc-list-item {
+//     padding-left: 0;
+//     padding-right: 0;
+// }
+
+.rotate {
+  transition: transform 225ms ease-in-out;
+}
+
+.rotate-cw {
+  transform: rotate(180deg);
+}
+
+::ng-deep {
+  .mat-mdc-tooltip {
+    z-index: 10000 !important;
+  }
+
+  .mdc-tooltip {
+    z-index: 10000 !important;
+  }
+}
+
+cn-navigation-list-item {
+  width: 100%;
+}

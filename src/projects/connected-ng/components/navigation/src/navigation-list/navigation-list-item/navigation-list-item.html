@@ -1,0 +1,56 @@
+<mat-list-item
+  matTooltipShowDelay="0"
+  matTooltipHideDelay="500"
+  role="listitem"
+  [matTooltip]="isCollapsed() ? item().label : null"
+  matTooltipPosition="right"
+  (click)="navigate(item()); toggleNested(item())"
+  [routerLink]="item().route"
+  routerLinkActive
+  #rla="routerLinkActive"
+  [activated]="rla.isActive"
+  [class.px-0]="isCollapsed()"
+>
+  <mat-icon
+    matListItemIcon
+    [class]="
+      rla.isActive
+        ? 'material-symbols-outlined fill'
+        : 'material-symbols-outlined w-300'
+    "
+    >{{ item().icon }}</mat-icon
+  >
+  <div
+    matListItemTitle
+    [class.d-none]="isCollapsed()"
+  >
+    {{ item().label }}
+  </div>
+  <!-- <div matListItemMeta class="mx-0" [class.d-none]="isCollapsed()">
+    {{ item().subitems?.length ?? "" }}
+  </div> -->
+  @if (item().children && !isCollapsed()){
+  <mat-icon matListItemMeta>
+    <mat-icon
+      class="rotate"
+      [class.rotate-cw]="nestedMenuOpen()"
+      >expand_more</mat-icon
+    >
+  </mat-icon>
+  }
+</mat-list-item>
+@if (item().children) {
+<div
+  class="nav-list-wrapper"
+  [class.expanded]="nestedMenuOpen()"
+>
+  <div class="nav-list">
+    @for (subitem of item().children; track subitem) {
+    <cn-navigation-list-item
+      [item]="subitem"
+      [isCollapsed]="isCollapsed()"
+    ></cn-navigation-list-item>
+    }
+  </div>
+</div>
+}

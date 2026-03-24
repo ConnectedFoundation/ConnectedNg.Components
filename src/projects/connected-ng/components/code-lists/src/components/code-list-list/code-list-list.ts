@@ -11,6 +11,6 @@ import { List, ActionBarComponent, ActionDescriptionWithAction } from '@connecte
 export class CodeListList<T> {
   items = input.required<T[]>();
   itemTemplate = input.required<TemplateRef<T>>();
-  itemActionsTemplate = input.required<TemplateRef<T>>();
+  itemActionsTemplate = input<TemplateRef<T>>();
   codeListActions = input<ActionDescriptionWithAction[]>([]);
 }

@@ -1,6 +1,6 @@
-import { Component, computed, effect, inject, input, signal } from '@angular/core';
+import { Component, computed, inject, input } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import { StackNavigationShell, EmptyPage, StackPageInfo } from '@connected-ng/components';
+import { StackNavigationShell, EmptyPage, StackPageInfo } from '@connected-ng/components/navigation';
 
 @Component({
   selector: 'cn-code-list-container',

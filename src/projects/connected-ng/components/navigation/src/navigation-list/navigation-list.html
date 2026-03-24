@@ -1,0 +1,12 @@
+<mat-nav-list
+  class="nav-list"
+  role="list"
+>
+  <!-- <div mat-subheader [class.d-none]="isCollapsed()">Fld {{isCollapsed()}}</div> -->
+  @for (item of navigationItems(); track item) {
+  <cn-navigation-list-item
+    [item]="item"
+    [isCollapsed]="isCollapsed()"
+  ></cn-navigation-list-item>
+  }
+</mat-nav-list>

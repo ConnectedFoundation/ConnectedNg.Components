@@ -1,36 +1,31 @@
 import { Component, effect, inject, input, signal, ViewContainerRef, viewChild, output, computed } from '@angular/core';
 import { FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { DtoDescriptor, InvokableServiceOperation } from '@connected-ng/core';
-import { ActionBarComponent, ActionDescriptionWithAction, StackNavigationContext, StackPageInfo } from '@connected-ng/components';
+import { ActionBarComponent, ActionDescriptionWithAction } from '@connected-ng/components';
 import { FormBase, FormGenerationInterceptors, generateFormFromDtoDescriptor, DynamicFormMetadata } from '@connected-ng/components/forms';
-import { Observable } from 'rxjs';
+import { StackNavigationContext } from '@connected-ng/components/navigation';
 
 @Component({
-  selector: 'cn-code-list-update-form',
+  selector: 'cn-code-list-insert-form',
+  standalone: true,
   imports: [ActionBarComponent, ReactiveFormsModule],
-  templateUrl: './code-list-update-form.html',
-  styleUrl: './code-list-update-form.scss'
+  templateUrl: './code-list-insert-form.html',
+  styleUrl: './code-list-insert-form.scss',
 })
-export class CodeListUpdateForm<TDto extends object> extends FormBase<TDto> {
+export class CodeListInsertForm<TDto extends object> extends FormBase<TDto> {
   // Inputs
-  updateOperation = input.required<InvokableServiceOperation<TDto, any>>();
-  title = input<string>('Edit Item');
-
-  //DTO
-  entityLoader = input.required<Observable<any>>();
-
+  serviceOperation = input.required<InvokableServiceOperation<TDto, any>>();
+  title = input<string>('New Item');
   actions = input<ActionDescriptionWithAction[]>([]);
   formInterceptors = input<FormGenerationInterceptors>();
-
   // Services
   navigationContext = inject(StackNavigationContext);
 
   // State
   dtoDescriptor = signal<DtoDescriptor | undefined>(undefined);
   formMetadata = signal<DynamicFormMetadata | undefined>(undefined);
-
+  isLoading = signal<boolean>(true);
   override form: FormGroup = new FormGroup({});
-
   displayedActions = computed(() => this.actions().length ? this.actions() : this.defaultActions());
 
   // View children for dynamic component creation
@@ -53,7 +48,7 @@ export class CodeListUpdateForm<TDto extends object> extends FormBase<TDto> {
         },
         {
           label: 'Save',
-          description: 'Save the item',
+          description: 'Save the new item',
           icon: 'save',
           action: () => this.onSubmit()
         }
@@ -80,19 +75,18 @@ export class CodeListUpdateForm<TDto extends object> extends FormBase<TDto> {
   override ngOnInit(): void {
     super.ngOnInit();
 
-    this.entityLoader().subscribe(entity => {
-      // Fetch descriptor and generate empty form for insert
-      this.updateOperation().describeDto().subscribe({
-        next: (descriptor) => {
-          this.dtoDescriptor.set(descriptor);
-          this.generateForm(entity, descriptor);
-        },
-        error: (err) => {
-          console.error('Error loading descriptor:', err);
-        }
-      });
+    // Fetch descriptor and generate empty form for insert
+    this.serviceOperation().describeDto().subscribe({
+      next: (descriptor) => {
+        this.dtoDescriptor.set(descriptor);
+        this.generateForm({}, descriptor);
+        this.isLoading.set(false);
+      },
+      error: (err) => {
+        console.error('Error loading descriptor:', err);
+        this.isLoading.set(false);
+      }
     });
-
   }
 
   private generateForm(dto: any, descriptor: DtoDescriptor): void {
@@ -108,7 +102,7 @@ export class CodeListUpdateForm<TDto extends object> extends FormBase<TDto> {
   override onSubmit(): void {
     if (this.form.valid) {
       const model = this.getModel();
-      this.updateOperation()(model).subscribe({
+      this.serviceOperation()(model).subscribe({
         next: (result) => {
           this.onClose({ result, success: true });
         },

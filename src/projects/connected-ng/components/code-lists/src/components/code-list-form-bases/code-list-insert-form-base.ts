@@ -1,6 +1,6 @@
 import { Component, computed, Directive, Signal, viewChild } from "@angular/core";
 import { FormBase } from "@connected-ng/components/forms";
-import { StackComponent, StackPageInfo } from "@connected-ng/components";
+import { StackComponent, StackPageInfo } from "@connected-ng/components/navigation";
 import { CodeListInsertForm } from "../code-list-insert-form/code-list-insert-form";
 
 @Component({

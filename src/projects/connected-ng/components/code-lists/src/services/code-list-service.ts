@@ -1,6 +1,7 @@
 import { Injectable, signal } from '@angular/core';
-import { EmptyPage, StackPageInfo } from '@connected-ng/components';
-
+import { EmptyPage, StackPageInfo } from '@connected-ng/components/navigation';
+import { CodeLists } from '../components/code-lists/code-lists';
+import { routePattern } from '@connected-ng/core';
 export interface CodeListStackPageInfo extends StackPageInfo<undefined> {
   title: string;
   icon?: string;
@@ -20,5 +21,17 @@ export class CodeListService {
 
   selectCodeList(codeList: CodeListStackPageInfo) {
     this.activeCodeList.set(codeList);
+  }
+
+  selectCodeListList() {
+    this.activeCodeList.set({
+      component: CodeLists,
+      key: '/',
+      title: 'Code lists',
+      childPages: this.codeLists(),
+      icon: 'settings',
+      pattern: routePattern('/').pattern,
+      data: {}
+    });
   }
 }
