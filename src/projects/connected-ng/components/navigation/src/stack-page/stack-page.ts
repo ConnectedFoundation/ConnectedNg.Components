@@ -11,7 +11,7 @@ import { Subscription } from 'rxjs';
   styleUrl: './stack-page.scss',
   providers: [
     { provide: STACK_PAGE, useExisting: (self: StackPage) => self.pageInfo() }
-  ]
+  ] 
 })
 export class StackPage implements OnDestroy {
   component = input.required<Type<unknown>>();

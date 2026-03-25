@@ -1,4 +1,4 @@
-import { Directive, inject, Injector, OnDestroy, signal } from "@angular/core";
+import { Directive, inject, Injector, input, OnDestroy, signal } from "@angular/core";
 import { StackNavigationContext } from "@connected-ng/components/navigation";
 import { CodeListAction, CodeListActions } from "../code-list-actions-container/code-list-actions";
 import { Subscription } from "rxjs";
@@ -23,6 +23,18 @@ export abstract class CodeListBase implements OnDestroy {
       });
     }
   }
+
+  ngOnDestroy() {
+    this.subscriptions.unsubscribe();
+  }
+}
+
+
+@Directive()
+export abstract class CodeListHeaderBase implements OnDestroy {
+  protected subscriptions = new Subscription();
+
+  data = input<any>();
 
   ngOnDestroy() {
     this.subscriptions.unsubscribe();

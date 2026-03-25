@@ -1,8 +1,8 @@
-<div #parent>
+<div #parent>@if(navigationContext.activePage() == pageInfo()){
   @for(parent of navigationContext.stack(); track parent){ @if(parent !=
   navigationContext.activePage() && parent.headerComponent){
-  <ng-container *ngComponentOutlet="parent.headerComponent; injector: injector"></ng-container>
+  <ng-container *ngComponentOutlet="parent.headerComponent;   inputs: {data: parent.data}"></ng-container>
   } }
+}
 </div>
-
 <ng-container #componentContainer></ng-container>
