@@ -40,15 +40,15 @@ export class CodeListActions {
 
   static getStatusChangeAction(item: ItemWithStatus, action: ((item: unknown) => void)): CodeListAction {
     if (item.status === Status.Enabled) {
-      return { label: 'Disable', itemAction: (item: ItemWithStatus) => action({ ...item, status: Status.Disabled }) };
+      return { label: 'Disable', description: 'Disable this code-list item', icon: 'mode_off_on', itemAction: (item: ItemWithStatus) => action({ ...item, status: Status.Disabled }) };
     }
     else {
-      return { label: 'Enable', itemAction: (item: ItemWithStatus) => action({ ...item, status: Status.Enabled }) };
+      return { label: 'Enable', description: 'Enable this code-list item', icon: 'mode_off_on', itemAction: (item: ItemWithStatus) => action({ ...item, status: Status.Enabled }) };
     }
-  }
+  };
 
   static relatedCodeListAction(action: ItemAction, url?: UrlParameter): CodeListAction {
-    return createCodeListAction({ label: 'Edit connected', description: 'Edit connected code-list', icon: 'edit' }, action, url);
+    return createCodeListAction({ label: 'Edit connected', description: 'Edit connected code-list', icon: 'edit_arrow_down' }, action, url);
   };
 
   static insertItemAction(action: () => void, url?: UrlParameter): ActionDescriptionWithAction {
