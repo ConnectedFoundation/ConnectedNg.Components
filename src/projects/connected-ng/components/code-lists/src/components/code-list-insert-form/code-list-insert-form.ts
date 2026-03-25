@@ -3,16 +3,16 @@ import { FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { DtoDescriptor, InvokableServiceOperation } from '@connected-ng/core';
 import { ActionBarComponent, ActionDescriptionWithAction } from '@connected-ng/components';
 import { FormBase, FormGenerationInterceptors, generateFormFromDtoDescriptor, DynamicFormMetadata } from '@connected-ng/components/forms';
-import { StackNavigationContext } from '@connected-ng/components/navigation';
+import { ActionsProviderContract, StackNavigationContext } from '@connected-ng/components/navigation';
 
 @Component({
   selector: 'cn-code-list-insert-form',
   standalone: true,
-  imports: [ActionBarComponent, ReactiveFormsModule],
+  imports: [ReactiveFormsModule],
   templateUrl: './code-list-insert-form.html',
   styleUrl: './code-list-insert-form.scss',
 })
-export class CodeListInsertForm<TDto extends object> extends FormBase<TDto> {
+export class CodeListInsertForm<TDto extends object> extends FormBase<TDto> implements ActionsProviderContract {
   // Inputs
   serviceOperation = input.required<InvokableServiceOperation<TDto, any>>();
   title = input<string>('New Item');
@@ -26,7 +26,7 @@ export class CodeListInsertForm<TDto extends object> extends FormBase<TDto> {
   formMetadata = signal<DynamicFormMetadata | undefined>(undefined);
   isLoading = signal<boolean>(true);
   override form: FormGroup = new FormGroup({});
-  displayedActions = computed(() => this.actions().length ? this.actions() : this.defaultActions());
+  pageActions = computed(() => this.actions().length ? this.actions() : this.defaultActions());
 
   // View children for dynamic component creation
   formFieldsContainer = viewChild<any, ViewContainerRef>('formFieldsContainer', { read: ViewContainerRef });

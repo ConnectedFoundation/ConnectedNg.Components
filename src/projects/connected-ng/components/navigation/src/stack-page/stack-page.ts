@@ -1,20 +1,33 @@
 import { NgComponentOutlet } from '@angular/common';
-import { Component, ComponentRef, computed, effect, inject, Injector, input, OnDestroy, Type, ViewChild, ViewContainerRef } from '@angular/core';
+import { Component, ComponentRef, computed, effect, EffectRef, inject, Injector, input, OnDestroy, signal, Type, ViewChild, ViewContainerRef } from '@angular/core';
 import { STACK_PAGE, StackNavigationContext, StackPageInfo } from '../services/stack-navigation-context';
 import { MatButton, MatButtonModule } from '@angular/material/button';
 import { Subscription } from 'rxjs';
+import { ActionBarComponent, ActionDescriptionWithAction } from "@connected-ng/components";
+import { isActionsProvider } from './actions-provider-contract';
 
 @Component({
   selector: 'cn-stack-page',
-  imports: [NgComponentOutlet, MatButtonModule],
+  imports: [NgComponentOutlet, MatButtonModule, ActionBarComponent],
   templateUrl: './stack-page.html',
   styleUrl: './stack-page.scss',
   providers: [
     { provide: STACK_PAGE, useExisting: (self: StackPage) => self.pageInfo() }
-  ] 
+  ]
 })
 export class StackPage implements OnDestroy {
   component = input.required<Type<unknown>>();
+
+  isActivePage = computed(() => this.navigationContext.activePage() == this.pageInfo());
+
+  private defaultActions = computed(() => this.isRoot?.() ? [] : [{
+    label: 'Back',
+    action: () => this.navigationContext.pop(),
+    description: 'Return to the previous screen',
+    icon: 'arrow_back'
+  }]);
+
+  actions = signal<ActionDescriptionWithAction[]>([]);
 
   injector = inject(Injector);
 
@@ -35,6 +48,7 @@ export class StackPage implements OnDestroy {
 
   private componentRef: ComponentRef<any> | null = null;
   private outputSubscriptions: Subscription[] = [];
+  private actionsEffectRef: EffectRef | null = null;
 
   constructor() {
     // Effect to create component when inputs change
@@ -90,9 +104,25 @@ export class StackPage implements OnDestroy {
 
     // Trigger change detection
     this.componentRef.changeDetectorRef.detectChanges();
+
+    // Bind component actions if it implements ActionsProviderContract
+    if (isActionsProvider(this.componentRef.instance)) {
+      const provider = this.componentRef.instance;
+      this.actionsEffectRef = effect(
+        () => this.actions.set(provider.pageActions()),
+        { injector: this.injector }
+      );
+    }
   }
 
   private cleanup() {
+    // Destroy actions effect before component
+    if (this.actionsEffectRef) {
+      this.actionsEffectRef.destroy();
+      this.actionsEffectRef = null;
+      this.actions.set(this.defaultActions());
+    }
+
     // Unsubscribe from all outputs
     this.outputSubscriptions.forEach(sub => sub.unsubscribe());
     this.outputSubscriptions = [];

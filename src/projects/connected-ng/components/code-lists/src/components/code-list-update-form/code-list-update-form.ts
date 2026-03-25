@@ -4,7 +4,7 @@ import { DtoDescriptor, InvokableServiceOperation } from '@connected-ng/core';
 import { ActionBarComponent, ActionDescriptionWithAction } from '@connected-ng/components';
 import { FormBase, FormGenerationInterceptors, generateFormFromDtoDescriptor, DynamicFormMetadata } from '@connected-ng/components/forms';
 import { Observable } from 'rxjs';
-import { StackNavigationContext } from '@connected-ng/components/navigation';
+import { ActionsProviderContract, StackNavigationContext } from '@connected-ng/components/navigation';
 
 @Component({
   selector: 'cn-code-list-update-form',
@@ -12,7 +12,7 @@ import { StackNavigationContext } from '@connected-ng/components/navigation';
   templateUrl: './code-list-update-form.html',
   styleUrl: './code-list-update-form.scss'
 })
-export class CodeListUpdateForm<TDto extends object> extends FormBase<TDto> {
+export class CodeListUpdateForm<TDto extends object> extends FormBase<TDto> implements ActionsProviderContract {
   // Inputs
   updateOperation = input.required<InvokableServiceOperation<TDto, any>>();
   title = input<string>('Edit Item');
@@ -32,7 +32,7 @@ export class CodeListUpdateForm<TDto extends object> extends FormBase<TDto> {
 
   override form: FormGroup = new FormGroup({});
 
-  displayedActions = computed(() => this.actions().length ? this.actions() : this.defaultActions());
+  pageActions = computed(() => this.actions().length ? this.actions() : this.defaultActions());
 
   // View children for dynamic component creation
   formFieldsContainer = viewChild<any, ViewContainerRef>('formFieldsContainer', { read: ViewContainerRef });

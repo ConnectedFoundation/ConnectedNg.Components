@@ -7,4 +7,5 @@ export * from './stack-navigation-shell/stack-navigation-shell';
 export * from './services/stack-navigation-context';
 export { POP_NAVIGATION } from './services/stack-navigation-context';
 export * from './stack-component/stack-component';
+export * from './stack-page/actions-provider-contract';
 

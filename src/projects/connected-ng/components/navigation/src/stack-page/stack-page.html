@@ -1,8 +1,11 @@
-<div #parent>@if(navigationContext.activePage() == pageInfo()){
-  @for(parent of navigationContext.stack(); track parent){ @if(parent !=
-  navigationContext.activePage() && parent.headerComponent){
-  <ng-container *ngComponentOutlet="parent.headerComponent;   inputs: {data: parent.data}"></ng-container>
-  } }
-}
-</div>
-<ng-container #componentContainer></ng-container>
+<cn-action-bar-component [actions]="actions()">
+  <div #parent>
+    @for(parent of navigationContext.stack(); track parent){ @if(parent !=
+    navigationContext.activePage() && parent.headerComponent){
+    <ng-container
+      *ngComponentOutlet="parent.headerComponent; inputs: {data: parent.data}"
+    ></ng-container>
+    } }
+  </div>
+  <ng-container #componentContainer></ng-container>
+</cn-action-bar-component>

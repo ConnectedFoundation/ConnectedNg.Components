@@ -1,15 +1,5 @@
-@if(codeListActions()){
-<cn-action-bar-component [actions]="codeListActions()">
-  <cn-list
-    [items]="items()"
-    [itemTemplate]="itemTemplate()"
-    [itemDetailTemplate]="itemActionsTemplate()"
-  ></cn-list>
-</cn-action-bar-component>
-}@else{
 <cn-list
   [items]="items()"
   [itemTemplate]="itemTemplate()"
   [itemDetailTemplate]="itemActionsTemplate()"
 ></cn-list>
-}
