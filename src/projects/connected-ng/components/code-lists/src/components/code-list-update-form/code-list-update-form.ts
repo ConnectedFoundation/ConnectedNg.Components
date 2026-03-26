@@ -15,7 +15,6 @@ import { ActionsProviderContract, StackNavigationContext } from '@connected-ng/c
 export class CodeListUpdateForm<TDto extends object> extends FormBase<TDto> implements ActionsProviderContract {
   // Inputs
   updateOperation = input.required<InvokableServiceOperation<TDto, any>>();
-  title = input<string>('Edit Item');
 
   //DTO
   entityLoader = input.required<Observable<any>>();
