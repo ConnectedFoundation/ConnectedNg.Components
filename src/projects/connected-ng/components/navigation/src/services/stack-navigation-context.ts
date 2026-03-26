@@ -79,10 +79,10 @@ export class StackNavigationContext {
     this.updateUrl();
   }
 
-  pop() {
-    if (this.stack().length > 1) {
+  pop(count = 1) {
+    if (this.stack().length > count) {
       this.stack.update((stack) => {
-        return stack.slice(0, -1);
+        return stack.slice(0, -count);
       });
       this.updateUrl();
     }
@@ -381,6 +381,8 @@ export interface StackPageInfo<T> {
   headerComponent?: Type<unknown>;
   data: any;
   key: string;
+  title?: string;
+  backStep?: number;
   /**
    * URL pattern for route matching (e.g., 'edit/:id', 'new', 'detail/:category/:item').
    * Used by navigation context to match URL segments and extract parameters.

@@ -1,5 +1,5 @@
 import { NgComponentOutlet } from '@angular/common';
-import { Component, ComponentRef, computed, effect, EffectRef, inject, Injector, input, OnDestroy, signal, Type, ViewChild, ViewContainerRef } from '@angular/core';
+import { Component, ComponentRef, computed, effect, EffectRef, forwardRef, inject, Injector, input, OnDestroy, signal, Type, ViewChild, ViewContainerRef } from '@angular/core';
 import { STACK_PAGE, StackNavigationContext, StackPageInfo } from '../services/stack-navigation-context';
 import { MatButton, MatButtonModule } from '@angular/material/button';
 import { Subscription } from 'rxjs';
@@ -12,7 +12,10 @@ import { isActionsProvider } from './actions-provider-contract';
   templateUrl: './stack-page.html',
   styleUrl: './stack-page.scss',
   providers: [
-    { provide: STACK_PAGE, useExisting: (self: StackPage) => self.pageInfo() }
+    {
+      provide: STACK_PAGE, useFactory: (self: StackPage) => self.pageInfo(),
+      deps: [forwardRef(() => StackPage)],
+    }
   ]
 })
 export class StackPage implements OnDestroy {
@@ -42,6 +45,10 @@ export class StackPage implements OnDestroy {
   });
 
   navigationContext = inject(StackNavigationContext);
+
+  parent = computed(() => {
+    return this.navigationContext.stack().at(-2);
+  });
 
   @ViewChild('componentContainer', { read: ViewContainerRef })
   componentContainer!: ViewContainerRef;

@@ -55,7 +55,7 @@ export class CodeListUpdateForm<TDto extends object> extends FormBase<TDto> impl
         {
           label: 'Save',
           description: 'Save the item',
-          icon: 'save',
+          icon: 'check_circle',
           action: () => this.onSubmit()
         }
       ]);

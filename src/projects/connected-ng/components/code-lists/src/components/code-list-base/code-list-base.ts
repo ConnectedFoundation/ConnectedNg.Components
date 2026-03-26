@@ -1,5 +1,5 @@
 import { computed, Directive, inject, Injector, input, OnDestroy, signal } from "@angular/core";
-import { ActionsProviderContract, StackNavigationContext } from "@connected-ng/components/navigation";
+import { ActionsProviderContract, STACK_PAGE, StackNavigationContext } from "@connected-ng/components/navigation";
 import { CodeListAction, CodeListActions } from "../code-list-actions-container/code-list-actions";
 import { Subscription } from "rxjs";
 import { ActionDescriptionWithAction } from "@connected-ng/components";
@@ -9,6 +9,8 @@ export abstract class CodeListBase implements OnDestroy, ActionsProviderContract
   navigationContext = inject(StackNavigationContext);
   injector = inject(Injector);
 
+  stackPage = inject(STACK_PAGE, { optional: true });
+
   protected subscriptions = new Subscription();
 
   codeListActions = signal<ActionDescriptionWithAction[]>([]);
@@ -17,9 +19,10 @@ export abstract class CodeListBase implements OnDestroy, ActionsProviderContract
 
   ngOnInit() {
     if ((this.navigationContext.stack()?.[0] ?? undefined) != this.navigationContext.activePage()) {
+      let popCount = this.stackPage?.backStep ?? 1;
       this.codeListActions.update((items) => {
         items = [
-          CodeListActions.backAction(() => this.navigationContext.pop()),
+          CodeListActions.backAction(() => this.navigationContext.pop(popCount)),
           ...items];
 
         return items;

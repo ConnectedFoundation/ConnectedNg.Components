@@ -9,6 +9,7 @@
   let-item
 >
   <a
+    class="anim-underline text-wrap"
     href="./{{item.pattern ?? item.key}}"
     (click)="$event.preventDefault(); openCodeList(item)"
     >{{item.title}}</a

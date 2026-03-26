@@ -1,11 +1,13 @@
 <cn-action-bar-component [actions]="actions()">
-  <div #parent>
-    @for(parent of navigationContext.stack(); track parent){ @if(parent !=
-    navigationContext.activePage() && parent.headerComponent){
+  <div>
+    @if(parent()?.headerComponent){
     <ng-container
-      *ngComponentOutlet="parent.headerComponent; inputs: {data: parent.data}"
+      *ngComponentOutlet="parent()!.headerComponent!; inputs: {data: parent()!.data}"
     ></ng-container>
-    } }
+    }
   </div>
-  <ng-container #componentContainer></ng-container>
+  <fieldset>
+    <legend>{{pageInfo().title}}</legend>
+    <ng-container #componentContainer></ng-container>
+  </fieldset>
 </cn-action-bar-component>
