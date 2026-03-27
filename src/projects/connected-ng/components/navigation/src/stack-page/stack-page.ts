@@ -47,7 +47,8 @@ export class StackPage implements OnDestroy {
   navigationContext = inject(StackNavigationContext);
 
   parent = computed(() => {
-    return this.navigationContext.stack().at(-2);
+    let parent = this.navigationContext.stack().at(-2);
+    return parent;
   });
 
   @ViewChild('componentContainer', { read: ViewContainerRef })

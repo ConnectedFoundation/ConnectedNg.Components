@@ -9,12 +9,12 @@
   } @if(urlString()) {
   <a
     [href]="urlString()"
-    class="anim-underline"
+    class="anim-underline stretched-link"
   >
     {{label()}}
   </a>
   } @else {
-  <a class="anim-underline"> {{label()}} </a>
+  <a class="anim-underline stretched-link"> {{label()}} </a>
   }
 </div>
 <div class="text-sm text-secondary">{{description()}}</div>
