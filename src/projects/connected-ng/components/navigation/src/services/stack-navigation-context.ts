@@ -11,6 +11,10 @@ export const STACK_BASE_PATH = new InjectionToken<string>('STACK_BASE_PATH');
  */
 export const POP_NAVIGATION = Symbol('POP_NAVIGATION');
 
+export interface StackPageNavigationInfo<T> extends StackPageInfo<T> {
+  navigatedFrom?: StackPageInfo<unknown>;
+}
+
 @Injectable()
 export class StackNavigationContext {
   private location = inject(Location, { optional: true });
@@ -19,7 +23,7 @@ export class StackNavigationContext {
   private rootPage?: StackPageInfo<unknown>;
   private locationSubscription?: any;
 
-  stack = signal<StackPageInfo<unknown>[]>([]);
+  stack = signal<StackPageNavigationInfo<unknown>[]>([]);
   private skipUrlUpdate = false;
 
   activePage = computed(() => {
@@ -51,17 +55,43 @@ export class StackNavigationContext {
 
     // Subscribe to browser back/forward events (popstate)
     this.locationSubscription = this.location.subscribe((event) => {
-      console.log('[StackNavigationContext] Browser navigation event (popstate):', event, 'current stack depth:', this.stack().length);
-
       // When browser back is pressed, the URL has already changed
       // We need to synchronize our stack by popping without updating the URL again
       if (this.stack().length > 1) {
         this.skipUrlUpdate = true;
-        this.stack.update((stack) => stack.slice(0, -1));
+        this.back();
         this.skipUrlUpdate = false;
-        console.log('[StackNavigationContext] Popped stack due to browser back, new depth:', this.stack().length);
       }
     });
+  }
+
+  back() {
+    if (this.activePage()?.navigatedFrom) {
+      this.popTo(this.activePage()!.navigatedFrom!);
+    } else {
+      this.pop(this.activePage()?.backStep ?? 1);
+    }
+  }
+
+  popTo(page: StackPageInfo<unknown>) {
+    const stack = this.stack();
+    // Search from second-to-last backwards (exclude the active page itself)
+    const parents = stack.slice(0, -1);
+    let targetIndex = -1;
+    for (let i = parents.length - 1; i >= 0; i--) {
+      if (parents[i] === page || parents[i].key === page.key) {
+        targetIndex = i;
+        break;
+      }
+    }
+
+    if (targetIndex === -1) {
+      console.warn('[StackNavigationContext] popTo: page not found in stack, doing nothing.', { page, stack });
+      return;
+    }
+
+    this.stack.update(s => s.slice(0, targetIndex + 1));
+    this.updateUrl();
   }
 
   /**
@@ -75,7 +105,8 @@ export class StackNavigationContext {
   }
 
   push(...pages: StackPageInfo<unknown>[]) {
-    this.stack.set([...this.stack(), ...pages]);
+    let activePage = this.activePage();
+    this.stack.set([...this.stack(), ...pages.map(e => ({ ...e, navigatedFrom: activePage }))]);
     this.updateUrl();
   }
 

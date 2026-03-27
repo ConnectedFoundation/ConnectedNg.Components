@@ -1,7 +1,7 @@
 @for(page of this.navigationContext.stack(); track page){
 <cn-stack-page
   [style.display]="page == this.navigationContext.activePage()? '':'none'"
-  [isRoot]="page == this.rootPage()"
+  [isRoot]="page.key == this.rootPage().key"
   [component]="page.component"
   [data]="page.data"
   [pageInfo]="page!"

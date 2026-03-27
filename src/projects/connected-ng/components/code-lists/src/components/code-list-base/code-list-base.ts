@@ -18,11 +18,12 @@ export abstract class CodeListBase implements OnDestroy, ActionsProviderContract
   pageActions = computed<ActionDescriptionWithAction[]>(() => this.codeListActions());
 
   ngOnInit() {
-    if ((this.navigationContext.stack()?.[0] ?? undefined) != this.navigationContext.activePage()) {
-      let popCount = this.stackPage?.backStep ?? 1;
+    const rootPage = this.navigationContext.stack()?.[0];
+    const activePage = this.navigationContext.activePage();
+    if (rootPage?.key !== activePage?.key) {
       this.codeListActions.update((items) => {
         items = [
-          CodeListActions.backAction(() => this.navigationContext.pop(popCount)),
+          CodeListActions.backAction(() => this.navigationContext.back()),
           ...items];
 
         return items;
