@@ -22,6 +22,42 @@
         [maxlength]="fieldConfig().maxLength ?? null"
         rows="4"
       ></textarea>
+    } @else if (fieldConfig().inputType === 'datetime-local') {
+      <mtx-datetimepicker
+        #datetimePicker
+        type="datetime"
+      >
+        <mtx-datetimepicker-actions>
+          <button
+            matButton
+            mtxDatetimepickerClear
+          >
+            Clear
+          </button>
+          <button
+            matButton
+            mtxDatetimepickerCancel
+          >
+            Cancel
+          </button>
+          <button
+            matButton="elevated"
+            mtxDatetimepickerApply
+          >
+            Apply
+          </button>
+        </mtx-datetimepicker-actions>
+      </mtx-datetimepicker>
+      <input
+        matInput
+        [id]="fieldConfig().propertyName"
+        [formControl]="control()"
+        [mtxDatetimepicker]="datetimePicker"
+      />
+      <mtx-datetimepicker-toggle
+        [for]="datetimePicker"
+        matSuffix
+      ></mtx-datetimepicker-toggle>
     } @else {
       <input
         matInput

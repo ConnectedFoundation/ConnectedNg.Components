@@ -112,13 +112,16 @@ export class StackPage implements OnDestroy {
     // Trigger change detection
     this.componentRef.changeDetectorRef.detectChanges();
 
-    // Bind component actions if it implements ActionsProviderContract
+    // Bind component actions if it implements ActionsProviderContract,
+    // otherwise fall back to the default actions (back button for non-root pages).
     if (isActionsProvider(this.componentRef.instance)) {
       const provider = this.componentRef.instance;
       this.actionsEffectRef = effect(
         () => this.actions.set(provider.pageActions()),
         { injector: this.injector }
       );
+    } else {
+      this.actions.set(this.defaultActions());
     }
   }
 

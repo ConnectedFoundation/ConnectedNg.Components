@@ -1,14 +1,14 @@
 import { Component, effect, inject, input, signal, ViewContainerRef, viewChild, output, computed } from '@angular/core';
 import { FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { DtoDescriptor, InvokableServiceOperation } from '@connected-ng/core';
-import { ActionBarComponent, ActionDescriptionWithAction } from '@connected-ng/components';
+import { ActionDescriptionWithAction } from '@connected-ng/components';
 import { FormBase, FormGenerationInterceptors, generateFormFromDtoDescriptor, DynamicFormMetadata } from '@connected-ng/components/forms';
 import { Observable } from 'rxjs';
 import { ActionsProviderContract, StackNavigationContext } from '@connected-ng/components/navigation';
 
 @Component({
   selector: 'cn-code-list-update-form',
-  imports: [ActionBarComponent, ReactiveFormsModule],
+  imports: [ReactiveFormsModule],
   templateUrl: './code-list-update-form.html',
   styleUrl: './code-list-update-form.scss'
 })

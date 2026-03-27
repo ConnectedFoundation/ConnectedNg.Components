@@ -1,10 +1,10 @@
 import { Component, input, TemplateRef } from '@angular/core';
 import { MatListModule } from '@angular/material/list';
-import { List, ActionBarComponent, ActionDescriptionWithAction } from '@connected-ng/components';
+import { List, ActionDescriptionWithAction } from '@connected-ng/components';
 
 @Component({
   selector: 'cn-code-list-list',
-  imports: [MatListModule, List, ActionBarComponent],
+  imports: [MatListModule, List],
   templateUrl: './code-list-list.html',
   styleUrl: './code-list-list.scss',
 })

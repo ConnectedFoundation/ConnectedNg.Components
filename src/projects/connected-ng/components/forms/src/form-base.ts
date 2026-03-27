@@ -154,6 +154,8 @@ export function createFormInputFromDtoProperty(
     inputType = 'email';
   } else if (property.type === 'number') {
     inputType = 'number';
+  } else if (property.type === 'datetime') {
+    inputType = 'datetime-local';
   } else if (property.type === 'date') {
     inputType = 'date';
   } else if (property.type === 'bool') {

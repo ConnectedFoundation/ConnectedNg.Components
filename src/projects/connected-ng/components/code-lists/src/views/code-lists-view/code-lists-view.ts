@@ -13,13 +13,7 @@ import { CodeListService } from '../../services/code-list-service';
   providers: [
     {
       provide: STACK_BASE_PATH,
-      useFactory: (route: ActivatedRoute) => {
-        const codeListKey = route.snapshot.url[0]?.path;
-        return codeListKey
-          ? `management/code-lists/${codeListKey}`
-          : 'management/code-lists';
-      },
-      deps: [ActivatedRoute]
+      useValue: 'management/code-lists'
     }
   ]
 })

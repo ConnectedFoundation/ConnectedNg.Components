@@ -116,7 +116,19 @@ export class StackNavigationContext {
 
     const url = this.getUrlFromStack();
     console.log('[StackNavigationContext] updateUrl:', url, 'stack:', this.stack().map(p => p.key), 'managesUrl:', this._managesUrl);
-    this.location.go(url);
+
+    // Normalize paths for comparison (strip leading slash)
+    const currentPath = this.location.path();
+    const normalizedCurrent = currentPath.startsWith('/') ? currentPath.slice(1) : currentPath;
+    const normalizedNew = url.startsWith('/') ? url.slice(1) : url;
+
+    if (normalizedCurrent === normalizedNew) {
+      // URL hasn't changed — replace instead of push to avoid a duplicate
+      // history entry that would make the back button appear to do nothing.
+      this.location.replaceState(url);
+    } else {
+      this.location.go(url);
+    }
   }
 
   /**
@@ -188,12 +200,11 @@ export class StackNavigationContext {
     // Determine if reconstruction was successful (all segments consumed, no holes)
     const success = holes.length === 0 && i >= segments.length;
 
-    if (success) {
-      // Apply the reconstructed navigation stack (without triggering URL update)
-      this.skipUrlUpdate = true;
-      this.stack.set(reconstructedPath);
-      this.skipUrlUpdate = false;
-    }
+    // Always apply the reconstructed path (even partial), so the stack is never left empty.
+    // On full success this is the complete path; on partial failure it navigates as deep as possible.
+    this.skipUrlUpdate = true;
+    this.stack.set(reconstructedPath);
+    this.skipUrlUpdate = false;
 
     return {
       success,

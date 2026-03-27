@@ -1,15 +1,14 @@
 <cn-action-bar-component [actions]="actions()">
+  <div>
+    @if(parent()?.headerComponent){
+    <ng-container
+      *ngComponentOutlet="parent()!.headerComponent!; inputs: {data: parent()!.data}"
+    ></ng-container>
+    }
+  </div>
 
-<div>
-  @if(pageInfo().headerComponent){
-  <ng-container
-    *ngComponentOutlet="pageInfo()!.headerComponent!; inputs: {data: pageInfo()!.data}"
-  ></ng-container>
-  }
-</div>
-
-<fieldset>
-  <legend>{{pageInfo().title}}</legend>
-  <ng-container #componentContainer></ng-container>
-</fieldset>
+  <fieldset>
+    <legend>{{pageInfo().title}}</legend>
+    <ng-container #componentContainer></ng-container>
+  </fieldset>
 </cn-action-bar-component>

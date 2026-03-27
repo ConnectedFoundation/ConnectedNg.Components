@@ -3,7 +3,14 @@ import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatCheckboxModule } from '@angular/material/checkbox';
+import {
+  MtxCalendarView,
+  MtxDatetimepickerMode,
+  MtxDatetimepickerModule,
+  MtxDatetimepickerType,
+} from '@ng-matero/extensions/datetimepicker';
 import { FormInputConfig } from './form-input-config';
+import { MatButtonModule } from '@angular/material/button';
 
 @Component({
   selector: 'dynamic-form-field',
@@ -12,7 +19,9 @@ import { FormInputConfig } from './form-input-config';
     ReactiveFormsModule,
     MatFormFieldModule,
     MatInputModule,
-    MatCheckboxModule
+    MatCheckboxModule,
+    MtxDatetimepickerModule,
+    MatButtonModule
   ],
   templateUrl: './dynamic-form-field.component.html',
   styleUrl: './dynamic-form-field.component.scss'

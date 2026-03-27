@@ -1,4 +1,4 @@
-import { Injectable, signal } from '@angular/core';
+import { computed, Injectable, signal } from '@angular/core';
 import { EmptyPage, StackPageInfo } from '@connected-ng/components/navigation';
 import { CodeLists } from '../components/code-lists/code-lists';
 import { routePattern } from '@connected-ng/core';
@@ -14,6 +14,21 @@ export class CodeListService {
   codeLists = signal<CodeListStackPageInfo[]>([]);
 
   activeCodeList = signal<CodeListStackPageInfo>({ ...EmptyPage, title: '' });
+
+  /**
+   * The root page for the code-lists stack navigation.
+   * Always has all registered code lists as childPages.
+   * Used so that direct URL navigation always starts from the code-lists root.
+   */
+  codeListsRootPage = computed<CodeListStackPageInfo>(() => ({
+    component: CodeLists,
+    key: '/',
+    title: 'Code lists',
+    childPages: this.codeLists(),
+    icon: 'settings',
+    pattern: routePattern('/').pattern,
+    data: undefined
+  }));
 
   registerCodeList(codeList: CodeListStackPageInfo) {
     this.codeLists.set([...this.codeLists(), codeList].sort((a, b) => a.title.localeCompare(b.title)));
