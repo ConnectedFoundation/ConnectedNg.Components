@@ -47,8 +47,12 @@ export class CodeListActions {
     }
   };
 
-  static relatedCodeListAction(action: ItemAction, url?: UrlParameter): CodeListAction {
-    return createCodeListAction({ label: 'Edit connected', description: 'Edit connected code-list', icon: 'edit_arrow_down' }, action, url);
+  static relatedCodeListAction(action: ItemAction, url?: UrlParameter, label?: string, description?: string): CodeListAction {
+    return createCodeListAction({
+      label: label ?? 'Edit connected',
+      description: description ?? 'Edit connected code-list',
+      icon: 'edit_arrow_down'
+    }, action, url);
   };
 
   static insertItemAction(action: () => void, url?: UrlParameter): ActionDescriptionWithAction {
