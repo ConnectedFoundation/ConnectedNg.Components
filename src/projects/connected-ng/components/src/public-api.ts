@@ -9,6 +9,7 @@ export * from './ide/ide-toolbox/ide-toolbox-template';
 export * from './ide/ide-document-editor/ide-document-editor';
 export * from './ide/ide-property-pane/ide-property-pane';
 export * from './ide/ide-pane-content/ide-pane-content';
+export * from './ide/services/dirty-editor-item.service';
 
 // IDE Services
 export * from './ide/services/document-service';

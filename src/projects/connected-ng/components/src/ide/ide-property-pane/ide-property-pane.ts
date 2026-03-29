@@ -11,7 +11,6 @@ import { MatMenuModule } from '@angular/material/menu';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatOptionModule } from '@angular/material/core';
 import { Subscription } from 'rxjs';
-import { debounceTime } from 'rxjs/operators';
 import { IdeEditorPropertyService } from '../services/editor-property-service';
 import { SelectionService, SelectedItem } from '../services/selection-service';
 import { IEditorItemProperty } from '../services/dtos/editor-item-property';
@@ -40,6 +39,8 @@ export class IdePropertyPane implements OnInit, OnDestroy {
   private propertyService = inject(IdeEditorPropertyService);
   private selectionService = inject(SelectionService);
   private subscriptions = new Subscription();
+  /** Separate subscription group for form controls — cleared on every loadProperties call. */
+  private formSubscriptions = new Subscription();
 
   protected properties = signal<IEditorItemProperty[]>([]);
   private selectedItem = signal<SelectedItem | null>(null);
@@ -59,6 +60,7 @@ export class IdePropertyPane implements OnInit, OnDestroy {
 
   ngOnDestroy() {
     this.subscriptions.unsubscribe();
+    this.formSubscriptions.unsubscribe();
   }
 
   private initializeSelectionTracking() {
@@ -99,7 +101,7 @@ export class IdePropertyPane implements OnInit, OnDestroy {
     }).subscribe({
       next: (properties) => {
         this.properties.set(properties);
-        this.initializePropertyForms(properties);
+        this.initializePropertyForms(properties, selectedItem);
         this.isLoading.set(false);
       },
       error: (error) => {
@@ -111,25 +113,30 @@ export class IdePropertyPane implements OnInit, OnDestroy {
   }
 
   private constructEditorItemIdentifier(item: SelectedItem): string {
-    // Construct the identifier based on type and context
-    // Format: "TypeFullName/ItemId" or similar depending on backend expectations
-    return `${item.type}/${item.id}`;
+    return `${item.id}`;
   }
 
-  private initializePropertyForms(properties: IEditorItemProperty[]) {
+  private initializePropertyForms(properties: IEditorItemProperty[], selectedItem: SelectedItem) {
+    // Tear down subscriptions from the previous load before creating new ones.
+    this.formSubscriptions.unsubscribe();
+    this.formSubscriptions = new Subscription();
+
     const forms = new Map<string, FormControl>();
 
     properties.forEach(prop => {
       const control = new FormControl(
-        { value: prop.value || '', disabled: prop.isReadOnly },
+        { value: prop.value ?? '', disabled: prop.isReadOnly },
         { updateOn: 'blur' }
       );
 
-      // Subscribe to changes with debounce
-      this.subscriptions.add(
-        control.valueChanges
-          .pipe(debounceTime(300))
-          .subscribe(value => this.onPropertyChanged(prop, value))
+      // Capture selectedItem at subscription setup time so it is still correct
+      // when the save fires — even if the global selection has changed by then.
+      // No debounce: with updateOn:'blur' the control emits exactly once per blur,
+      // so the save must fire immediately before any subsequent click can alter state.
+      this.formSubscriptions.add(
+        control.valueChanges.subscribe(value =>
+          this.onPropertyChanged(selectedItem, prop, value)
+        )
       );
 
       forms.set(prop.name, control);
@@ -138,19 +145,14 @@ export class IdePropertyPane implements OnInit, OnDestroy {
     this.propertyEditorForms.set(forms);
   }
 
-  private onPropertyChanged(property: IEditorItemProperty, newValue: any) {
-    const selectedItem = this.selectedItem();
-    if (!selectedItem) return;
-
-    // Update the property via the service
+  private onPropertyChanged(selectedItem: SelectedItem, property: IEditorItemProperty, newValue: any) {
     this.propertyService.update({
       iEditorItem: this.constructEditorItemIdentifier(selectedItem),
       name: property.name,
-      value: String(newValue)
+      value: String(newValue ?? '')
     }).subscribe({
       next: (updated) => {
-        // Optionally update the local property
-        this.updateLocalProperty(property.name, updated);
+        if (updated) this.updateLocalProperty(property.name, updated);
       },
       error: (error) => {
         console.error('Failed to update property:', error);
@@ -160,11 +162,13 @@ export class IdePropertyPane implements OnInit, OnDestroy {
   }
 
   private updateLocalProperty(name: string, updated: IEditorItemProperty) {
+    if (!updated) return;
     const props = this.properties();
     const index = props.findIndex(p => p.name === name);
     if (index >= 0) {
-      props[index] = updated;
-      this.properties.set([...props]);
+      const newProps = [...props];
+      newProps[index] = updated;
+      this.properties.set(newProps);
     }
   }
 
@@ -218,7 +222,7 @@ export class IdePropertyPane implements OnInit, OnDestroy {
   }
 
   protected trackByPropertyName(index: number, property: IEditorItemProperty): string {
-    return property.name;
+    return property?.name ?? String(index);
   }
 
   trackByCategory(index: number, entry: [string, IEditorItemProperty[]]): string {

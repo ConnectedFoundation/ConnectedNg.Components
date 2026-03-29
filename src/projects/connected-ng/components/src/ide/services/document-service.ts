@@ -41,6 +41,15 @@ export class IdeDocumentService {
   $activated?: Observable<IdeDocument> = this.activatedSubject.asObservable();
   $deactivated?: Observable<IdeDocument> = this.deactivatedSubject.asObservable();
 
+  private entityUpdatedSubject = new Subject<string>();
+  /** Fires with an entity UUID when that entity was updated and any open
+   *  document for it should refresh its label/content. */
+  $entityUpdated: Observable<string> = this.entityUpdatedSubject.asObservable();
+
+  notifyEntityUpdated(entityId: string): void {
+    this.entityUpdatedSubject.next(entityId);
+  }
+
   query(dto?: IDocumentQueryDto): Observable<IdeDocument[]> {
     return this.http.get<IdeDocument[]>(
       this.urlService.generateUrl(this.configuration.baseUrl(), `${IdeDocumentService.serviceUrl}/query`),

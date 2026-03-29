@@ -7,6 +7,7 @@ import { SelectedItem as SelectedItem, SelectionService } from '../services/sele
 import { Subscription } from 'rxjs';
 import { MatIcon } from "@angular/material/icon";
 import { MatButtonModule } from '@angular/material/button';
+import { DirtyEditorItemService } from '../services/dirty-editor-item.service';
 
 @Component({
   selector: 'cf-ide-document-editor',
@@ -23,6 +24,8 @@ export class IdeDocumentEditor implements OnInit, OnDestroy {
 
   editorService = inject(IdeEditorService);
   injector = inject(Injector);
+
+  readonly dirtyEditorItemService = inject(DirtyEditorItemService);
 
   activeEditorInstances = signal<IdeDocument[]>([]);
   selectedEditorInstance = signal<IdeDocument | undefined>(undefined);
@@ -88,6 +91,25 @@ export class IdeDocumentEditor implements OnInit, OnDestroy {
         })
       );
     }
+
+    this.subscriptions.add(
+      this.documentService.$entityUpdated.subscribe(entityId => {
+        const lower = entityId.toLowerCase();
+        const toRefresh = this.activeEditorInstances()
+          .filter(i => i.id.toLowerCase().includes(lower));
+        toRefresh.forEach(instance => {
+          this.documentService.select({ id: instance.id }).subscribe(fresh => {
+            if (!fresh) return;
+            this.activeEditorInstances.update(list =>
+              list.map(i => (documentsEqual(i, instance) ? fresh : i))
+            );
+            if (this.selectedEditorInstance() && documentsEqual(this.selectedEditorInstance()!, instance)) {
+              this.selectedEditorInstance.set(fresh);
+            }
+          });
+        });
+      })
+    );
   }
 
   selectDocument(selectedItem: SelectedItem) {

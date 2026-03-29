@@ -11,7 +11,7 @@
       (click)="onTabClick(document)"
       [active]="isDocumentSelected(document)"
     >
-      <span>{{ document.name }}</span>
+      <span>{{ dirtyEditorItemService.isDirty(document.id) ? '* ' + document.name : document.name }}</span>
       <button
         matIconButton
         class="icon-btn-sm ml-2 text-secondary"

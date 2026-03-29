@@ -27,7 +27,7 @@
   @if (hasSelectedItem() && hasProperties() && !isLoading()) {
   <div class="properties-container">
     <div class="properties-action-bar">Properties</div>
-    @for (property of properties(); track trackByPropertyName($index, property)) {
+    @for (property of properties(); track trackByPropertyName($index, property)) { @if (property) {
     <div
       class="property-row"
       [class.read-only]="property.isReadOnly"
@@ -78,7 +78,7 @@
         } }
       </div>
     </div>
-    }
+    } }
   </div>
   }
 
