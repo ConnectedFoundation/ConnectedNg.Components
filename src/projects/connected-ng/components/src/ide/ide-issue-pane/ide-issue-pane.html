@@ -1,0 +1,89 @@
+<div class="ide-issue-pane">
+  <!-- Header / summary bar -->
+  <div class="issue-header">
+    <span class="header-title">Issues</span>
+    <span class="summary">
+      @if (errorCount() > 0) {
+      <button
+        class="badge badge-error"
+        [class.badge-inactive]="!showErrors()"
+        [matTooltip]="errorCount() + ' error(s) — click to toggle'"
+        (click)="toggleFilter(IssueSeverity.Error)"
+      >
+        <mat-icon>error</mat-icon>{{ errorCount() }}
+      </button>
+      } @if (warningCount() > 0) {
+      <button
+        class="badge badge-warning"
+        [class.badge-inactive]="!showWarnings()"
+        [matTooltip]="warningCount() + ' warning(s) — click to toggle'"
+        (click)="toggleFilter(IssueSeverity.Warning)"
+      >
+        <mat-icon>warning</mat-icon>{{ warningCount() }}
+      </button>
+      } @if (suggestionCount() > 0) {
+      <button
+        class="badge badge-suggestion"
+        [class.badge-inactive]="!showSuggestions()"
+        [matTooltip]="suggestionCount() + ' suggestion(s) — click to toggle'"
+        (click)="toggleFilter(IssueSeverity.Suggestion)"
+      >
+        <mat-icon>lightbulb</mat-icon>{{ suggestionCount() }}
+      </button>
+      }
+    </span>
+  </div>
+
+  <!-- Empty -->
+  @if (groupedIssues().length === 0) {
+  <div class="empty-state">
+    <mat-icon>check_circle_outline</mat-icon>
+    <p>No issues detected</p>
+  </div>
+  }
+
+  <!-- Issue list grouped by document -->
+  @if (groupedIssues().length > 0) {
+  <div class="issue-list">
+    @for (group of groupedIssues(); track group.documentName) {
+    <div class="issue-group">
+      <div
+        class="group-header"
+        (click)="toggleGroup(group.documentName)"
+        role="button"
+        tabindex="0"
+        (keydown.enter)="toggleGroup(group.documentName)"
+        (keydown.space)="toggleGroup(group.documentName)"
+      >
+        <mat-icon class="collapse-icon"
+          >{{ isGroupCollapsed(group.documentName) ? 'chevron_right' : 'expand_more' }}</mat-icon
+        >
+        <mat-icon class="doc-icon">description</mat-icon>
+        <span class="doc-name">{{ group.documentName }}</span>
+        <span class="group-count">{{ group.issues.length }}</span>
+      </div>
+      @if (!isGroupCollapsed(group.documentName)) { @for (issue of group.issues; track $index) {
+      <div
+        class="issue-row"
+        [class.severity-error]="issue.severity === IssueSeverity.Error"
+        [class.severity-warning]="issue.severity === IssueSeverity.Warning"
+        [class.severity-suggestion]="issue.severity === IssueSeverity.Suggestion"
+        [matTooltip]="severityLabel(issue.severity) + ': ' + issue.message"
+        (click)="selectItem(issue)"
+        role="button"
+        tabindex="0"
+        (keydown.enter)="selectItem(issue)"
+        (keydown.space)="selectItem(issue)"
+      >
+        <mat-icon class="severity-icon">{{ severityIcon(issue.severity) }}</mat-icon>
+        <span class="issue-message">{{ issue.message }}</span>
+        @if (issue.code) {
+        <span class="issue-code">{{ issue.code }}</span>
+        }
+      </div>
+      } }
+    </div>
+    }
+  </div>
+  }
+</div>

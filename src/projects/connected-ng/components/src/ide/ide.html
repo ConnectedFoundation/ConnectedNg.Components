@@ -1,8 +1,9 @@
 <div style="height: 100%; display: flex; flex-direction: column">
-  <div style="flex-grow: 1">
+  <div style="flex-grow: 1; overflow: hidden; min-height: 0">
     <as-split
       [gutterSize]="2"
       direction="horizontal"
+      style="height: 100%"
     >
       @if (layoutService.leftPane().hasPortal() && layoutService.leftPane().visible()) {
       <as-split-area
@@ -18,12 +19,16 @@
         <as-split
           [gutterSize]="2"
           direction="vertical"
+          style="height: 100%"
         >
           <as-split-area [size]="'*'">
             <cf-ide-document-editor [context]="context()"></cf-ide-document-editor>
           </as-split-area>
           @if (layoutService.bottomPane().hasPortal() && layoutService.bottomPane().visible()) {
-          <as-split-area [size]="15">
+          <as-split-area
+            [size]="15"
+            [minSize]="5"
+          >
             <cf-ide-pane-content [pane]="layoutService.bottomPane()">
               <ng-template [cdkPortalOutlet]="layoutService.bottomPane().portal()"></ng-template>
             </cf-ide-pane-content>
