@@ -22,6 +22,7 @@ export * from './ide/services/project-service';
 export * from './ide/services/selection-service';
 export * from './ide/services/toolbox-item-service';
 export * from './ide/services/issue-service';
+export * from './ide/services/editor-item-service';
 
 // IDE Utilities
 export * from './ide/ide-item-id';

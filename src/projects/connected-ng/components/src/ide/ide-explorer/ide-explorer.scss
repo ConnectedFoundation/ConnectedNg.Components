@@ -2,6 +2,21 @@
   display: block;
 }
 
+.cfExplorerRenameInput {
+  flex: 1;
+  min-width: 0;
+  border: 1px solid var(--mat-sys-primary, #1976d2);
+  border-radius: 2px;
+  padding: 0 4px;
+  font: inherit;
+  font-size: inherit;
+  line-height: 1.4;
+  background: var(--mat-sys-surface, #fff);
+  color: var(--mat-sys-on-surface, #000);
+  outline: none;
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--mat-sys-primary, #1976d2) 30%, transparent);
+}
+
 .cfExplorer {
   display: block;
   font-size: 0.85em;

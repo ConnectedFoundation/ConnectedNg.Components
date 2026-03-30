@@ -1,6 +1,8 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  Directive,
+  ElementRef,
   TemplateRef,
   computed,
   contentChildren,
@@ -14,12 +16,27 @@ import {
   untracked,
 } from '@angular/core';
 import { NgTemplateOutlet } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { Subscription } from 'rxjs';
 import { IdeExplorerTemplateDirective } from './ide-explorer-template';
 import { IdeExplorerItemService, IExplorerItem } from '../services/explorer-item-service';
 import { SelectionService, SelectedItem } from '../services/selection-service';
+import { IdeEditorItemService } from '../services/editor-item-service';
+import { IdeDocumentService } from '../services/document-service';
+import { IdeItemId } from '../ide-item-id';
 
 export type ExplorerId = string;
+
+/** Autofocuses and selects all text in the rename input when it appears in the DOM. */
+@Directive({ selector: '[cfExplorerRenameAutofocus]', standalone: true })
+export class ExplorerRenameAutofocusDirective {
+  constructor(el: ElementRef<HTMLInputElement>) {
+    setTimeout(() => {
+      el.nativeElement.focus();
+      el.nativeElement.select();
+    });
+  }
+}
 
 export interface ExplorerNode<TItem = IExplorerItem> {
   id: ExplorerId;
@@ -58,7 +75,7 @@ export interface IdeExplorerSelectionItem<TItem = IExplorerItem> {
 @Component({
   selector: 'cf-ide-explorer',
   standalone: true,
-  imports: [NgTemplateOutlet],
+  imports: [NgTemplateOutlet, FormsModule, ExplorerRenameAutofocusDirective],
   changeDetection: ChangeDetectionStrategy.OnPush,
   templateUrl: './ide-explorer.html',
   styleUrl: './ide-explorer.scss',
@@ -99,6 +116,7 @@ export class IdeExplorer<TItem extends IExplorerItem = IExplorerItem> implements
   activeItemChanged = output<IdeExplorerSelectionItem<TItem> | null>();
   selectionChanged = output<IdeExplorerSelectionItem<TItem>[]>();
   moved = output<IdeExplorerMoveEvent>();
+  renamed = output<{ id: ExplorerId; item: TItem; newName: string }>();
 
   // ---------------- Template mapping ----------------
   private templateDirectives = contentChildren(IdeExplorerTemplateDirective);
@@ -106,9 +124,16 @@ export class IdeExplorer<TItem extends IExplorerItem = IExplorerItem> implements
   // ---------------- Services ----------------
   private explorerItemService = inject(IdeExplorerItemService);
   private selectionService = inject(SelectionService);
+  private editorItemService = inject(IdeEditorItemService);
+  private documentService = inject(IdeDocumentService);
 
   // ---------------- Internal state ----------------
   private items = signal<TItem[]>([]);
+
+  /** The node currently being renamed, or null when no rename is active. */
+  renamingNodeId = signal<ExplorerId | null>(null);
+  /** Tracks the pending rename text while the input is open. */
+  renamingValue = signal<string>('');
 
   private templateEntries = computed(() =>
     this.templateDirectives().map(d => ({ matcher: d.templateKey, templateRef: d.templateRef }))
@@ -156,6 +181,11 @@ export class IdeExplorer<TItem extends IExplorerItem = IExplorerItem> implements
 
   ngOnInit() {
     this.loadExplorerItems();
+
+    // Reload node names when any entity is updated (rename, etc.)
+    this.subscriptions.add(
+      this.documentService.$entityUpdated.subscribe(() => this.loadExplorerItems())
+    );
 
     // Listen to selection service and select matching items
     if (this.selectionService.$selected) {
@@ -274,6 +304,22 @@ export class IdeExplorer<TItem extends IExplorerItem = IExplorerItem> implements
     let isMultiSelectModifier = event.ctrlKey || event.metaKey || event.shiftKey;
 
     if (!isMultiSelectModifier || !this.isMultiSelectEnabled()) {
+      // Second click on already-active renameable node starts rename
+      if (
+        this.activeNodeId() === node.id &&
+        node.item.canRename &&
+        !isMultiSelectModifier &&
+        this.renamingNodeId() === null
+      ) {
+        this.startRename(node);
+        return;
+      }
+
+      // Cancel any in-progress rename when clicking elsewhere
+      if (this.renamingNodeId() !== null && this.renamingNodeId() !== node.id) {
+        this.cancelRename();
+      }
+
       this.activeNodeId.set(node.id);
       this.activeItemChanged.emit({ id: node.id, item: node.item });
 
@@ -291,6 +337,17 @@ export class IdeExplorer<TItem extends IExplorerItem = IExplorerItem> implements
   }
 
   handleDoubleClick(node: ExplorerNode<TItem>, _event: MouseEvent) {
+    // Cancel rename if one was in progress on a different node
+    if (this.renamingNodeId() !== null) {
+      this.cancelRename();
+    }
+
+    // Start rename on double-click when the item supports it
+    if (node.item.canRename) {
+      this.startRename(node);
+      return;
+    }
+
     this.itemDoubleClicked.emit({ id: node.id, item: node.item });
     this.activeNodeId.set(node.id);
     this.activeItemChanged.emit({ id: node.id, item: node.item });
@@ -308,6 +365,46 @@ export class IdeExplorer<TItem extends IExplorerItem = IExplorerItem> implements
     if (node.children.length > 0) {
       this.toggleNodeExpansion(node, _event as any as MouseEvent);
     }
+  }
+
+  // ---------------- Rename ----------------
+  startRename(node: ExplorerNode<TItem>) {
+    this.renamingNodeId.set(node.id);
+    this.renamingValue.set(node.item.name);
+  }
+
+  cancelRename() {
+    this.renamingNodeId.set(null);
+    this.renamingValue.set('');
+  }
+
+  commitRename(node: ExplorerNode<TItem>) {
+    const newName = this.renamingValue().trim();
+    this.renamingNodeId.set(null);
+    this.renamingValue.set('');
+
+    if (!newName || newName === node.item.name) {
+      return;
+    }
+
+    this.editorItemService.rename({ id: node.item.id, newName }).subscribe({
+      next: () => {
+        this.documentService.notifyEntityUpdated(IdeItemId.value(node.item.id));
+        this.renamed.emit({ id: node.id, item: node.item, newName });
+        this.loadExplorerItems();
+      },
+    });
+  }
+
+  onRenameKeydown(event: KeyboardEvent, node: ExplorerNode<TItem>) {
+    if (event.key === 'Enter') {
+      event.preventDefault();
+      this.commitRename(node);
+    } else if (event.key === 'Escape') {
+      event.preventDefault();
+      this.cancelRename();
+    }
+    event.stopPropagation();
   }
 
   // ---------------- Selection ----------------

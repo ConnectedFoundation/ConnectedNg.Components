@@ -31,6 +31,7 @@ export interface IExplorerItem {
   name: string;
   project: string;
   parent: string | null;
+  canRename: boolean;
 }
 
 @Injectable({

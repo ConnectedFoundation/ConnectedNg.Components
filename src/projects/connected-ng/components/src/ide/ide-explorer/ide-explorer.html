@@ -39,11 +39,23 @@
       </button>
       } @else {
       <span class="cfExplorerExpandButtonPlaceholder"></span>
-      }
+      } @if (renamingNodeId() === node.id) {
+      <input
+        class="cfExplorerRenameInput"
+        type="text"
+        [ngModel]="renamingValue()"
+        (ngModelChange)="renamingValue.set($event)"
+        (blur)="commitRename(node)"
+        (keydown)="onRenameKeydown($event, node)"
+        (click)="$event.stopPropagation()"
+        cfExplorerRenameAutofocus
+      />
+      } @else {
       <ng-container
         [ngTemplateOutlet]="resolveTemplate(node.templateKey, node.item) ?? defaultItemTemplate"
         [ngTemplateOutletContext]="{ $implicit: node.item, node: node, depth: 0 }"
       ></ng-container>
+      }
     </div>
 
     @if (isNodeExpanded(node.id) && node.children.length > 0) { @for (childNode of node.children;
@@ -100,11 +112,23 @@
     </button>
     } @else {
     <span class="cfExplorerExpandButtonPlaceholder"></span>
-    }
+    } @if (renamingNodeId() === node.id) {
+    <input
+      class="cfExplorerRenameInput"
+      type="text"
+      [ngModel]="renamingValue()"
+      (ngModelChange)="renamingValue.set($event)"
+      (blur)="commitRename(node)"
+      (keydown)="onRenameKeydown($event, node)"
+      (click)="$event.stopPropagation()"
+      cfExplorerRenameAutofocus
+    />
+    } @else {
     <ng-container
       [ngTemplateOutlet]="resolveTemplate(node.templateKey, node.item) ?? defaultItemTemplate"
       [ngTemplateOutletContext]="{ $implicit: node.item, node: node, depth: depth }"
     ></ng-container>
+    }
   </div>
 
   @if (isNodeExpanded(node.id) && node.children.length > 0) { @for (childNode of node.children;

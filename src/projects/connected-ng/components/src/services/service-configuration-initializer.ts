@@ -9,6 +9,7 @@ import { TOOLBOX_ITEM_SERVICE_CONFIG, ToolboxItemServiceConfiguration } from '..
 import { EXPLORER_ITEM_SERVICE_CONFIG, ExplorerItemServiceConfiguration } from '../ide/services/explorer-item-service';
 import { EDITOR_PROPERTY_SERVICE_CONFIG, EditorPropertyServiceConfiguration } from '../ide/services/editor-property-service';
 import { ISSUE_SERVICE_CONFIG, IssueServiceConfiguration } from '../ide/services/issue-service';
+import { EDITOR_ITEM_SERVICE_CONFIG, EditorItemServiceConfiguration } from '../ide/services/editor-item-service';
 
 @Injectable({
   providedIn: 'root',
@@ -31,6 +32,7 @@ export class ComponentsConfigurationProvider extends ConfigurationProvider {
       EXPLORER_ITEM_SERVICE_CONFIG,
       EDITOR_PROPERTY_SERVICE_CONFIG,
       ISSUE_SERVICE_CONFIG,
+      EDITOR_ITEM_SERVICE_CONFIG,
       ...CoreConfigurationProvider.getConfigurationTokens()
     ];
   }
@@ -44,6 +46,7 @@ export class ComponentsConfigurationProvider extends ConfigurationProvider {
       { provide: TOOLBOX_ITEM_SERVICE_CONFIG, useValue: new ToolboxItemServiceConfiguration() },
       { provide: EDITOR_PROPERTY_SERVICE_CONFIG, useValue: new EditorPropertyServiceConfiguration() },
       { provide: ISSUE_SERVICE_CONFIG, useValue: new IssueServiceConfiguration() },
+      { provide: EDITOR_ITEM_SERVICE_CONFIG, useValue: new EditorItemServiceConfiguration() },
       ...CoreConfigurationProvider.getConfigurationTokenProviders()
     ];
   }
