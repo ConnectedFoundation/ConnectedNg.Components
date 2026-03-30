@@ -1,5 +1,5 @@
 import { Component, computed, inject, Injectable, InjectionToken, signal, Type } from '@angular/core';
-import { Location } from '@angular/common';
+import { LocationStrategy } from '@angular/common';
 
 export const STACK_PAGE = new InjectionToken<StackPageInfo<unknown>>('STACK_PAGE');
 export const STACK_SHELL = new InjectionToken<any>('STACK_SHELL');
@@ -17,11 +17,11 @@ export interface StackPageNavigationInfo<T> extends StackPageInfo<T> {
 
 @Injectable()
 export class StackNavigationContext {
-  private location = inject(Location, { optional: true });
+  private locationStrategy = inject(LocationStrategy, { optional: true });
   private basePath = inject(STACK_BASE_PATH, { optional: true }) ?? '';
   private _managesUrl = true;
-  private rootPage?: StackPageInfo<unknown>;
-  private locationSubscription?: any;
+  private popstateHandler?: (event: PopStateEvent) => void;
+  private handlingPopstate = false;
 
   stack = signal<StackPageNavigationInfo<unknown>[]>([]);
   private skipUrlUpdate = false;
@@ -47,22 +47,52 @@ export class StackNavigationContext {
    * Must be called with the root page after navigation context is set up.
    */
   initializeBrowserNavigation(rootPage: StackPageInfo<unknown>) {
-    this.rootPage = rootPage;
-
-    if (!this.location || !this._managesUrl) {
+    if (!this._managesUrl) {
       return;
     }
 
-    // Subscribe to browser back/forward events (popstate)
-    this.locationSubscription = this.location.subscribe((event) => {
-      // When browser back is pressed, the URL has already changed
-      // We need to synchronize our stack by popping without updating the URL again
-      if (this.stack().length > 1) {
-        this.skipUrlUpdate = true;
-        this.back();
-        this.skipUrlUpdate = false;
+    // Listen to native popstate directly so Angular's router never sees the event.
+    this.popstateHandler = (event: PopStateEvent) => {
+      // Immediately undo the browser's back/forward by pushing the current
+      // stack URL back into history. This cancels the browser's navigation
+      // so Angular's router never processes the stale URL.
+      const correctUrl = this.getFullUrl();
+      this.handlingPopstate = true;
+
+      if (event.state?.stackForward) {
+        // Forward navigation: reconstruct from the URL the browser navigated to
+        const forwardUrl = window.location.pathname;
+        let relativePath = forwardUrl;
+        const basePrefix = this.locationStrategy ? this.locationStrategy.getBaseHref() : '/';
+        if (basePrefix && basePrefix !== '/' && relativePath.startsWith(basePrefix)) {
+          relativePath = relativePath.substring(basePrefix.length);
+        }
+        if (this.basePath && relativePath.startsWith('/' + this.basePath)) {
+          relativePath = relativePath.substring(('/' + this.basePath).length);
+        }
+        if (relativePath.startsWith('/')) {
+          relativePath = relativePath.substring(1);
+        }
+        const segments = relativePath.split('/').filter(s => s.length > 0);
+        if (segments.length > 0) {
+          this.skipUrlUpdate = true;
+          this.reconstructFromUrl(segments, rootPage);
+          this.skipUrlUpdate = false;
+          // Replace the current entry so it has our stack marker
+          this.nativeReplaceState(this.getFullUrl());
+        }
+      } else {
+        // Back navigation: undo the browser's navigation, then run our back() logic
+        history.pushState({ stackNav: true }, '', correctUrl);
+        if (this.stack().length > 1) {
+          this.back();
+        }
       }
-    });
+
+      this.handlingPopstate = false;
+    };
+
+    window.addEventListener('popstate', this.popstateHandler);
   }
 
   back() {
@@ -98,9 +128,9 @@ export class StackNavigationContext {
    * Cleans up browser navigation subscription.
    */
   destroyBrowserNavigation() {
-    if (this.locationSubscription) {
-      this.locationSubscription.unsubscribe();
-      this.locationSubscription = undefined;
+    if (this.popstateHandler) {
+      window.removeEventListener('popstate', this.popstateHandler);
+      this.popstateHandler = undefined;
     }
   }
 
@@ -120,7 +150,7 @@ export class StackNavigationContext {
   }
 
   /**
-   * Generates a URL path from the current stack
+   * Generates a URL path from the current stack (without base href)
    */
   getUrlFromStack(): string {
     const keys = this.stack()
@@ -138,27 +168,48 @@ export class StackNavigationContext {
   }
 
   /**
-   * Updates the browser URL based on the current stack
+   * Gets the full URL including base href for use with native history API
+   */
+  private getFullUrl(): string {
+    const baseHref = this.locationStrategy ? this.locationStrategy.getBaseHref() : '/';
+    const stackPath = this.getUrlFromStack();
+    const base = baseHref.endsWith('/') ? baseHref : baseHref + '/';
+    const path = stackPath.startsWith('/') ? stackPath.substring(1) : stackPath;
+    return base + path;
+  }
+
+  /**
+   * Pushes a new history entry with native API, bypassing Angular's router
+   */
+  private nativePushState(url: string): void {
+    history.pushState({ stackNav: true, stackForward: true }, '', url);
+  }
+
+  /**
+   * Replaces current history entry with native API, bypassing Angular's router
+   */
+  private nativeReplaceState(url: string): void {
+    history.replaceState({ stackNav: true, stackForward: true }, '', url);
+  }
+
+  /**
+   * Updates the browser URL based on the current stack.
+   * Uses native history API to avoid Angular's router intercepting URL changes.
    */
   private updateUrl(): void {
-    if (!this.location || this.skipUrlUpdate || !this._managesUrl) {
+    if (this.skipUrlUpdate || !this._managesUrl) {
       return;
     }
 
-    const url = this.getUrlFromStack();
+    const url = this.getFullUrl();
     console.log('[StackNavigationContext] updateUrl:', url, 'stack:', this.stack().map(p => p.key), 'managesUrl:', this._managesUrl);
 
-    // Normalize paths for comparison (strip leading slash)
-    const currentPath = this.location.path();
-    const normalizedCurrent = currentPath.startsWith('/') ? currentPath.slice(1) : currentPath;
-    const normalizedNew = url.startsWith('/') ? url.slice(1) : url;
+    const currentPath = window.location.pathname;
 
-    if (normalizedCurrent === normalizedNew) {
-      // URL hasn't changed — replace instead of push to avoid a duplicate
-      // history entry that would make the back button appear to do nothing.
-      this.location.replaceState(url);
+    if (currentPath === url) {
+      this.nativeReplaceState(url);
     } else {
-      this.location.go(url);
+      this.nativePushState(url);
     }
   }
 
