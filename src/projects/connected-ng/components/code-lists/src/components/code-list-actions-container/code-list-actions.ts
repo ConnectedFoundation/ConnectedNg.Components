@@ -13,7 +13,7 @@ export const convertToAction = (action: CodeListAction, item: unknown) => {
   const url = typeof action.url === 'function' ? action.url(item) : action.url;
   const actionFn = action.itemAction ? () => action.itemAction!(item) : undefined;
   return {
-    icon: action.icon,
+    // icon: action.icon,
     label: action.label,
     description: action.description,
     url: url,

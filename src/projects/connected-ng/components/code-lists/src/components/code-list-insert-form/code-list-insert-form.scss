@@ -1,10 +1,4 @@
 .insert-form {
-  padding: 1rem;
-
-  h2 {
-    margin-bottom: 1rem;
-  }
-
   .loading-container {
     display: flex;
     justify-content: center;
@@ -20,9 +14,9 @@
     border-radius: 4px;
   }
 
-  .grid {
-    display: grid;
-    gap: 1rem;
-    grid-template-columns: repeat(var(--columns, 1), 1fr);
-  }
+  // .grid {
+  //   display: grid;
+  //   gap: 1rem;
+  //   grid-template-columns: repeat(var(--columns, 1), 1fr);
+  // }
 }
