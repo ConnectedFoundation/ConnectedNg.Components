@@ -1,5 +1,5 @@
 import { NgComponentOutlet } from '@angular/common';
-import { Component, ComponentRef, computed, effect, EffectRef, forwardRef, inject, Injector, input, OnDestroy, signal, Type, ViewChild, ViewContainerRef } from '@angular/core';
+import { Component, ComponentRef, computed, effect, EffectRef, EmbeddedViewRef, forwardRef, inject, Injector, input, OnDestroy, signal, TemplateRef, Type, ViewChild, ViewContainerRef } from '@angular/core';
 import { STACK_PAGE, StackNavigationContext, StackPageInfo } from '../services/stack-navigation-context';
 import { MatButton, MatButtonModule } from '@angular/material/button';
 import { Subscription } from 'rxjs';
@@ -19,7 +19,7 @@ import { isActionsProvider } from './actions-provider-contract';
   ]
 })
 export class StackPage implements OnDestroy {
-  component = input.required<Type<unknown>>();
+  component = input.required<Type<unknown> | TemplateRef<unknown>>();
 
   isActivePage = computed(() => this.navigationContext.activePage() == this.pageInfo());
 
@@ -55,6 +55,7 @@ export class StackPage implements OnDestroy {
   componentContainer!: ViewContainerRef;
 
   private componentRef: ComponentRef<any> | null = null;
+  private embeddedViewRef: EmbeddedViewRef<any> | null = null;
   private outputSubscriptions: Subscription[] = [];
   private actionsEffectRef: EffectRef | null = null;
 
@@ -76,11 +77,18 @@ export class StackPage implements OnDestroy {
     this.createComponent(this.component(), this.data(), this.pageInfo().outputs as any);
   }
 
-  private createComponent(component: Type<unknown>, data: any, outputs?: Record<string, ((...args: any[]) => void) | symbol>) {
+  private createComponent(component: Type<unknown> | TemplateRef<unknown>, data: any, outputs?: Record<string, ((...args: any[]) => void) | symbol>) {
     // Clean up previous component and subscriptions
     this.cleanup();
 
     if (!this.componentContainer) return;
+
+    if (component instanceof TemplateRef) {
+      this.embeddedViewRef = this.componentContainer.createEmbeddedView(component, { data, outputs });
+      this.embeddedViewRef.detectChanges();
+      this.actions.set(this.defaultActions());
+      return;
+    }
 
     // Create the component
     this.componentRef = this.componentContainer.createComponent(component, {
@@ -142,6 +150,12 @@ export class StackPage implements OnDestroy {
     if (this.componentRef) {
       this.componentRef.destroy();
       this.componentRef = null;
+    }
+
+    // Destroy embedded view
+    if (this.embeddedViewRef) {
+      this.embeddedViewRef.destroy();
+      this.embeddedViewRef = null;
     }
 
     // Clear container

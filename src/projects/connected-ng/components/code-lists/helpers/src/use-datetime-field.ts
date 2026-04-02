@@ -24,7 +24,11 @@ export function useDateTimeField(...fieldNames: string[]) {
     const existing = context.fieldMetadata as any;
     if (existing?.component === DynamicFormFieldComponent) {
       return {
+        control: context.control,
         fieldMetadata: {
+          fieldName: existing.fieldName,
+          control: existing.control,
+          fieldConfig: existing.fieldConfig,
           component: DynamicFormFieldComponent,
           inputs: {
             ...existing.inputs,

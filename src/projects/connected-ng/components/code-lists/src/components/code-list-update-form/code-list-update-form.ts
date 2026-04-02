@@ -15,6 +15,7 @@ import { ActionsProviderContract, StackNavigationContext } from '@connected-ng/c
 export class CodeListUpdateForm<TDto extends object> extends FormBase<TDto> implements ActionsProviderContract {
   // Inputs
   updateOperation = input.required<InvokableServiceOperation<TDto, any>>();
+  formRenderer = input<(instance: CodeListUpdateForm<TDto>) => void>();
 
   //DTO
   entityLoader = input.required<Observable<any>>();
@@ -29,12 +30,16 @@ export class CodeListUpdateForm<TDto extends object> extends FormBase<TDto> impl
   dtoDescriptor = signal<DtoDescriptor | undefined>(undefined);
   formMetadata = signal<DynamicFormMetadata | undefined>(undefined);
 
+  field(name: string) {
+    return computed(() => this.formMetadata()?.fields.find(e => e.fieldName == name));
+  }
+
   override form: FormGroup = new FormGroup({});
 
   pageActions = computed(() => this.actions().length ? this.actions() : this.defaultActions());
 
   // View children for dynamic component creation
-  formFieldsContainer = viewChild<any, ViewContainerRef>('formFieldsContainer', { read: ViewContainerRef });
+  private formFieldsContainer = viewChild<any, ViewContainerRef>('formFieldsContainer', { read: ViewContainerRef });
 
   // Actions
   defaultActions = signal<ActionDescriptionWithAction[]>([]);
@@ -62,18 +67,7 @@ export class CodeListUpdateForm<TDto extends object> extends FormBase<TDto> impl
 
     // Effect to render form fields when metadata changes
     effect(() => {
-      const metadata = this.formMetadata();
-      const container = this.formFieldsContainer();
-
-      if (metadata && container) {
-        container.clear();
-        metadata.fields.forEach(field => {
-          const componentRef = container.createComponent(field.component);
-          Object.entries(field.inputs).forEach(([key, value]) => {
-            componentRef.setInput(key, value);
-          });
-        });
-      }
+      this.renderForm();
     });
   }
 
@@ -93,6 +87,26 @@ export class CodeListUpdateForm<TDto extends object> extends FormBase<TDto> impl
       });
     });
 
+  }
+
+  protected renderForm() {
+    if (this.formRenderer()) {
+      this.formRenderer()!(this);
+      return;
+    }
+
+    const metadata = this.formMetadata();
+    const container = this.formFieldsContainer();
+
+    if (metadata && container) {
+      container.clear();
+      metadata.fields.forEach(field => {
+        const componentRef = container.createComponent(field.component);
+        Object.entries(field.inputs).forEach(([key, value]) => {
+          componentRef.setInput(key, value);
+        });
+      });
+    }
   }
 
   private generateForm(dto: any, descriptor: DtoDescriptor): void {

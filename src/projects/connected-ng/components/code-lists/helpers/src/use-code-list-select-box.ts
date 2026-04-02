@@ -7,13 +7,18 @@ export function useCodeListSelectBox(fieldName: string, component: Type<any>, co
       return {
         fieldMetadata: {
           component: component,
+          fieldName,
+          control: context.control,
+          fieldConfig: context.fieldMetadata!.fieldConfig,
           inputs: {
             control: context.control,
             ...componentInputs
           }
-        }
+        },
+        control: context.control
       };
     }
+
     return undefined;
   }
 }

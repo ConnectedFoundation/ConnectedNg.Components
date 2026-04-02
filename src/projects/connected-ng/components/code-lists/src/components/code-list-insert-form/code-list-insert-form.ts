@@ -24,6 +24,9 @@ export class CodeListInsertForm<TDto extends object> extends FormBase<TDto> impl
   // State
   dtoDescriptor = signal<DtoDescriptor | undefined>(undefined);
   formMetadata = signal<DynamicFormMetadata | undefined>(undefined);
+  field(name: string) {
+    return computed(() => this.formMetadata()?.fields.find(e => e.fieldName == name));
+  }
   isLoading = signal<boolean>(true);
   override form: FormGroup = new FormGroup({});
   pageActions = computed(() => this.actions().length ? this.actions() : this.defaultActions());

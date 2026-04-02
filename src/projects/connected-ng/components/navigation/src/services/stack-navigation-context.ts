@@ -1,4 +1,4 @@
-import { Component, computed, inject, Injectable, InjectionToken, signal, Type } from '@angular/core';
+import { Component, computed, inject, Injectable, InjectionToken, signal, TemplateRef, Type } from '@angular/core';
 import { LocationStrategy } from '@angular/common';
 
 export const STACK_PAGE = new InjectionToken<StackPageInfo<unknown>>('STACK_PAGE');
@@ -470,7 +470,7 @@ export interface NavigationHole {
 }
 
 export interface StackPageInfo<T> {
-  component: Type<unknown>;
+  component: Type<unknown> | TemplateRef<unknown>;
   headerComponent?: Type<unknown>;
   data: any;
   key: string;

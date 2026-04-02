@@ -122,6 +122,9 @@ export function createFormFromDtoDescriptor(dto: any, dtoDescriptor: DtoDescript
  */
 export interface DynamicComponentMetadata<TComponent = any> {
   component: Type<TComponent>;
+  fieldName: string;
+  control: FormControl;
+  fieldConfig: FormInputConfig,
   inputs: any;
 }
 
@@ -194,6 +197,9 @@ export function createFormInputFromDtoProperty(
 
   return {
     component: DynamicFormFieldComponent,
+    fieldName: propertyName,
+    control: control,
+    fieldConfig: config,
     inputs: {
       fieldConfig: config,
       control: control
@@ -208,7 +214,7 @@ export interface DynamicFormMetadata {
 
 export interface FormFieldInterceptorContext {
   property: DtoPropertyDescriptor;
-  fieldMetadata: DynamicComponentMetadata | null;
+  fieldMetadata: DynamicComponentMetadata;
   control: FormControl;
   formGroup: FormGroup;
 }

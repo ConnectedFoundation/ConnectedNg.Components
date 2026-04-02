@@ -5,6 +5,7 @@
   <ng-content />
 </div>
 <cn-floating-action-bar
+  [class.d-none]="!(actions()?.length)"
   #actionBar
   [actions]="actions()"
 ></cn-floating-action-bar>
