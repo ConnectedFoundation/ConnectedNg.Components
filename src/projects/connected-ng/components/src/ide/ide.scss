@@ -24,3 +24,22 @@
 //     background-color: black;
 //   }
 // }
+
+.nav-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  align-items: flex-start;
+  padding: 0;
+  width: 100%;
+  --mat-list-list-item-leading-icon-start-space: 12px;
+  --mat-list-list-item-leading-icon-end-space: 12px;
+}
+
+.mat-mdc-list-item {
+  border-radius: var(--mat-list-active-indicator-shape, var(--mat-sys-corner-full));
+  --mat-focus-indicator-border-radius: var(
+    --mat-list-active-indicator-shape,
+    var(--mat-sys-corner-full)
+  );
+}

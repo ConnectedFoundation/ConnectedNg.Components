@@ -1,4 +1,14 @@
-<div style="height: 100%; display: flex; flex-direction: column">
+<div style="height: calc(100% - 2.1rem); display: flex; flex-direction: column">
+  <!-- <div
+    class="d-flex"
+    style="height: 100%; overflow: hidden"
+  >
+    <div
+      class="cf-ide-navbar"
+      style="width: 85px; margin-right: 2px"
+    >
+    </div> -->
+
   <div style="flex-grow: 1; overflow: hidden; min-height: 0">
     <as-split
       [gutterSize]="2"
@@ -45,11 +55,13 @@
       }
     </as-split>
   </div>
-  <!-- <mat-divider [inset]="true"></mat-divider> -->
-  <div
-    class="status-bar"
-    style="min-height: 1rem"
-  >
-    Status bar
-  </div>
 </div>
+
+<!-- <mat-divider [inset]="true"></mat-divider> -->
+<div
+  class="status-bar"
+  style="min-height: 2.1rem"
+>
+  Status bar
+</div>
+<!-- </div> -->

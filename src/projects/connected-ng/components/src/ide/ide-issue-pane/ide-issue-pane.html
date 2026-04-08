@@ -10,7 +10,8 @@
         [matTooltip]="errorCount() + ' error(s) — click to toggle'"
         (click)="toggleFilter(IssueSeverity.Error)"
       >
-        <mat-icon>error</mat-icon>{{ errorCount() }}
+        <mat-icon>error</mat-icon
+        ><span style="color: var(--mat-sys-on-surface)">{{ errorCount() }}</span>
       </button>
       } @if (warningCount() > 0) {
       <button

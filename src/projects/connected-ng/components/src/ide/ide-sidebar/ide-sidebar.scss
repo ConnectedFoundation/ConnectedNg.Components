@@ -30,6 +30,8 @@
 
     .mat-mdc-tab {
       min-width: 120px;
+      height: var(--mat-tab-container-height, 40px);
+      border-radius: 0;
     }
 
     .mat-mdc-tab-label-content {
