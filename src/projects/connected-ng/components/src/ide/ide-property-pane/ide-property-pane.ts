@@ -1,4 +1,4 @@
-import { Component, computed, effect, inject, OnDestroy, OnInit, signal } from '@angular/core';
+import { Component, computed, effect, inject, Inject, OnDestroy, OnInit, Optional, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule, FormControl, FormGroup } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -6,7 +6,7 @@ import { MatInputModule } from '@angular/material/input';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatSelectModule } from '@angular/material/select';
-import { MatCheckboxModule } from '@angular/material/checkbox';
+import { MatSlideToggleModule } from '@angular/material/slide-toggle';
 import { MatMenuModule } from '@angular/material/menu';
 import { MatDividerModule } from '@angular/material/divider';
 import { MatOptionModule } from '@angular/material/core';
@@ -14,6 +14,7 @@ import { Subscription } from 'rxjs';
 import { IdeEditorPropertyService } from '../services/editor-property-service';
 import { SelectionService, SelectedItem } from '../services/selection-service';
 import { IEditorItemProperty } from '../services/dtos/editor-item-property';
+import { PROPERTY_EDITOR_RULES, PropertyEditorRule, PropertyEditorType } from './property-editor-rules';
 
 @Component({
   selector: 'cf-ide-property-pane',
@@ -28,7 +29,7 @@ import { IEditorItemProperty } from '../services/dtos/editor-item-property';
     MatButtonModule,
     MatSelectModule,
     MatOptionModule,
-    MatCheckboxModule,
+    MatSlideToggleModule,
     MatMenuModule,
     MatDividerModule
   ],
@@ -39,6 +40,13 @@ export class IdePropertyPane implements OnInit, OnDestroy {
   private propertyService = inject(IdeEditorPropertyService);
   private selectionService = inject(SelectionService);
   private subscriptions = new Subscription();
+
+  /** Flattened, ordered list of all registered rules (earlier registrations win). */
+  private readonly rules: PropertyEditorRule[];
+
+  constructor(@Optional() @Inject(PROPERTY_EDITOR_RULES) ruleGroups: PropertyEditorRule[][] | null) {
+    this.rules = ruleGroups ? ruleGroups.flat() : [];
+  }
   /** Separate subscription group for form controls — cleared on every loadProperties call. */
   private formSubscriptions = new Subscription();
 
@@ -124,8 +132,15 @@ export class IdePropertyPane implements OnInit, OnDestroy {
     const forms = new Map<string, FormControl>();
 
     properties.forEach(prop => {
+      const editorType = this.getPropertyEditor(prop);
+      let initialValue: any = prop.value ?? '';
+      if (editorType === 'checkbox') {
+        initialValue = initialValue === true || String(initialValue).toLowerCase() === 'true';
+      } else if (editorType === 'number') {
+        initialValue = initialValue !== '' ? Number(initialValue) : '';
+      }
       const control = new FormControl(
-        { value: prop.value ?? '', disabled: prop.isReadOnly },
+        { value: initialValue, disabled: prop.isReadOnly },
         { updateOn: 'blur' }
       );
 
@@ -203,19 +218,64 @@ export class IdePropertyPane implements OnInit, OnDestroy {
     return control;
   }
 
-  protected getPropertyEditor(property: IEditorItemProperty): 'text' | 'number' | 'checkbox' | 'dropdown' {
-    if (!property.editor) return 'text';
+  protected getPropertyLabel(property: IEditorItemProperty): string {
+    const rule = this.findRule(property);
+    return rule?.label ?? property.name;
+  }
 
-    const editor = property.editor.split(':')[0];
-    switch (editor.toLowerCase()) {
+  protected getPropertyEditor(property: IEditorItemProperty): PropertyEditorType {
+    // 1. Check registered rules first
+    const rule = this.findRule(property);
+    if (rule) return rule.editor;
+
+    // 2. Fall back to value sent by the server
+    if (property.editor) {
+      return this.resolveEditorString(property.editor.split(':')[0]);
+    }
+
+    // 3. Infer from CLR type name
+    return this.inferEditorFromType(property.propertyType);
+  }
+
+  private findRule(property: IEditorItemProperty): PropertyEditorRule | undefined {
+    return this.rules.find(rule => {
+      if (rule.name !== undefined && rule.name !== property.name) return false;
+      if (rule.propertyType !== undefined && rule.propertyType !== property.propertyType) return false;
+      return true;
+    });
+  }
+
+  private resolveEditorString(value: string): PropertyEditorType {
+    switch (value.toLowerCase()) {
+      case 'int':
       case 'integer':
       case 'number':
         return 'number';
+      case 'bool':
       case 'boolean':
         return 'checkbox';
       case 'dropdown':
       case 'select':
         return 'dropdown';
+      default:
+        return 'text';
+    }
+  }
+
+  private inferEditorFromType(propertyType: string): PropertyEditorType {
+    switch (propertyType) {
+      case 'System.Boolean':
+        return 'checkbox';
+      case 'System.Int16':
+      case 'System.Int32':
+      case 'System.Int64':
+      case 'System.UInt16':
+      case 'System.UInt32':
+      case 'System.UInt64':
+      case 'System.Single':
+      case 'System.Double':
+      case 'System.Decimal':
+        return 'number';
       default:
         return 'text';
     }

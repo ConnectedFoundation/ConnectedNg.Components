@@ -110,6 +110,12 @@ export class IdeExplorer<TItem extends IExplorerItem = IExplorerItem> implements
   autoExpandHoverDelayMilliseconds = input<number>(450);
   autoExpandRoots = input<boolean>(false);
 
+  /**
+   * Optional comparator applied when sorting sibling nodes.
+   * When provided it replaces the default sortKey-based sort.
+   */
+  sortFunction = input<((a: ExplorerNode<TItem>, b: ExplorerNode<TItem>) => number) | null>(null);
+
   // ---------------- Outputs ----------------
   itemClicked = output<{ id: ExplorerId; item: TItem }>();
   itemDoubleClicked = output<{ id: ExplorerId; item: TItem }>();
@@ -213,11 +219,12 @@ export class IdeExplorer<TItem extends IExplorerItem = IExplorerItem> implements
     this.clearAutoExpandTimeout();
   }
 
-  loadExplorerItems() {
+  loadExplorerItems(afterLoad?: () => void) {
     this.explorerItemService.query({
       context: this.context()
     }).subscribe(items => {
       this.items.set(items as TItem[]);
+      afterLoad?.();
     });
   }
 
@@ -839,28 +846,33 @@ export class IdeExplorer<TItem extends IExplorerItem = IExplorerItem> implements
     }
 
     let sortRecursively = (nodes: ExplorerNode<TItem>[]) => {
-      nodes.sort((left, right) => {
-        let leftSortKey = sortKeyById.get(left.id);
-        let rightSortKey = sortKeyById.get(right.id);
+      const customSort = this.sortFunction();
+      if (customSort) {
+        nodes.sort(customSort);
+      } else {
+        nodes.sort((left, right) => {
+          let leftSortKey = sortKeyById.get(left.id);
+          let rightSortKey = sortKeyById.get(right.id);
 
-        if (leftSortKey == null && rightSortKey == null) {
-          return left.id.localeCompare(right.id);
-        }
+          if (leftSortKey == null && rightSortKey == null) {
+            return left.id.localeCompare(right.id);
+          }
 
-        if (leftSortKey == null) {
-          return 1;
-        }
+          if (leftSortKey == null) {
+            return 1;
+          }
 
-        if (rightSortKey == null) {
-          return -1;
-        }
+          if (rightSortKey == null) {
+            return -1;
+          }
 
-        if (typeof leftSortKey === 'number' && typeof rightSortKey === 'number') {
-          return leftSortKey - rightSortKey;
-        }
+          if (typeof leftSortKey === 'number' && typeof rightSortKey === 'number') {
+            return leftSortKey - rightSortKey;
+          }
 
-        return String(leftSortKey).localeCompare(String(rightSortKey));
-      });
+          return String(leftSortKey).localeCompare(String(rightSortKey));
+        });
+      }
 
       for (let node of nodes) {
         sortRecursively(node.children);

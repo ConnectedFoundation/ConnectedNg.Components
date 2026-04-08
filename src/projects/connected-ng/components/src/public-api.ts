@@ -1,13 +1,13 @@
 // IDE Components
 export * from './ide/ide';
 export * from './ide/ide-explorer/ide-explorer';
-export * from './ide/ide-explorer/ide-explorer-template';
-export * from './ide/ide-sidebar/ide-sidebar';
+export * from './ide/ide-explorer/ide-explorer-template'; export * from './ide/ide-sidebar/ide-sidebar';
 export * from './ide/ide-sidebar/ide-sidebar-tab.directive';
 export * from './ide/ide-toolbox/ide-toolbox';
 export * from './ide/ide-toolbox/ide-toolbox-template';
 export * from './ide/ide-document-editor/ide-document-editor';
 export * from './ide/ide-property-pane/ide-property-pane';
+export * from './ide/ide-property-pane/property-editor-rules';
 export * from './ide/ide-issue-pane/ide-issue-pane';
 export * from './ide/ide-pane-content/ide-pane-content';
 export * from './ide/services/dirty-editor-item.service';

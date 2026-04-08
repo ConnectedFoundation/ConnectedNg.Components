@@ -150,11 +150,28 @@ export class IdeDocumentEditor implements OnInit, OnDestroy {
   closeDocument(document: IdeDocument) {
     let existing = this.activeEditorInstances().find(e => documentsEqual(e, document));
     if (existing) {
-      if (this.selectedEditorInstance() && documentsEqual(this.selectedEditorInstance()!, document)) {
-        this.selectedEditorInstance.set(undefined);
+      const wasSelected = this.selectedEditorInstance() && documentsEqual(this.selectedEditorInstance()!, document);
+      const remaining = this.activeEditorInstances().filter(e => !documentsEqual(e, document));
+
+      if (wasSelected) {
+        const next = remaining.length > 0 ? remaining[remaining.length - 1] : undefined;
+        this.selectedEditorInstance.set(next);
+        if (next) {
+          this.selectionService.select({
+            id: next.id,
+            type: next.type,
+            project: next.project,
+            context: this.context(),
+            currentEditor: 'IdeDocumentEditor'
+          });
+        }
       }
 
-      this.activeEditorInstances.set(this.activeEditorInstances().filter(e => !documentsEqual(e, document)));
+      // Defer removal so the tab strip can animate to the newly selected tab
+      // before the closed tab disappears from the DOM.
+      setTimeout(() => {
+        this.activeEditorInstances.update((items) => items.filter(e => !documentsEqual(e, document)));
+      });
     }
   }
 

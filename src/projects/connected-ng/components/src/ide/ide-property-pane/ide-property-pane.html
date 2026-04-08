@@ -42,7 +42,7 @@
           subscriptSizing="dynamic"
           class="input-parent"
         >
-          <mat-label>{{ property.name }}</mat-label>
+          <mat-label>{{ getPropertyLabel(property) }}</mat-label>
           <input
             matInput
             type="text"
@@ -56,6 +56,7 @@
           subscriptSizing="dynamic"
           class="input-parent"
         >
+          <mat-label>{{ getPropertyLabel(property) }}</mat-label>
           <input
             matInput
             type="number"
@@ -64,7 +65,9 @@
           />
         </mat-form-field>
         } @case ('checkbox') {
-        <mat-checkbox [formControl]="getPropertyControl(property.name)"> </mat-checkbox>
+        <mat-slide-toggle [formControl]="getPropertyControl(property.name)">
+          {{ getPropertyLabel(property) }}
+        </mat-slide-toggle>
         } @case ('dropdown') {
         <mat-form-field
           appearance="outline"

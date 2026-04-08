@@ -1,8 +1,9 @@
 .status-bar {
   border-top: 1px solid var(--mat-sys-outline);
-  font-size: 0.875em;
+  font-size: 0.75em;
   padding: 0.25em 1em;
   background: light-dark(aliceblue, var(--mat-sys-primary));
+  height: fit-content;
 }
 
 // cf-ide-pane-content {
