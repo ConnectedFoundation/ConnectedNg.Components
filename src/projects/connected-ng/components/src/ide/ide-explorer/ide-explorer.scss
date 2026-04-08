@@ -42,30 +42,30 @@
   transition: background-color 200ms ease;
 
   &:hover {
-    background-color: rgba(0, 0, 0, 0.04);
+    background-color: light-dark(rgba(0, 0, 0, 0.04), rgba(255, 255, 255, 0.025));
   }
 
   &[data-active='true'] {
-    background-color: rgba(0, 123, 255, 0.1);
+    background-color: light-dark(rgba(0, 0, 0, 0.08), rgba(255, 255, 255, 0.05));
 
     &:hover {
-      background-color: rgba(0, 123, 255, 0.15);
+      background-color: light-dark(rgba(0, 0, 0, 0.1), rgba(255, 255, 255, 0.1));
     }
   }
 
   &[data-selected='true'] {
-    background-color: rgba(0, 123, 255, 0.05);
+    background-color: light-dark(rgba(0, 0, 0, 0.08), rgba(255, 255, 255, 0.05));
 
     &:hover {
-      background-color: rgba(0, 123, 255, 0.08);
+      background-color: light-dark(rgba(0, 0, 0, 0.1), rgba(255, 255, 255, 0.1));
     }
   }
 
   &[data-active='true'][data-selected='true'] {
-    background-color: rgba(0, 123, 255, 0.12);
+    background-color: light-dark(rgba(0, 0, 0, 0.08), rgba(255, 255, 255, 0.05));
 
     &:hover {
-      background-color: rgba(0, 123, 255, 0.17);
+      background-color: light-dark(rgba(0, 0, 0, 0.1), rgba(255, 255, 255, 0.1));
     }
   }
 }
