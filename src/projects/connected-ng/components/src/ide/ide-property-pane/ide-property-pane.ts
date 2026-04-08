@@ -15,6 +15,7 @@ import { IdeEditorPropertyService } from '../services/editor-property-service';
 import { SelectionService, SelectedItem } from '../services/selection-service';
 import { IEditorItemProperty } from '../services/dtos/editor-item-property';
 import { PROPERTY_EDITOR_RULES, PropertyEditorRule, PropertyEditorType } from './property-editor-rules';
+import { MatCheckbox, MatCheckboxModule } from "@angular/material/checkbox";
 
 @Component({
   selector: 'cf-ide-property-pane',
@@ -31,7 +32,8 @@ import { PROPERTY_EDITOR_RULES, PropertyEditorRule, PropertyEditorType } from '.
     MatOptionModule,
     MatSlideToggleModule,
     MatMenuModule,
-    MatDividerModule
+    MatDividerModule,
+    MatCheckboxModule
   ],
   templateUrl: './ide-property-pane.html',
   styleUrl: './ide-property-pane.scss',

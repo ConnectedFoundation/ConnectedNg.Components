@@ -65,9 +65,18 @@
           />
         </mat-form-field>
         } @case ('checkbox') {
-        <mat-slide-toggle [formControl]="getPropertyControl(property.name)">
+        <mat-slide-toggle
+          class="md w-10"
+          [formControl]="getPropertyControl(property.name)"
+          labelPosition="before"
+        >
           {{ getPropertyLabel(property) }}
         </mat-slide-toggle>
+        <!-- <mat-checkbox
+          [formControl]="getPropertyControl(property.name)"
+          labelPosition="before"
+          >{{ getPropertyLabel(property) }}
+        </mat-checkbox> -->
         } @case ('dropdown') {
         <mat-form-field
           appearance="outline"

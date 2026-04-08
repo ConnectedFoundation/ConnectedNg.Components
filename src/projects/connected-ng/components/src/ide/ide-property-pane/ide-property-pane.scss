@@ -155,3 +155,16 @@
     transform: rotate(360deg);
   }
 }
+
+::ng-deep mat-slide-toggle.md {
+  .mdc-switch {
+    scale: 0.75;
+  }
+  .mat-internal-form-field {
+    display: flex;
+    justify-content: space-between;
+  }
+  .mdc-form-field--align-end > label {
+    margin-left: initial;
+  }
+}
