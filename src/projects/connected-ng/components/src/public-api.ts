@@ -39,3 +39,5 @@ export * from './lists/list/list';
 export * from './lists/expandable-list-item/expandable-list-item';
 export * from './action-tile/action-tile';
 export * from './action-bar-component/action-bar-component';
+export * from './carousel/carousel/carousel';
+export * from './carousel/carousel-item/carousel-item';
