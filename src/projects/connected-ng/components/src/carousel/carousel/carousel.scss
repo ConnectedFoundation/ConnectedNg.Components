@@ -12,13 +12,13 @@
   margin-right: 0;
 }
 
-.carousel-viewport {
-  display: flex;
-  align-items: center;
-  flex: 1 1 auto;
-  min-height: 0;
-  position: relative;
-}
+// .carousel-viewport {
+//   display: flex;
+//   align-items: stretch;
+//   flex: 1 1 auto;
+//   min-height: 0;
+//   position: relative;
+// }
 
 .carousel-chevron {
   display: flex;
@@ -64,7 +64,6 @@
 
   display: flex;
   flex: 1 1 auto;
-  min-height: 0;
   gap: var(--carousel-gap, 1rem);
 
   width: 100%;
