@@ -1,19 +1,45 @@
 <div class="carousel-container">
+  @if (showChevrons()) {
+  <button
+    class="carousel-chevron chevron-prev"
+    [class.hidden]="!canScrollPrev()"
+    (click)="scrollPrev()"
+    aria-label="Previous"
+  >
+    &#8249;
+  </button>
+  }
+
   <div
     #carouselContainer
     class="carousel-content"
+    [class.dragging]="isDragging()"
     (scroll)="onScroll($event)"
+    (mousedown)="onDragStart($event)"
+    (mousemove)="onDragMove($event)"
+    (mouseup)="onDragEnd()"
+    (mouseleave)="onDragEnd()"
   >
     <ng-content />
   </div>
 
-  @if (showIndicators()) {
+  @if (showChevrons()) {
+  <button
+    class="carousel-chevron chevron-next"
+    [class.hidden]="!canScrollNext()"
+    (click)="scrollNext()"
+    aria-label="Next"
+  >
+    &#8250;
+  </button>
+  } @if (showIndicators()) {
   <div class="carousel-indicators">
     @for (index of getIndicatorArray(); track index) {
     <div
       class="indicator"
       [class.active]="currentIndex() === index"
       [attr.aria-label]="'Slide ' + (index + 1)"
+      (click)="scrollToIndex(index)"
     ></div>
     }
   </div>
