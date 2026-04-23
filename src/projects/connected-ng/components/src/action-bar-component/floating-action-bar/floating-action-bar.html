@@ -1,6 +1,6 @@
-<cn-carousel>
+<cn-carousel [visibleItems]="{'0': 1, '576': 2, '992': 2}" [showChevrons]="false" [showIndicators]="false" class="w-10">
   @for(action of actions(); track action){
-  <cn-carousel-item style="height: fit-content; width: fit-content; position: relative">
+  <cn-carousel-item style="position: relative">
     <cn-action-tile
       [description]="action.description"
       [icon]="action.icon"
