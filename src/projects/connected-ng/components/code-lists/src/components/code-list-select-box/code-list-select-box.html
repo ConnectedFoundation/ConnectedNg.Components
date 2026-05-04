@@ -39,11 +39,18 @@
   </mtx-select>
 
   @if (insertFormComponent()) {
-  <mat-icon
+  <button class="icon-btn-sm mr-3" matIconButton matIconSuffix type="button" (click)="openInsertDialog()">
+    <mat-icon>add</mat-icon>
+  </button>
+  }
+
+  <!-- @if (insertFormComponent()) {
+    <mat-icon
     matIconSuffix
     (click)="openInsertDialog()"
     class="add-icon"
     >add</mat-icon
   >
-  }
+  } -->
+
 </mat-form-field>

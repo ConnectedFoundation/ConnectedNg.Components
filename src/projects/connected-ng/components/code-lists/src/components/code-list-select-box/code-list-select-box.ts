@@ -97,7 +97,8 @@ export class CodeListSelectBox<T = any> implements ControlValueAccessor, Validat
 
     const result = await firstValueFrom(
       this.dialog.open(InsertFormDialogWrapper, {
-        width: 'fit-content',
+        width: '80vw',
+        // width: 'fit-content',
         data: { formComponent, formInputs: this.insertFormInputs(), title: this.insertFormTitle() }
       }).afterClosed()
     );
@@ -118,17 +119,17 @@ export class CodeListSelectBox<T = any> implements ControlValueAccessor, Validat
   imports: [CommonModule, MatDialogModule, MatButtonModule],
   template: `
     <div class="dialog-header">
-      <h2 mat-dialog-title>{{ data.title }}</h2>
+      <h4 mat-dialog-title>{{ data.title }}</h4>
     </div>
     <mat-dialog-content>
       <div #formContainer></div>
     </mat-dialog-content>
   `,
   styles: [`
-    .dialog-header {
-      margin-bottom: 16px;
-      padding: 24px;
-    }
+    // .dialog-header {
+    //   margin-bottom: 16px;
+    //   padding: 24px;
+    // }
   `]
 })
 export class InsertFormDialogWrapper<T> {
