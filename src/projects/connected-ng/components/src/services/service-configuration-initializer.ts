@@ -8,6 +8,7 @@ import { SELECTION_SERVICE_CONFIG, SelectionServiceConfiguration } from '../ide/
 import { TOOLBOX_ITEM_SERVICE_CONFIG, ToolboxItemServiceConfiguration } from '../ide/services/toolbox-item-service';
 import { EXPLORER_ITEM_SERVICE_CONFIG, ExplorerItemServiceConfiguration } from '../ide/services/explorer-item-service';
 import { EDITOR_PROPERTY_SERVICE_CONFIG, EditorPropertyServiceConfiguration } from '../ide/services/editor-property-service';
+import { PROPERTY_COLLECTION_SERVICE_CONFIG, PropertyCollectionServiceConfiguration } from '../ide/services/property-collection-service';
 import { ISSUE_SERVICE_CONFIG, IssueServiceConfiguration } from '../ide/services/issue-service';
 import { EDITOR_ITEM_SERVICE_CONFIG, EditorItemServiceConfiguration } from '../ide/services/editor-item-service';
 
@@ -31,6 +32,7 @@ export class ComponentsConfigurationProvider extends ConfigurationProvider {
       TOOLBOX_ITEM_SERVICE_CONFIG,
       EXPLORER_ITEM_SERVICE_CONFIG,
       EDITOR_PROPERTY_SERVICE_CONFIG,
+      PROPERTY_COLLECTION_SERVICE_CONFIG,
       ISSUE_SERVICE_CONFIG,
       EDITOR_ITEM_SERVICE_CONFIG,
       ...CoreConfigurationProvider.getConfigurationTokens()
@@ -45,6 +47,7 @@ export class ComponentsConfigurationProvider extends ConfigurationProvider {
       { provide: EXPLORER_ITEM_SERVICE_CONFIG, useValue: new ExplorerItemServiceConfiguration() },
       { provide: TOOLBOX_ITEM_SERVICE_CONFIG, useValue: new ToolboxItemServiceConfiguration() },
       { provide: EDITOR_PROPERTY_SERVICE_CONFIG, useValue: new EditorPropertyServiceConfiguration() },
+      { provide: PROPERTY_COLLECTION_SERVICE_CONFIG, useValue: new PropertyCollectionServiceConfiguration() },
       { provide: ISSUE_SERVICE_CONFIG, useValue: new IssueServiceConfiguration() },
       { provide: EDITOR_ITEM_SERVICE_CONFIG, useValue: new EditorItemServiceConfiguration() },
       ...CoreConfigurationProvider.getConfigurationTokenProviders()

@@ -26,4 +26,22 @@ export class DirtyEditorItemService {
   isDirty(id: string): boolean {
     return this._dirtyItems().has(id);
   }
+
+  markDirty(id: string): void {
+    this._dirtyItems.update(s => {
+      if (s.has(id)) return s;
+      const next = new Set(s);
+      next.add(id);
+      return next;
+    });
+  }
+
+  clearDirty(id: string): void {
+    this._dirtyItems.update(s => {
+      if (!s.has(id)) return s;
+      const next = new Set(s);
+      next.delete(id);
+      return next;
+    });
+  }
 }

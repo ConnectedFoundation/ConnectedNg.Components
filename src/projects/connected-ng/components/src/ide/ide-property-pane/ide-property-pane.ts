@@ -12,8 +12,11 @@ import { MatDividerModule } from '@angular/material/divider';
 import { MatOptionModule } from '@angular/material/core';
 import { Subscription } from 'rxjs';
 import { IdeEditorPropertyService } from '../services/editor-property-service';
+import { PropertyCollectionService } from '../services/property-collection-service';
 import { SelectionService, SelectedItem } from '../services/selection-service';
 import { IEditorItemProperty } from '../services/dtos/editor-item-property';
+import { IdeItemId } from '../ide-item-id';
+import { IPropertyValueCollectionItem } from '../services/dtos/property-collection-item';
 import { PROPERTY_EDITOR_RULES, PropertyEditorRule, PropertyEditorType } from './property-editor-rules';
 import { MatCheckbox, MatCheckboxModule } from "@angular/material/checkbox";
 
@@ -40,6 +43,7 @@ import { MatCheckbox, MatCheckboxModule } from "@angular/material/checkbox";
 })
 export class IdePropertyPane implements OnInit, OnDestroy {
   private propertyService = inject(IdeEditorPropertyService);
+  private collectionService = inject(PropertyCollectionService);
   private selectionService = inject(SelectionService);
   private subscriptions = new Subscription();
 
@@ -56,6 +60,7 @@ export class IdePropertyPane implements OnInit, OnDestroy {
   private selectedItem = signal<SelectedItem | null>(null);
   private lastLoadedItemKey = signal<string | null>(null);
   private propertyEditorForms = signal<Map<string, FormControl>>(new Map());
+  protected dropdownOptions = signal<Map<string, IPropertyValueCollectionItem[]>>(new Map());
   protected isLoading = signal<boolean>(false);
   protected errorMessage = signal<string | null>(null);
 
@@ -132,6 +137,7 @@ export class IdePropertyPane implements OnInit, OnDestroy {
     this.formSubscriptions = new Subscription();
 
     const forms = new Map<string, FormControl>();
+    this.dropdownOptions.set(new Map());
 
     properties.forEach(prop => {
       const editorType = this.getPropertyEditor(prop);
@@ -157,9 +163,31 @@ export class IdePropertyPane implements OnInit, OnDestroy {
       );
 
       forms.set(prop.name, control);
+
+      // For collection-backed dropdowns, load options from the backend.
+      if (this.isCollectionType(prop.propertyType)) {
+        this.collectionService.query({ type: prop.propertyType }).subscribe({
+          next: (items) => {
+            const current = new Map(this.dropdownOptions());
+            current.set(prop.name, items);
+            this.dropdownOptions.set(current);
+          },
+          error: (error) => {
+            console.error(`Failed to load collection items for property '${prop.name}':`, error);
+          }
+        });
+      }
     });
 
     this.propertyEditorForms.set(forms);
+  }
+
+  private isCollectionType(propertyType: string): boolean {
+    return propertyType?.startsWith('collection:') === true;
+  }
+
+  getDropdownOptions(propertyName: string): IPropertyValueCollectionItem[] {
+    return this.dropdownOptions().get(propertyName) ?? [];
   }
 
   private onPropertyChanged(selectedItem: SelectedItem, property: IEditorItemProperty, newValue: any) {
@@ -226,16 +254,21 @@ export class IdePropertyPane implements OnInit, OnDestroy {
   }
 
   protected getPropertyEditor(property: IEditorItemProperty): PropertyEditorType {
-    // 1. Check registered rules first
+    // 1. Collection scheme always maps to dropdown.
+    if (this.isCollectionType(property.propertyType)) {
+      return 'dropdown';
+    }
+
+    // 2. Check registered rules.
     const rule = this.findRule(property);
     if (rule) return rule.editor;
 
-    // 2. Fall back to value sent by the server
+    // 3. Fall back to value sent by the server.
     if (property.editor) {
       return this.resolveEditorString(property.editor.split(':')[0]);
     }
 
-    // 3. Infer from CLR type name
+    // 4. Infer from type name (CLR or simple).
     return this.inferEditorFromType(property.propertyType);
   }
 
@@ -264,10 +297,24 @@ export class IdePropertyPane implements OnInit, OnDestroy {
     }
   }
 
+  protected openJsonEditor(property: IEditorItemProperty): void {
+    const schemeValue = property.iEditorItem.replace('://', '/');
+    const docId = IdeItemId.create('jsonconfiguration', `${schemeValue}/${property.name}`);
+    this.selectionService.select({
+      id: docId,
+      type: property.propertyType,
+      project: this.selectedItem()?.project,
+      currentEditor: 'JsonConfigEditor',
+    });
+  }
+
   private inferEditorFromType(propertyType: string): PropertyEditorType {
     switch (propertyType) {
+      // Simple backend type names
+      case 'boolean':
       case 'System.Boolean':
         return 'checkbox';
+      case 'int':
       case 'System.Int16':
       case 'System.Int32':
       case 'System.Int64':
@@ -278,6 +325,9 @@ export class IdePropertyPane implements OnInit, OnDestroy {
       case 'System.Double':
       case 'System.Decimal':
         return 'number';
+      case 'json':
+      case 'Json':
+        return 'json';
       default:
         return 'text';
     }

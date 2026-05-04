@@ -1,16 +1,10 @@
-export const IdeScheme = {
-  Workflow: 'workflow',
-  WorkflowNode: 'workflownode',
-  CustomCsharpCode: 'customcsharpcode',
-  Script: 'script',
-  ScriptsFolder: 'scriptsfolder',
-} as const;
+export const IdeScheme = {} as const;
 
-export type IdeSchemeType = (typeof IdeScheme)[keyof typeof IdeScheme];
+export type IdeSchemeType = string;
 
 export const IdeItemId = {
   /** Create a scheme-prefixed ID, e.g. `workflow://some-guid`. */
-  create(scheme: IdeSchemeType, value: string): string {
+  create(scheme: string, value: string): string {
     return `${scheme}://${value}`;
   },
 
@@ -27,7 +21,7 @@ export const IdeItemId = {
   },
 
   /** Returns true when the id starts with the given scheme. Handles null/undefined safely. */
-  hasScheme(id: string | undefined | null, scheme: IdeSchemeType): boolean {
+  hasScheme(id: string | undefined | null, scheme: string): boolean {
     return id?.startsWith(`${scheme}://`) ?? false;
   },
 };

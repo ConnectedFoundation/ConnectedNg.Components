@@ -81,12 +81,24 @@
         <mat-form-field
           appearance="outline"
           subscriptSizing="dynamic"
+          class="input-parent"
         >
+          <mat-label>{{ getPropertyLabel(property) }}</mat-label>
           <mat-select [formControl]="getPropertyControl(property.name)">
-            <mat-option value="">-- Select --</mat-option>
-            <!-- Options would need to be provided via metadata -->
+            @for (option of getDropdownOptions(property.name); track option.id) {
+            <mat-option [value]="option.key">{{ option.value }}</mat-option>
+            }
           </mat-select>
         </mat-form-field>
+        } @case ('json') {
+        <button
+          mat-stroked-button
+          class="input-parent"
+          (click)="openJsonEditor(property)"
+        >
+          <mat-icon>code</mat-icon>
+          Edit {{ getPropertyLabel(property) }}
+        </button>
         } }
       </div>
     </div>

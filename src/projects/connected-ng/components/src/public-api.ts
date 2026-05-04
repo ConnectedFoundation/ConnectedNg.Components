@@ -15,6 +15,7 @@ export * from './ide/services/dirty-editor-item.service';
 // IDE Services
 export * from './ide/services/document-service';
 export * from './ide/services/editor-property-service';
+export * from './ide/services/property-collection-service';
 export * from './ide/services/explorer-item-service';
 export * from './ide/services/ide-editor-service';
 export * from './ide/services/ide-layout-service';
@@ -30,6 +31,7 @@ export * from './ide/ide-item-id';
 // IDE DTOs
 export * from './ide/services/dtos/editor-item';
 export * from './ide/services/dtos/editor-item-property';
+export * from './ide/services/dtos/property-collection-item';
 export * from './ide/services/dtos/issue-item';
 
 export { ComponentsConfigurationProvider as ConfigurationProvider } from './services/service-configuration-initializer';

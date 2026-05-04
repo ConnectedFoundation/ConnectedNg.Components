@@ -1,6 +1,6 @@
 import { InjectionToken } from '@angular/core';
 
-export type PropertyEditorType = 'text' | 'number' | 'checkbox' | 'dropdown';
+export type PropertyEditorType = 'text' | 'number' | 'checkbox' | 'dropdown' | 'json';
 
 /**
  * A rule that maps property data to an editor type and optional display label.
