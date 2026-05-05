@@ -98,6 +98,7 @@ export class CodeListSelectBox<T = any> implements ControlValueAccessor, Validat
     const result = await firstValueFrom(
       this.dialog.open(InsertFormDialogWrapper, {
         width: '80vw',
+        height: '80vh',
         // width: 'fit-content',
         data: { formComponent, formInputs: this.insertFormInputs(), title: this.insertFormTitle() }
       }).afterClosed()
