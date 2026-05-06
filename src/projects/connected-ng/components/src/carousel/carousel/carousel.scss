@@ -114,4 +114,8 @@
       cursor: default;
     }
   }
+.indicator:only-child {
+    visibility: hidden;
+}
+
 }
