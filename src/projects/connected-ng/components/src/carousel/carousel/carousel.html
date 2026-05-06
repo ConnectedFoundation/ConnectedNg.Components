@@ -1,12 +1,13 @@
 <div class="carousel-container">
   @if (showChevrons()) {
-  <button
+  <button matIconButton
     class="carousel-chevron chevron-prev"
     [class.hidden]="!canScrollPrev()"
     (click)="scrollPrev()"
     aria-label="Previous"
   >
-    &#8249;
+    <!-- &#8249; -->
+     <mat-icon>chevron_left</mat-icon>
   </button>
   }
 
@@ -24,13 +25,14 @@
   </div>
 
   @if (showChevrons()) {
-  <button
+  <button matIconButton
     class="carousel-chevron chevron-next"
     [class.hidden]="!canScrollNext()"
     (click)="scrollNext()"
     aria-label="Next"
   >
-    &#8250;
+    <!-- &#8250; -->
+     <mat-icon>chevron_right</mat-icon>
   </button>
   } @if (showIndicators()) {
   <div class="carousel-indicators">

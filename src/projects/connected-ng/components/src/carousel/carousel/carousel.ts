@@ -1,5 +1,8 @@
 import { Component, computed, ContentChildren, ElementRef, input, output, QueryList, signal, viewChild } from '@angular/core';
 import { CarouselItem } from '../carousel-item/carousel-item';
+import { MatIcon } from "@angular/material/icon";
+import { MatButtonModule } from '@angular/material/button';
+
 
 /**
  * Configures how many items are visible at different container widths.
@@ -13,6 +16,7 @@ export type CarouselVisibleItems = number | Record<number, number>;
   selector: 'cn-carousel',
   templateUrl: './carousel.html',
   styleUrl: './carousel.scss',
+  imports: [MatIcon, MatButtonModule],
 })
 export class Carousel {
   @ContentChildren(CarouselItem) items!: QueryList<CarouselItem>;
