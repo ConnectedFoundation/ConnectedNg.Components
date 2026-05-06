@@ -1,4 +1,4 @@
-import { Component, input, signal, computed, Type, ViewContainerRef, viewChild, forwardRef, inject, TemplateRef } from '@angular/core';
+import { Component, input, signal, computed, Type, ViewContainerRef, viewChild, forwardRef, inject, TemplateRef, AfterViewInit, ChangeDetectorRef, ViewChild } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR, NG_VALIDATORS, Validator, AbstractControl, ValidationErrors } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
@@ -41,13 +41,13 @@ export class CodeListSelectBox<T = any> implements ControlValueAccessor, Validat
   items = input.required<T[]>();
   keySelector = input.required<(item: T) => any>();
   displayMemberSelector = input<(item: T) => string>((item: T) => String(item));
-  placeholder = input<string>('Select an item');
+  placeholder = input<string>('Izberite...');
   label = input<string>('');
   required = input<boolean>(false);
   insertFormComponent = input<Type<FormBase<unknown>>>();
   insertFormResultMapper = input<(result: FormResult) => Promise<T | undefined>>();
   insertFormInputs = input<any>({});
-  insertFormTitle = input<string>('Add New Item');
+  insertFormTitle = input<string>('Dodaj nov vnos');
   itemTemplate = input<TemplateRef<any>>();
 
   addedItems = signal<T[]>([]);
@@ -118,40 +118,58 @@ export class CodeListSelectBox<T = any> implements ControlValueAccessor, Validat
   selector: 'cn-insert-form-dialog-wrapper',
   standalone: true,
   imports: [CommonModule, MatDialogModule, MatButtonModule],
-  template: `
-    <div class="dialog-header">
-      <h4 mat-dialog-title>{{ data.title }}</h4>
-    </div>
-    <mat-dialog-content>
-      <div #formContainer></div>
-    </mat-dialog-content>
-  `,
   styles: [`
-    // .dialog-header {
-    //   margin-bottom: 16px;
-    //   padding: 24px;
-    // }
-  `]
+    mat-dialog-content ::ng-deep cn-floating-action-bar { display: none !important; }
+  `],
+  template: `
+    <h4 mat-dialog-title>{{ title() }}</h4>
+    <mat-dialog-content>
+      <ng-container #formContainer></ng-container>
+    </mat-dialog-content>
+    <mat-dialog-actions align="end">
+      <button mat-button type="button" (click)="dialogRef.close()">Prekliči</button>
+      <button mat-flat-button color="primary" type="button" (click)="submit()">Shrani</button>
+    </mat-dialog-actions>
+  `,
 })
-export class InsertFormDialogWrapper<T> {
+export class InsertFormDialogWrapper<T> implements AfterViewInit {
   data = inject<{ formComponent: Type<FormBase<T>>, formInputs: any, title: string }>(MAT_DIALOG_DATA);
   dialogRef = inject(MatDialogRef<InsertFormDialogWrapper<T>>);
-  formContainer = viewChild<any, ViewContainerRef>('formContainer', { read: ViewContainerRef });
+  cdr = inject(ChangeDetectorRef);
 
+  @ViewChild('formContainer', { read: ViewContainerRef })
+  formContainer!: ViewContainerRef;
+
+  private formInstance: any;
+  title = signal('Nov vnos');
+
+  submit(): void {
+    if (this.formInstance?.formComponent?.()) {
+      this.formInstance.formComponent().onSubmit();
+    } else if (this.formInstance?.onSubmit) {
+      this.formInstance.onSubmit();
+    }
+  }
 
   ngAfterViewInit(): void {
-    const container = this.formContainer();
-    if (container) {
-      const componentRef = container.createComponent(this.data.formComponent);
-
-      // Set inputs
-      Object.keys(this.data.formInputs).forEach(key => {
-        (componentRef.instance as any)[key] = this.data.formInputs[key];
-      });
-
-      componentRef.instance.formClose.subscribe((result) => {
-        this.dialogRef.close(result);
-      });
+    if (!this.formContainer) {
+      console.error('formContainer is null!');
+      return;
     }
+
+    const componentRef = this.formContainer.createComponent(this.data.formComponent);
+    this.formInstance = componentRef.instance;
+
+    Object.keys(this.data.formInputs).forEach(key => {
+      (componentRef.instance as any)[key] = this.data.formInputs[key];
+    });
+
+    this.title.set(this.data.title || 'Nov vnos');
+
+    componentRef.instance.formClose.subscribe((result: any) => {
+      this.dialogRef.close(result);
+    });
+
+    this.cdr.detectChanges();
   }
 }
