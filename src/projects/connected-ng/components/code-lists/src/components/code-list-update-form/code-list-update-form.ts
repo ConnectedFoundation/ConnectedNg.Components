@@ -116,7 +116,7 @@ export class CodeListUpdateForm<TDto extends object> extends FormBase<TDto> impl
   }
 
   override getModel(): TDto {
-    return this.form.value as TDto;
+    return this.form.getRawValue() as TDto;
   }
 
   override onSubmit(): void {
