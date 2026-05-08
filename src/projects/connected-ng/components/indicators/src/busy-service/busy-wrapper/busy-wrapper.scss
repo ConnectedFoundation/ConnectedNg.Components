@@ -20,3 +20,7 @@
   display: grid;
   place-items: center;
 }
+
+.cf-busy:has(>.mdc-button) .cf-busy__overlay--block {
+    border-radius: var(--mat-button-filled-container-shape, var(--mat-sys-corner-full));
+}
