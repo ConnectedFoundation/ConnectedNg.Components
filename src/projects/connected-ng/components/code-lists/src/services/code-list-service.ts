@@ -23,7 +23,7 @@ export class CodeListService {
   codeListsRootPage = computed<CodeListStackPageInfo>(() => ({
     component: CodeLists,
     key: '/',
-    title: 'Code lists',
+    title: 'Seznam šifrantov',
     childPages: this.codeLists(),
     icon: 'settings',
     pattern: routePattern('/').pattern,
@@ -42,7 +42,7 @@ export class CodeListService {
     this.activeCodeList.set({
       component: CodeLists,
       key: '/',
-      title: 'Code lists',
+      title: 'Seznam šifrantov',
       childPages: this.codeLists(),
       icon: 'settings',
       pattern: routePattern('/').pattern,

@@ -31,35 +31,35 @@ interface ItemWithStatus {
 
 export class CodeListActions {
   static editAction(action: ItemAction, url?: UrlParameter): CodeListAction {
-    return createCodeListAction({ label: 'Edit', description: 'Edit this code-list item', icon: 'edit' }, action, url);
+    return createCodeListAction({ label: 'Odpri', description: 'Odpri ali uredi ta šifrant', icon: 'edit' }, action, url);
   };
 
   static recordStatusAction(action: ItemAction): CodeListAction {
-    return createCodeListAction({ label: 'Edit', description: 'Edit this code-list item', icon: 'edit' }, action);
+    return createCodeListAction({ label: 'Odpri', description: 'Odpri ali uredi ta šifrant', icon: 'edit' }, action);
   };
 
   static getStatusChangeAction(item: ItemWithStatus, action: ((item: unknown) => void)): CodeListAction {
     if (item.status === Status.Enabled) {
-      return { label: 'Disable', description: 'Disable this code-list item', icon: 'mode_off_on', itemAction: (item: ItemWithStatus) => action({ ...item, status: Status.Disabled }) };
+      return { label: 'Onemogoči', description: 'Onemogoči ta šifrant', icon: 'mode_off_on', itemAction: (item: ItemWithStatus) => action({ ...item, status: Status.Disabled }) };
     }
     else {
-      return { label: 'Enable', description: 'Enable this code-list item', icon: 'mode_off_on', itemAction: (item: ItemWithStatus) => action({ ...item, status: Status.Enabled }) };
+      return { label: 'Omogoči', description: 'Omogoči ta šifrant', icon: 'mode_off_on', itemAction: (item: ItemWithStatus) => action({ ...item, status: Status.Enabled }) };
     }
   };
 
   static relatedCodeListAction(action: ItemAction, url?: UrlParameter, label?: string, description?: string): CodeListAction {
     return createCodeListAction({
-      label: label ?? 'Edit connected',
-      description: description ?? 'Edit connected code-list',
+      label: label ?? 'Uredi povezano',
+      description: description ?? 'Uredi povezani šifrant',
       icon: 'edit_arrow_down'
     }, action, url);
   };
 
   static insertItemAction(action: () => void, url?: UrlParameter): ActionDescriptionWithAction {
-    return { label: 'New', description: 'Add new entry', icon: 'add', action, url };
+    return { label: 'Novo', description: 'Dodaj nov vnos', icon: 'add', action, url };
   };
 
   static backAction(action: () => void) {
-    return { label: "Back", description: 'Return to previous screen', icon: 'arrow_back', action };
+    return { label: "Nazaj", description: 'Vrnitev na prejšnji zaslon', icon: 'arrow_back', action };
   }
 }
