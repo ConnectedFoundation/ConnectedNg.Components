@@ -1,4 +1,4 @@
-<mat-form-field class="code-list-select-box">
+<mat-form-field class="code-list-select-box" [floatLabel]="selectedItem() != null ? 'always' : 'auto'">
   @if (label()) {
   <mat-label>{{ label() }}</mat-label>
   }
@@ -39,7 +39,7 @@
   </mtx-select>
 
   @if (insertFormComponent()) {
-  <button class="icon-btn-sm mr-3" matIconButton matIconSuffix type="button" (click)="openInsertDialog()">
+  <button class="icon-btn-sm mr-3" matIconButton matIconSuffix type="button" (click)="openInsertDialog();$event.stopPropagation()">
     <mat-icon>add</mat-icon>
   </button>
   }
