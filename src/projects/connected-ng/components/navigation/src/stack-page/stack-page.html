@@ -2,7 +2,7 @@
   <div>
     @if(parent()?.headerComponent){
     <ng-container
-      *ngComponentOutlet="parent()!.headerComponent!; inputs: {data: parent()!.data}"
+      *ngComponentOutlet="parent()!.headerComponent!; inputs: {data: resolvedParentData()}"
     ></ng-container>
     }
   </div>

@@ -8,4 +8,5 @@ export * from './services/stack-navigation-context';
 export { POP_NAVIGATION } from './services/stack-navigation-context';
 export * from './stack-component/stack-component';
 export * from './stack-page/actions-provider-contract';
+export * from './services/child-page-provider';
 

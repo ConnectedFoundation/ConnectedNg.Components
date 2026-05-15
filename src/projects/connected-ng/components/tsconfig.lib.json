@@ -7,7 +7,13 @@
     "declaration": true,
     "declarationMap": true,
     "sourceMap": true,
-    "types": []
+    "types": [],
+    "paths": {
+      "@connected-ng/components": ["../../../dist/connected-ng/components"],
+      "@connected-ng/components/*": ["../../../dist/connected-ng/components/*"],
+      "@connected-ng/core": ["../../../../../ConnectedNg.Core/src/dist/connected-ng/core"],
+      "@connected-ng/core/*": ["../../../../../ConnectedNg.Core/src/dist/connected-ng/core/*"]
+    }
   },
   "include": ["./**/*.ts"],
   "exclude": ["**/*.spec.ts"]

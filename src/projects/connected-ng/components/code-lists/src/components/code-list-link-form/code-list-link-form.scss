@@ -1,0 +1,10 @@
+:host.cn-code-list-link-form {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+
+  cdk-virtual-scroll-viewport {
+    flex: 1 1 auto;
+    min-height: 400px;
+  }
+}

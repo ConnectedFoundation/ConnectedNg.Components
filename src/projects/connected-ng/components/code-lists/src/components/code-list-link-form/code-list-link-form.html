@@ -1,0 +1,36 @@
+<mat-form-field
+  appearance="outline"
+  subscriptSizing="dynamic"
+>
+  <mat-label>Filter</mat-label>
+  <input
+    matInput
+    [ngModel]="filterValue()"
+    (ngModelChange)="filterValue.set($event)"
+  />
+  <mat-icon matSuffix>search</mat-icon>
+</mat-form-field>
+
+<mat-checkbox
+  [ngModel]="showOnlySelected()"
+  (ngModelChange)="showOnlySelected.set($event)"
+>
+  Show selected only
+</mat-checkbox>
+
+<cdk-virtual-scroll-viewport [itemSize]="itemSize()">
+  <div *cdkVirtualFor="let item of filteredItems(); trackBy: trackItem">
+    <div
+      class="d-grid py-2 bb-1"
+      style="grid-template-columns: auto 1fr; gap: 0.5rem"
+    >
+      <mat-checkbox
+        [checked]="isSelected(item) || isImmutable(item)"
+        [disabled]="isImmutable(item)"
+        (change)="toggle(item, $event.checked)"
+      >
+      </mat-checkbox>
+      <ng-container *ngTemplateOutlet="itemTemplate(); context: { $implicit: item }"></ng-container>
+    </div>
+  </div>
+</cdk-virtual-scroll-viewport>

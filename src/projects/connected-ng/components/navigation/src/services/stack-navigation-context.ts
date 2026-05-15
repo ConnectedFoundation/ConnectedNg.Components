@@ -472,7 +472,7 @@ export interface NavigationHole {
 export interface StackPageInfo<T> {
   component: Type<unknown> | TemplateRef<unknown>;
   headerComponent?: Type<unknown>;
-  data: any;
+  data: any | ((instance: any) => any);
   key: string;
   title?: string;
   backStep?: number;

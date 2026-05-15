@@ -1,20 +1,49 @@
 /* To learn more about Typescript configuration file: https://www.typescriptlang.org/docs/handbook/tsconfig-json.html. */
 /* To learn more about Angular compiler options: https://angular.dev/reference/configs/angular-compiler-options. */
 {
-  "extends":[
-    "../../tsconfig.base.json"
-  ],
+  "extends": ["../../tsconfig.base.json"],
   "compileOnSave": false,
   "compilerOptions": {
     "paths": {
-      "@connected-ng/components/*": [
-        "./dist/connected-ng/components/*"
+      "@connected-ng/components": ["./projects/connected-ng/components/src/public-api.ts"],
+      "@connected-ng/components/code-lists": [
+        "./projects/connected-ng/components/code-lists/src/public-api.ts"
       ],
-      "@connected-ng/components": [
-        "./dist/connected-ng/components"
+      "@connected-ng/components/code-lists/helpers": [
+        "./projects/connected-ng/components/code-lists/helpers/src/public-api.ts"
+      ],
+      "@connected-ng/components/dialogs": [
+        "./projects/connected-ng/components/dialogs/src/public-api.ts"
+      ],
+      "@connected-ng/components/forms": [
+        "./projects/connected-ng/components/forms/src/public-api.ts"
+      ],
+      "@connected-ng/components/indicators": [
+        "./projects/connected-ng/components/indicators/src/public-api.ts"
+      ],
+      "@connected-ng/components/navigation": [
+        "./projects/connected-ng/components/navigation/src/public-api.ts"
+      ],
+      "@connected-ng/components/notifications": [
+        "./projects/connected-ng/components/notifications/src/public-api.ts"
       ],
       "@connected-ng/core": [
-        "./dist/connected-ng/core"
+        "../../ConnectedNg.Core/src/projects/connected-ng/core/src/public-api.ts"
+      ],
+      "@connected-ng/core/authentication": [
+        "../../ConnectedNg.Core/src/projects/connected-ng/core/authentication/src/public-api.ts"
+      ],
+      "@connected-ng/core/errors": [
+        "../../ConnectedNg.Core/src/projects/connected-ng/core/errors/src/public-api.ts"
+      ],
+      "@connected-ng/core/permissions": [
+        "../../ConnectedNg.Core/src/projects/connected-ng/core/permissions/src/public-api.ts"
+      ],
+      "@connected-ng/core/users": [
+        "../../ConnectedNg.Core/src/projects/connected-ng/core/users/src/public-api.ts"
+      ],
+      "@connected-ng/core/permission-management": [
+        "../../ConnectedNg.Core/src/projects/connected-ng/core/permission-management/src/public-api.ts"
       ]
     },
     "strict": true,

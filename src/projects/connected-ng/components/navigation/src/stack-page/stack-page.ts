@@ -51,6 +51,13 @@ export class StackPage implements OnDestroy {
     return parent;
   });
 
+  resolvedParentData = computed(() => {
+    const parent = this.parent();
+    if (!parent) return undefined;
+    const d = parent.data;
+    return typeof d === 'function' ? d(undefined) : d;
+  });
+
   @ViewChild('componentContainer', { read: ViewContainerRef })
   componentContainer!: ViewContainerRef;
 
@@ -96,7 +103,8 @@ export class StackPage implements OnDestroy {
     });
 
     // Set inputs
-    const inputs = this.toRecord(data);
+    const resolvedData = typeof data === 'function' ? data(this.componentRef.instance) : data;
+    const inputs = this.toRecord(resolvedData);
     Object.entries(inputs).forEach(([key, value]) => {
       this.componentRef!.setInput(key, value);
     });
