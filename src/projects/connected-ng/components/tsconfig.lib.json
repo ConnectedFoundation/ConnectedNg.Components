@@ -16,7 +16,9 @@
       "@connected-ng/components/forms": ["./forms/src/public-api.ts"],
       "@connected-ng/components/indicators": ["./indicators/src/public-api.ts"],
       "@connected-ng/components/navigation": ["./navigation/src/public-api.ts"],
-      "@connected-ng/components/notifications": ["./notifications/src/public-api.ts"]
+      "@connected-ng/components/notifications": ["./notifications/src/public-api.ts"],
+      "@connected-ng/core": ["../../../../../ConnectedNg.Core/src/dist/connected-ng/core"],
+      "@connected-ng/core/*": ["../../../../../ConnectedNg.Core/src/dist/connected-ng/core/*"]
     }
   },
   "include": ["./**/*.ts"],
