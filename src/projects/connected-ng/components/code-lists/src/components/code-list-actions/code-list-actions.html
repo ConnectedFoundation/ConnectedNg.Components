@@ -1,0 +1,24 @@
+<div class="cn-list-action-wrapper bt-1">
+  <div class="cn-list-action-group">
+    @for(action of leftResolved(); track action.label) {
+      <cn-action-tile
+        [icon]="action.icon"
+        [label]="action.label"
+        [description]="action.description"
+        [url]="action.url"
+        (click)="handleItemClick(action, $event)"
+      />
+    }
+  </div>
+  <div class="cn-list-action-group">
+    @for(action of rightResolved(); track action.label) {
+      <cn-action-tile
+        [icon]="action.icon"
+        [label]="action.label"
+        [description]="action.description"
+        [url]="action.url"
+        (click)="handleItemClick(action, $event)"
+      />
+    }
+  </div>
+</div>
