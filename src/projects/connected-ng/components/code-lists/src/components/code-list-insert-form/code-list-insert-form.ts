@@ -102,6 +102,11 @@ export class CodeListInsertForm<TDto extends object> extends FormBase<TDto> impl
     return this.form.getRawValue() as TDto;
   }
 
+  override onError(error: any): void {
+    super.onError(error);
+    this.formError.emit(error);
+  }
+
   override onSubmit(): void {
     if (this.form.valid) {
       const model = this.getModel();

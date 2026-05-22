@@ -10,6 +10,7 @@ export abstract class FormBase<TModel> {
   validityChange = output<boolean>();
   formConfirm = output<TModel>();
   formClose = output<FormResult>();
+  formError = output<any>();
 
   form?: FormGroup;
   abstract getModel(): TModel;
