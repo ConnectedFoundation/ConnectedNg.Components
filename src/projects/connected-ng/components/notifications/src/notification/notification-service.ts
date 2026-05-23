@@ -1,6 +1,6 @@
 import { inject, Injectable } from "@angular/core";
 import { Notification, NotificationType } from "./notification/notification";
-import { MatSnackBar } from "@angular/material/snack-bar";
+import { MatSnackBar, MatSnackBarRef } from "@angular/material/snack-bar";
 
 @Injectable({
   providedIn: 'root'
@@ -22,10 +22,10 @@ export class NotificationService {
     });
   }
 
-  info(message: string): void {
-    this.snackBar.openFromComponent(Notification, {
+  info(message: string, duration = 3000): MatSnackBarRef<Notification> {
+    return this.snackBar.openFromComponent(Notification, {
       data: { type: NotificationType.Info, message },
-      duration: 3000
+      duration
     });
   }
 }
