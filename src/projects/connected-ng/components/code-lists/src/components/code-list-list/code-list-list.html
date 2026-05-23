@@ -1,5 +1,16 @@
 <cn-list
-  [items]="items()"
+  [items]="pagedItems()"
   [itemTemplate]="itemTemplate()"
   [itemDetailTemplate]="itemActionsTemplate()"
 ></cn-list>
+
+@if (paginate() && items().length > 0) {
+<mat-paginator
+  [length]="items().length"
+  [pageSize]="currentPageSize()"
+  [pageIndex]="pageIndex()"
+  [pageSizeOptions]="pageSizeOptions()"
+  [hidePageSize]="hidePageSize()"
+  (page)="onPageChange($event)"
+></mat-paginator>
+}
