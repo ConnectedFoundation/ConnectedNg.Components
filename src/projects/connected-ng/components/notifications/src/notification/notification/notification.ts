@@ -6,6 +6,7 @@ import { MatButtonModule } from '@angular/material/button';
 export interface NotificationData {
   message: string;
   type: NotificationType;
+  animated?: boolean;
 }
 
 export enum NotificationType {

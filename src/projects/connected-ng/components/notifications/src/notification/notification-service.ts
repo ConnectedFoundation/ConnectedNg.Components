@@ -22,9 +22,9 @@ export class NotificationService {
     });
   }
 
-  info(message: string, duration = 3000): MatSnackBarRef<Notification> {
+  info(message: string, duration = 3000, animated = false): MatSnackBarRef<Notification> {
     return this.snackBar.openFromComponent(Notification, {
-      data: { type: NotificationType.Info, message },
+      data: { type: NotificationType.Info, message, animated },
       duration
     });
   }
