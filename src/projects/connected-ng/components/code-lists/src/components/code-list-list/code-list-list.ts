@@ -1,11 +1,14 @@
 import { Component, computed, effect, input, signal, TemplateRef } from '@angular/core';
 import { MatListModule } from '@angular/material/list';
 import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
+import { MatFormFieldModule } from '@angular/material/form-field';
+import { MatInputModule } from '@angular/material/input';
+import { MatIconModule } from '@angular/material/icon';
 import { List, ActionDescriptionWithAction } from '@connected-ng/components';
 
 @Component({
   selector: 'cn-code-list-list',
-  imports: [MatListModule, MatPaginatorModule, List],
+  imports: [MatListModule, MatPaginatorModule, MatFormFieldModule, MatInputModule, MatIconModule, List],
   templateUrl: './code-list-list.html',
   styleUrl: './code-list-list.scss',
 })
@@ -18,12 +21,23 @@ export class CodeListList<T> {
   pageSize = input(20);
   pageSizeOptions = input<number[]>([5, 10, 25]);
   hidePageSize = input(true);
+  filter = input<((item: T, query: string) => boolean) | undefined>();
 
   protected readonly pageIndex = signal(0);
   protected readonly currentPageSize = signal(20);
+  protected readonly searchQuery = signal('');
+
+  protected readonly filteredItems = computed(() => {
+    const items = this.items();
+    const fn = this.filter();
+    const query = this.searchQuery().trim().toLowerCase();
+    if (!fn || !query) 
+      return items;
+    return items.filter(item => fn(item, query));
+  });
 
   protected readonly pagedItems = computed(() => {
-    const items = this.items();
+    const items = this.filteredItems();
 
     if (!this.paginate()) {
       return items;
@@ -39,8 +53,13 @@ export class CodeListList<T> {
     this.pageIndex.set(0);
   });
 
+  private readonly resetPageOnSearch = effect(() => {
+    this.searchQuery();
+    this.pageIndex.set(0);
+  });
+
   private readonly clampPageIndex = effect(() => {
-    const items = this.items();
+    const items = this.filteredItems();
 
     if (!this.paginate()) {
       this.pageIndex.set(0);

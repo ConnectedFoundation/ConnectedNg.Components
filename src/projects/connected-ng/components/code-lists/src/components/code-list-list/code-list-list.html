@@ -1,12 +1,19 @@
+@if(filter()){
+<mat-form-field appearance="outline" subscriptSizing="dynamic" class="search-field">
+  <mat-label>Filter</mat-label>
+  <input matInput type="text" [value]="searchQuery()" (input)="searchQuery.set($any($event.target).value)" />
+  <mat-icon matSuffix>search</mat-icon>
+</mat-form-field>
+}
 <cn-list
   [items]="pagedItems()"
   [itemTemplate]="itemTemplate()"
   [itemDetailTemplate]="itemActionsTemplate()"
 ></cn-list>
 
-@if (paginate() && items().length > 0) {
+@if (paginate() && filteredItems().length > 0) {
 <mat-paginator
-  [length]="items().length"
+  [length]="filteredItems().length"
   [pageSize]="currentPageSize()"
   [pageIndex]="pageIndex()"
   [pageSizeOptions]="pageSizeOptions()"
