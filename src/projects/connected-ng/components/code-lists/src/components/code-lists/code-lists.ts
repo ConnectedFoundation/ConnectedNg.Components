@@ -13,6 +13,9 @@ export class CodeLists {
   codeListService = inject(CodeListService);
   navigationContext = inject(StackNavigationContext);
 
+  readonly filter = (item: CodeListStackPageInfo, query: string) =>
+    item.title.toLowerCase().includes(query);
+
   openCodeList(item: CodeListStackPageInfo) {
     this.navigationContext.push(item);
   }
