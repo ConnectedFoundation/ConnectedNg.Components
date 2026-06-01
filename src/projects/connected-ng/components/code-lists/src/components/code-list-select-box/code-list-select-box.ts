@@ -51,7 +51,15 @@ export class CodeListSelectBox<T = any> implements ControlValueAccessor, Validat
   itemTemplate = input<TemplateRef<any>>();
 
   addedItems = signal<T[]>([]);
-  allItems = computed(() => [...this.items(), ...this.addedItems()]);
+  allItems = computed(() => {
+    const seen = new Set<any>();
+    return [...this.items(), ...this.addedItems()].filter(item => {
+      const key = this.keySelector()(item);
+      if (seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    });
+  });
   private _value = signal<any>(undefined);
   selectedItem = computed<T | null>(() => {
     let item = this._value() != null ? (this.allItems().find(i => this.keySelector()(i) == this._value()) ?? null) : null
