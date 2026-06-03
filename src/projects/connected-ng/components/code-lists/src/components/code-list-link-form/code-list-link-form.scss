@@ -5,6 +5,10 @@
 
   cdk-virtual-scroll-viewport {
     flex: 1 1 auto;
-    min-height: 400px;
+    //min-height: 400px;
+    min-height: calc(100vh - 370px);
+      @media only screen and (max-width: 576px) {
+        min-height: calc(100vh - 330px);
+  }
   }
 }
