@@ -1,7 +1,8 @@
-import { Component, input, model, output, signal, computed, TemplateRef } from '@angular/core';
+import { Component, effect, input, model, output, signal, computed, TemplateRef, untracked } from '@angular/core';
 import { NgTemplateOutlet } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ScrollingModule } from '@angular/cdk/scrolling';
+import { MatPaginatorModule, PageEvent } from '@angular/material/paginator';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatCheckboxModule } from '@angular/material/checkbox';
@@ -13,6 +14,7 @@ import { MatIconModule } from '@angular/material/icon';
     NgTemplateOutlet,
     FormsModule,
     ScrollingModule,
+    MatPaginatorModule,
     MatFormFieldModule,
     MatInputModule,
     MatCheckboxModule,
@@ -28,6 +30,10 @@ export class CodeListLinkForm<TItem extends Record<string, any>> {
   itemTemplate = input.required<TemplateRef<{ $implicit: TItem }>>();
   keyField = input<string>('id');
   itemSize = input<number>(48);
+  paginate = input(false);
+  pageSize = input<number>(20);
+  pageSizeOptions = input<number[]>([5, 10, 25]);
+  hidePageSize = input(true);
   selectedValues = model<any[]>([]);
 
   itemSelected = output<TItem>();
@@ -35,6 +41,8 @@ export class CodeListLinkForm<TItem extends Record<string, any>> {
 
   readonly filterValue = signal('');
   readonly showOnlySelected = signal(false);
+  readonly pageIndex = signal(0);
+  readonly currentPageSize = signal(20);
 
   private readonly selectedSet = computed(() => new Set(this.selectedValues()));
   private readonly immutableSet = computed(() => new Set(this.immutableItems()));
@@ -54,6 +62,31 @@ export class CodeListLinkForm<TItem extends Record<string, any>> {
       return true;
     });
   });
+
+  readonly pagedItems = computed(() => {
+    const items = this.filteredItems();
+    if (!this.paginate()) return items;
+    const size = this.currentPageSize();
+    const start = this.pageIndex() * size;
+    return items.slice(start, start + size);
+  });
+
+  constructor() {
+    effect(() => {
+      this.currentPageSize.set(this.pageSize());
+      this.pageIndex.set(0);
+    });
+    effect(() => {
+      this.filterValue();
+      this.showOnlySelected();
+      untracked(() => this.pageIndex.set(0));
+    });
+  }
+
+  onPageChange(event: PageEvent): void {
+    this.currentPageSize.set(event.pageSize);
+    this.pageIndex.set(event.pageIndex);
+  }
 
   isSelected(item: TItem): boolean {
     return this.selectedSet().has(item[this.keyField()]);

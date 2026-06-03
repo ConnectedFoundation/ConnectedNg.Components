@@ -21,7 +21,7 @@ class="pt-1 pb-3 form-sm"
 </mat-checkbox>
 
 <cdk-virtual-scroll-viewport [itemSize]="itemSize()">
-  <div *cdkVirtualFor="let item of filteredItems(); trackBy: trackItem">
+  <div *cdkVirtualFor="let item of pagedItems(); trackBy: trackItem">
     <div
       class="d-grid py-2 bb-1"
       style="grid-template-columns: auto 1fr; gap: 0.5rem"
@@ -36,3 +36,14 @@ class="pt-1 pb-3 form-sm"
     </div>
   </div>
 </cdk-virtual-scroll-viewport>
+
+@if (paginate() && filteredItems().length > 0) {
+<mat-paginator
+  [length]="filteredItems().length"
+  [pageSize]="currentPageSize()"
+  [pageIndex]="pageIndex()"
+  [pageSizeOptions]="pageSizeOptions()"
+  [hidePageSize]="hidePageSize()"
+  (page)="onPageChange($event)"
+></mat-paginator>
+}
