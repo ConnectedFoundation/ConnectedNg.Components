@@ -3,6 +3,6 @@
   {{ message() }}
 </mat-dialog-content>
 <mat-dialog-actions>
-  <button matButton (click)="dialogRef.close(false)">Prekliči</button>
-  <button matButton cdkFocusInitial (click)="dialogRef.close(true)">Potrdi</button>
+  <button matButton (click)="dialogRef.close(false)" i18n="@@cn.confirm-dialog.cancel">Cancel</button>
+  <button matButton cdkFocusInitial (click)="dialogRef.close(true)" i18n="@@cn.confirm-dialog.confirm">Confirm</button>
 </mat-dialog-actions>

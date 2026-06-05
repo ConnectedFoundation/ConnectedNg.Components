@@ -41,13 +41,13 @@ export class CodeListSelectBox<T = any> implements ControlValueAccessor, Validat
   items = input.required<T[]>();
   keySelector = input.required<(item: T) => any>();
   displayMemberSelector = input<(item: T) => string>((item: T) => String(item));
-  placeholder = input<string>('Izberite...');
+  placeholder = input<string>($localize`:@@cn.code-list-select-box.placeholder:Select...`);
   label = input<string>('');
   required = input<boolean>(false);
   insertFormComponent = input<Type<FormBase<unknown>>>();
   insertFormResultMapper = input<(result: FormResult) => Promise<T | undefined>>();
   insertFormInputs = input<any>({});
-  insertFormTitle = input<string>('Dodaj nov vnos');
+  insertFormTitle = input<string>($localize`:@@cn.code-list-select-box.insert-form-title:Add new entry`);
   itemTemplate = input<TemplateRef<any>>();
 
   addedItems = signal<T[]>([]);
@@ -135,8 +135,8 @@ export class CodeListSelectBox<T = any> implements ControlValueAccessor, Validat
       <ng-container #formContainer></ng-container>
     </mat-dialog-content>
     <mat-dialog-actions align="end">
-      <button mat-button type="button" (click)="dialogRef.close()">Prekliči</button>
-      <button mat-flat-button color="primary" type="button" (click)="submit()">Shrani</button>
+      <button mat-button type="button" (click)="dialogRef.close()" i18n="@@cn.code-list-select-box.cancel">Cancel</button>
+      <button mat-flat-button color="primary" type="button" (click)="submit()" i18n="@@cn.code-list-select-box.save">Save</button>
     </mat-dialog-actions>
   `,
 })
@@ -149,7 +149,7 @@ export class InsertFormDialogWrapper<T> implements AfterViewInit {
   formContainer!: ViewContainerRef;
 
   private formInstance: any;
-  title = signal('Nov vnos');
+  title = signal($localize`:@@cn.code-list-select-box.new-entry-title:New entry`);
 
   submit(): void {
     if (this.formInstance?.formComponent?.()) {
@@ -172,7 +172,7 @@ export class InsertFormDialogWrapper<T> implements AfterViewInit {
       (componentRef.instance as any)[key] = this.data.formInputs[key];
     });
 
-    this.title.set(this.data.title || 'Nov vnos');
+    this.title.set(this.data.title || $localize`:@@cn.code-list-select-box.new-entry-title:New entry`);
 
     componentRef.instance.formClose.subscribe((result: any) => {
       this.dialogRef.close(result);

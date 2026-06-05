@@ -31,35 +31,35 @@ interface ItemWithStatus {
 
 export class CodeListActions {
   static editAction(action: ItemAction, url?: UrlParameter): CodeListAction {
-    return createCodeListAction({ label: 'Open', description: 'Open or edit this code list', icon: 'edit' }, action, url);
+    return createCodeListAction({ label: $localize`:@@krka.code-list.action.open:Open`, description: $localize`:@@krka.code-list.action.open.description:Open or edit this code list`, icon: 'edit' }, action, url);
   };
 
   static recordStatusAction(action: ItemAction): CodeListAction {
-    return createCodeListAction({ label: 'Open', description: 'Open or edit this code list', icon: 'edit' }, action);
+    return createCodeListAction({ label: $localize`:@@krka.code-list.action.open:Open`, description: $localize`:@@krka.code-list.action.open.description:Open or edit this code list`, icon: 'edit' }, action);
   };
 
   static getStatusChangeAction(item: ItemWithStatus, action: ((item: unknown) => void)): CodeListAction {
     if (item.status === Status.Enabled) {
-      return { label: 'Disable', description: 'Disable this code list', icon: 'mode_off_on', itemAction: (item: ItemWithStatus) => action({ ...item, status: Status.Disabled }) };
+      return { label: $localize`:@@krka.code-list.action.disable:Disable`, description: $localize`:@@krka.code-list.action.disable.description:Disable this code list`, icon: 'mode_off_on', itemAction: (item: ItemWithStatus) => action({ ...item, status: Status.Disabled }) };
     }
     else {
-      return { label: 'Enable', description: 'Enable this code list', icon: 'mode_off_on', itemAction: (item: ItemWithStatus) => action({ ...item, status: Status.Enabled }) };
+      return { label: $localize`:@@krka.code-list.action.enable:Enable`, description: $localize`:@@krka.code-list.action.enable.description:Enable this code list`, icon: 'mode_off_on', itemAction: (item: ItemWithStatus) => action({ ...item, status: Status.Enabled }) };
     }
   };
 
   static relatedCodeListAction(action: ItemAction, url?: UrlParameter, label?: string, description?: string): CodeListAction {
     return createCodeListAction({
-      label: label ?? 'Edit related',
-      description: description ?? 'Edit related code list',
+      label: label ?? $localize`:@@krka.code-list.action.related:Edit related`,
+      description: description ?? $localize`:@@krka.code-list.action.related.description:Edit related code list`,
       icon: 'edit_arrow_down'
     }, action, url);
   };
 
   static insertItemAction(action: () => void, url?: UrlParameter): ActionDescriptionWithAction {
-    return { label: 'New', description: 'Add new entry', icon: 'add', action, url };
+    return { label: $localize`:@@krka.code-list.action.new:New`, description: $localize`:@@krka.code-list.action.new.description:Add new entry`, icon: 'add', action, url };
   };
 
   static backAction(action: () => void) {
-    return { label: "Back", description: 'Return to previous screen', icon: 'arrow_back', action };
+    return { label: $localize`:@@krka.code-list.action.back:Back`, description: $localize`:@@krka.code-list.action.back.description:Return to the previous screen`, icon: 'arrow_back', action };
   }
 }

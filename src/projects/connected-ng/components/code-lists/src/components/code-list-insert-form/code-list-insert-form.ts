@@ -44,14 +44,14 @@ export class CodeListInsertForm<TDto extends object> extends FormBase<TDto> impl
     effect(() => {
       this.defaultActions.set([
         {
-          label: 'Nazaj',
-          description: 'Vrnitev na prejšnji zaslon',
+          label: $localize`:@@code-list.action.back:Back`, 
+          description: $localize`:@@code-list.action.back.description:Return to the previous screen`,
           icon: 'arrow_back',
           action: () => this.onClose()
         },
         {
-          label: 'Shrani',
-          description: 'Shrani nov vnos',
+          label: $localize`:@@code-list.action.save:Save`,
+          description: $localize`:@@code-list.action.save.description:Save new entry`,
           icon: 'check_circle',
           action: () => this.onSubmit()
         }

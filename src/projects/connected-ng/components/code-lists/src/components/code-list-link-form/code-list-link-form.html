@@ -3,7 +3,7 @@ class="pt-1 pb-3 form-sm"
   appearance="outline"
   subscriptSizing="dynamic"
 >
-  <mat-label>Filter</mat-label>
+  <mat-label i18n="@@code-list-link-form.filter">Filter</mat-label>
   <input
     matInput
     [ngModel]="filterValue()"
@@ -17,7 +17,7 @@ class="pt-1 pb-3 form-sm"
   (ngModelChange)="showOnlySelected.set($event)"
   class="text-right"
 >
-  Show selected only
+  <ng-container i18n="@@code-list-link-form.show-selected">Show selected only</ng-container>
 </mat-checkbox>
 
 <cdk-virtual-scroll-viewport [itemSize]="itemSize()">

@@ -51,14 +51,14 @@ export class CodeListUpdateForm<TDto extends object> extends FormBase<TDto> impl
     effect(() => {
       this.defaultActions.set([
         {
-          label: 'Nazaj',
-          description: 'Vrnitev na prejšnji zaslon',
+          label: $localize`:@@code-list.action.back:Back`,
+          description: $localize`:@@code-list.action.back.description:Return to the previous screen`,
           icon: 'arrow_back',
           action: () => this.onClose()
         },
         {
-          label: 'Shrani',
-          description: 'Shrani spremembe',
+          label: $localize`:@@code-list.action.save:Save`,
+          description: $localize`:@@cn.code-list-update-form.save.description:Save changes`,
           icon: 'check_circle',
           action: () => this.onSubmit()
         }
