@@ -32,12 +32,12 @@
       } @empty { @if (!hasItems()) {
       <div class="no-results">
         <mat-icon class="w-200">stack_off</mat-icon>
-        <p>No items available</p>
+        <p i18n="@@cn.ide-toolbox.no-items-available">No items available</p>
       </div>
       } @else if (hasSearchText()) {
       <div class="no-results">
         <mat-icon class="w-200">search_off</mat-icon>
-        <p>No items found</p>
+        <p i18n="@@cn.ide-toolbox.no-items-found">No items found</p>
       </div>
       } }
     </div>
