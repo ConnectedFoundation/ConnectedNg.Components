@@ -13,6 +13,7 @@ export interface ActionDescription {
 export interface ActionDescriptionWithAction extends ActionDescription {
   action?: () => void;
   url?: UrlParameter;
+  disabled?: boolean;
 }
 
 @Component({
@@ -20,9 +21,11 @@ export interface ActionDescriptionWithAction extends ActionDescription {
   imports: [MatIcon],
   templateUrl: './action-tile.html',
   styleUrl: './action-tile.scss',
+  host: { '[class.disabled]': 'disabled()' },
 })
 export class ActionTile {
   icon = input<string | undefined>('');
+  disabled = input<boolean>(false);
 
   label = input.required<string>();
   description = input<string | undefined>('');

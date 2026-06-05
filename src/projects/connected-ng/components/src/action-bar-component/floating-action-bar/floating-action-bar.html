@@ -11,6 +11,7 @@
       [icon]="action.icon"
       [label]="action.label"
       [url]="action.url"
+      [disabled]="action.disabled ?? false"
       (click)="handleItemClick(action, $event)"
     ></cn-action-tile>
   </cn-carousel-item>

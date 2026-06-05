@@ -1,20 +1,25 @@
 <div class="d-flex items-center">
-  @if(icon()){
-  <mat-icon
-    class="material-symbols-outlined w-300 sm mr-1"
-    aria-hidden="true"
-  >
-    {{icon()}}
-  </mat-icon>
-  } @if(urlString()) {
-  <a
-    [href]="urlString()"
-    class="anim-underline stretched-link"
-  >
-    {{label()}}
-  </a>
+  @if (disabled()) {
+    <mat-icon class="material-symbols-outlined w-300 sm mr-1 spin" aria-hidden="true">progress_activity</mat-icon>
+    <span class="text-secondary" style="font-size: 0.875rem">{{ label() }}</span>
   } @else {
-  <a class="anim-underline stretched-link">{{label()}}</a>
+    @if(icon()){
+    <mat-icon
+      class="material-symbols-outlined w-300 sm mr-1"
+      aria-hidden="true"
+    >
+      {{icon()}}
+    </mat-icon>
+    } @if(urlString()) {
+    <a
+      [href]="urlString()"
+      class="anim-underline stretched-link"
+    >
+      {{label()}}
+    </a>
+    } @else {
+    <a class="anim-underline stretched-link">{{label()}}</a>
+    }
   }
 </div>
 <div class="text-sm text-secondary">{{description()}}</div>

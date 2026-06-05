@@ -13,6 +13,7 @@ export class FloatingActionBar {
   actions = input.required<ActionDescriptionWithAction[]>();
 
   handleItemClick(item: ActionDescriptionWithAction, $event: Event) {
+    if (item.disabled) return;
     if (item.action) {
       $event.preventDefault();
       $event.stopPropagation();

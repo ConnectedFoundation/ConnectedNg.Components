@@ -29,6 +29,7 @@ export class CodeListUpdateForm<TDto extends object> extends FormBase<TDto> impl
   // State
   dtoDescriptor = signal<DtoDescriptor | undefined>(undefined);
   formMetadata = signal<DynamicFormMetadata | undefined>(undefined);
+  saving = signal<boolean>(false);
 
   field(name: string) {
     return computed(() => this.formMetadata()?.fields.find(e => e.fieldName == name));
@@ -49,6 +50,7 @@ export class CodeListUpdateForm<TDto extends object> extends FormBase<TDto> impl
 
     // Effect to update actions when inputs change
     effect(() => {
+      const isSaving = this.saving();
       this.defaultActions.set([
         {
           label: $localize`:@@code-list.action.back:Back`,
@@ -57,9 +59,12 @@ export class CodeListUpdateForm<TDto extends object> extends FormBase<TDto> impl
           action: () => this.onClose()
         },
         {
-          label: $localize`:@@code-list.action.save:Save`,
+          label: isSaving
+            ? $localize`:@@code-list.action.saving:Saving...`
+            : $localize`:@@code-list.action.save:Save`,
           description: $localize`:@@cn.code-list-update-form.save.description:Save changes`,
           icon: 'check_circle',
+          disabled: isSaving,
           action: () => this.onSubmit()
         }
       ]);
@@ -126,12 +131,15 @@ export class CodeListUpdateForm<TDto extends object> extends FormBase<TDto> impl
 
   override onSubmit(): void {
     if (this.form.valid) {
+      this.saving.set(true);
       const model = this.getModel();
       this.updateOperation()(model).subscribe({
         next: (result) => {
+          this.saving.set(false);
           this.onClose({ result, success: true });
         },
         error: (err) => {
+          this.saving.set(false);
           this.onError(err);
         }
       });
