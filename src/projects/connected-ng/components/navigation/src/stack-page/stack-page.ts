@@ -24,9 +24,9 @@ export class StackPage implements OnDestroy {
   isActivePage = computed(() => this.navigationContext.activePage() == this.pageInfo());
 
   private defaultActions = computed(() => this.isRoot?.() ? [] : [{
-    label: 'Back',
+    label: $localize`:@@code-list.action.back:Back`,
     action: () => this.navigationContext.pop(),
-    description: 'Return to the previous screen',
+    description: $localize`:@@code-list.action.back.description:Return to the previous screen`,
     icon: 'arrow_back'
   }]);
 
