@@ -28,7 +28,7 @@ class="pt-1 pb-3 form-sm"
     >
       <mat-checkbox
         [checked]="isSelected(item) || isImmutable(item)"
-        [disabled]="isImmutable(item)"
+        [disabled]="isImmutable(item) || disabled()"
         (change)="toggle(item, $event.checked)"
       >
       </mat-checkbox>

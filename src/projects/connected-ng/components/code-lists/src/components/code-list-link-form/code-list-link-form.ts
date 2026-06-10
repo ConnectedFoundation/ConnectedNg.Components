@@ -35,6 +35,7 @@ export class CodeListLinkForm<TItem extends Record<string, any>> {
   pageSizeOptions = input<number[]>([5, 10, 25]);
   hidePageSize = input(true);
   selectedValues = model<any[]>([]);
+  disabled = input<boolean>(false);
 
   itemSelected = output<TItem>();
   itemDeselected = output<TItem>();
@@ -99,6 +100,7 @@ export class CodeListLinkForm<TItem extends Record<string, any>> {
   trackItem = (_index: number, item: TItem): any => item[this.keyField()];
 
   toggle(item: TItem, checked: boolean): void {
+    if (this.disabled()) return;
     const id = item[this.keyField()];
     if (checked) {
       this.selectedValues.update(current => [...current, id]);
