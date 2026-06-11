@@ -31,18 +31,21 @@
           <button
             matButton
             mtxDatetimepickerClear
+            i18n="@@cn.datetimepicker.clear"
           >
             Clear
           </button>
           <button
             matButton
             mtxDatetimepickerCancel
+            i18n="@@cn.datetimepicker.cancel"
           >
             Cancel
           </button>
           <button
             matButton="elevated"
             mtxDatetimepickerApply
+            i18n="@@cn.datetimepicker.apply"
           >
             Apply
           </button>
@@ -78,7 +81,7 @@
 
     @if (control().invalid && control().touched) {
       @if (control().errors?.['required']) {
-        <mat-error>{{ fieldConfig().label }} is required</mat-error>
+        <mat-error i18n="@@cn.form-field.required">This field is required</mat-error>
       }
       @if (control().errors?.['minlength']) {
         <mat-error>Minimum length is {{ fieldConfig().minLength }}</mat-error>
