@@ -79,25 +79,23 @@
       <mat-hint>{{ fieldConfig().description }}</mat-hint>
     }
 
-    @if (control().invalid && control().touched) {
-      @if (control().errors?.['required']) {
-        <mat-error i18n="@@cn.form-field.required">This field is required</mat-error>
-      }
-      @if (control().errors?.['minlength']) {
-        <mat-error>Minimum length is {{ fieldConfig().minLength }}</mat-error>
-      }
-      @if (control().errors?.['maxlength']) {
-        <mat-error>Maximum length is {{ fieldConfig().maxLength }}</mat-error>
-      }
-      @if (control().errors?.['min']) {
-        <mat-error>Minimum value is {{ fieldConfig().min }}</mat-error>
-      }
-      @if (control().errors?.['max']) {
-        <mat-error>Maximum value is {{ fieldConfig().max }}</mat-error>
-      }
-      @if (control().errors?.['email']) {
-        <mat-error>Invalid email format</mat-error>
-      }
+    @if (control().touched && control().errors?.['required']) {
+      <mat-error i18n="@@cn.form-field.required">This field is required</mat-error>
+    }
+    @if (control().touched && control().errors?.['minlength']) {
+      <mat-error>Minimum length is {{ fieldConfig().minLength }}</mat-error>
+    }
+    @if (control().touched && control().errors?.['maxlength']) {
+      <mat-error>Maximum length is {{ fieldConfig().maxLength }}</mat-error>
+    }
+    @if (control().touched && control().errors?.['min']) {
+      <mat-error>Minimum value is {{ fieldConfig().min }}</mat-error>
+    }
+    @if (control().touched && control().errors?.['max']) {
+      <mat-error>Maximum value is {{ fieldConfig().max }}</mat-error>
+    }
+    @if (control().touched && control().errors?.['email']) {
+      <mat-error>Invalid email format</mat-error>
     }
   </mat-form-field>
 }
