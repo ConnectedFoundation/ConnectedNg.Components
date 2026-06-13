@@ -4,6 +4,7 @@ import { DtoDescriptor, InvokableServiceOperation } from '@connected-ng/core';
 import { ActionBarComponent, ActionDescriptionWithAction } from '@connected-ng/components';
 import { FormBase, FormGenerationInterceptors, generateFormFromDtoDescriptor, DynamicFormMetadata } from '@connected-ng/components/forms';
 import { ActionsProviderContract, StackNavigationContext } from '@connected-ng/components/navigation';
+import { NotificationService } from '@connected-ng/components/notifications';
 
 @Component({
   selector: 'cn-code-list-insert-form',
@@ -18,8 +19,10 @@ export class CodeListInsertForm<TDto extends object> extends FormBase<TDto> impl
   title = input<string>('New Item');
   actions = input<ActionDescriptionWithAction[]>([]);
   formInterceptors = input<FormGenerationInterceptors>();
+  
   // Services
   navigationContext = inject(StackNavigationContext);
+  private notificationService = inject(NotificationService);
 
   // State
   dtoDescriptor = signal<DtoDescriptor | undefined>(undefined);
@@ -41,7 +44,6 @@ export class CodeListInsertForm<TDto extends object> extends FormBase<TDto> impl
   constructor() {
     super();
 
-    // Effect to update actions when inputs change
     effect(() => {
       const isSaving = this.saving();
       this.defaultActions.set([
@@ -63,7 +65,6 @@ export class CodeListInsertForm<TDto extends object> extends FormBase<TDto> impl
       ]);
     });
 
-    // Effect to render form fields when metadata changes
     effect(() => {
       const metadata = this.formMetadata();
       const container = this.formFieldsContainer();
@@ -83,7 +84,6 @@ export class CodeListInsertForm<TDto extends object> extends FormBase<TDto> impl
   override ngOnInit(): void {
     super.ngOnInit();
 
-    // Fetch descriptor and generate empty form for insert
     this.serviceOperation().describeDto().subscribe({
       next: (descriptor) => {
         this.dtoDescriptor.set(descriptor);
@@ -128,6 +128,10 @@ export class CodeListInsertForm<TDto extends object> extends FormBase<TDto> impl
       });
     } else {
       this.form.markAllAsTouched();
+      
+      const errorMessage = $localize`:@@cn.form.errors:Please correct the errors above before submitting.`;
+      
+      this.notificationService.error(errorMessage);
     }
   }
 }

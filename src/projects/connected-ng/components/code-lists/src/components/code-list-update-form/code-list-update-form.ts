@@ -5,6 +5,7 @@ import { ActionDescriptionWithAction } from '@connected-ng/components';
 import { FormBase, FormGenerationInterceptors, generateFormFromDtoDescriptor, DynamicFormMetadata } from '@connected-ng/components/forms';
 import { Observable } from 'rxjs';
 import { ActionsProviderContract, StackNavigationContext } from '@connected-ng/components/navigation';
+import { NotificationService } from '../../../../notifications/src/notification/notification-service';
 
 @Component({
   selector: 'cn-code-list-update-form',
@@ -25,6 +26,7 @@ export class CodeListUpdateForm<TDto extends object> extends FormBase<TDto> impl
 
   // Services
   navigationContext = inject(StackNavigationContext);
+  private notificationService = inject(NotificationService);
 
   // State
   dtoDescriptor = signal<DtoDescriptor | undefined>(undefined);
@@ -145,6 +147,9 @@ export class CodeListUpdateForm<TDto extends object> extends FormBase<TDto> impl
       });
     } else {
       this.form.markAllAsTouched();
+      
+      const errorMessage = $localize`:@@cn.form.errors:Please correct the errors above before submitting.`;
+      this.notificationService.error(errorMessage);
     }
   }
 }
