@@ -5,7 +5,7 @@ import { ActionDescriptionWithAction } from '@connected-ng/components';
 import { FormBase, FormGenerationInterceptors, generateFormFromDtoDescriptor, DynamicFormMetadata } from '@connected-ng/components/forms';
 import { Observable } from 'rxjs';
 import { ActionsProviderContract, StackNavigationContext } from '@connected-ng/components/navigation';
-import { NotificationService } from '../../../../notifications/src/notification/notification-service';
+import { NotificationService } from '@connected-ng/components/notifications';
 
 @Component({
   selector: 'cn-code-list-update-form',
