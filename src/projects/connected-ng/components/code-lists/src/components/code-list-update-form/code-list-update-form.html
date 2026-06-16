@@ -1,3 +1,8 @@
+@if (isLoading()) {
+<div class="no-content" style="height: 100px" *busyIndicator="['loadCodeListForm']">
+  <p i18n="@@cn.form.loading">Loading form...</p>
+</div>
+} @else {
 <form
   [formGroup]="form"
   (ngSubmit)="onSubmit()"
@@ -16,3 +21,4 @@
   </div>
   } -->
 </form>
+}

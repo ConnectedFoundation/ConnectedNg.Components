@@ -6,10 +6,11 @@ import { FormBase, FormGenerationInterceptors, generateFormFromDtoDescriptor, Dy
 import { Observable } from 'rxjs';
 import { ActionsProviderContract, StackNavigationContext } from '@connected-ng/components/navigation';
 import { NotificationService } from '@connected-ng/components/notifications';
+import { BusyService, BusyIndicatorStructuralDirective } from '@connected-ng/components/indicators';
 
 @Component({
   selector: 'cn-code-list-update-form',
-  imports: [ReactiveFormsModule],
+  imports: [ReactiveFormsModule, BusyIndicatorStructuralDirective],
   templateUrl: './code-list-update-form.html',
   styleUrl: './code-list-update-form.scss'
 })
@@ -27,11 +28,13 @@ export class CodeListUpdateForm<TDto extends object> extends FormBase<TDto> impl
   // Services
   navigationContext = inject(StackNavigationContext);
   private notificationService = inject(NotificationService);
+  private busyService = inject(BusyService);
 
   // State
   dtoDescriptor = signal<DtoDescriptor | undefined>(undefined);
   formMetadata = signal<DynamicFormMetadata | undefined>(undefined);
   saving = signal<boolean>(false);
+  isLoading = computed(() => this.formMetadata() === undefined);
 
   field(name: string) {
     return computed(() => this.formMetadata()?.fields.find(e => e.fieldName == name));

@@ -5,11 +5,12 @@ import { ActionBarComponent, ActionDescriptionWithAction } from '@connected-ng/c
 import { FormBase, FormGenerationInterceptors, generateFormFromDtoDescriptor, DynamicFormMetadata } from '@connected-ng/components/forms';
 import { ActionsProviderContract, StackNavigationContext } from '@connected-ng/components/navigation';
 import { NotificationService } from '@connected-ng/components/notifications';
+import { BusyService, BusyIndicatorStructuralDirective } from '@connected-ng/components/indicators';
 
 @Component({
   selector: 'cn-code-list-insert-form',
   standalone: true,
-  imports: [ReactiveFormsModule],
+  imports: [ReactiveFormsModule, BusyIndicatorStructuralDirective],
   templateUrl: './code-list-insert-form.html',
   styleUrl: './code-list-insert-form.scss',
 })
@@ -23,6 +24,7 @@ export class CodeListInsertForm<TDto extends object> extends FormBase<TDto> impl
   // Services
   navigationContext = inject(StackNavigationContext);
   private notificationService = inject(NotificationService);
+  private busyService = inject(BusyService);
 
   // State
   dtoDescriptor = signal<DtoDescriptor | undefined>(undefined);
