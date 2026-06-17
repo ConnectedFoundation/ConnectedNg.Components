@@ -80,7 +80,7 @@
     }
 
     @if (control().touched && control().errors?.['required']) {
-      <mat-error i18n="@@cn.form-field.required">This field is required</mat-error>
+      <mat-error i18n="@@cn.form-field.required">This field is required!</mat-error>
     }
     @if (control().touched && control().errors?.['minlength']) {
       <mat-error>Minimum length is {{ fieldConfig().minLength }}</mat-error>
