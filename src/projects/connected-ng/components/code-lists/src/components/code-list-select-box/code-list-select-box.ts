@@ -120,7 +120,7 @@ export class CodeListSelectBox<T = any> implements ControlValueAccessor, Validat
   setDisabledState(isDisabled: boolean): void { this.isDisabled.set(isDisabled); }
 
   validate(_control: AbstractControl): ValidationErrors | null {
-    return _control.hasValidator(Validators.required) && this.selectedItem() == null ? { required: true } : null;
+    return _control.hasValidator(Validators.required) && this._value() == null ? { required: true } : null;
   }
 
   onSelectionChange(item: T | null): void {
