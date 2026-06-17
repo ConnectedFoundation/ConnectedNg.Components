@@ -1,5 +1,5 @@
 import { Component, input, signal, computed, Type, ViewContainerRef, forwardRef, inject, TemplateRef, AfterViewInit, ChangeDetectorRef, ViewChild, OnInit, DoCheck, Injector, viewChild } from '@angular/core';
-import { ControlValueAccessor, NG_VALUE_ACCESSOR, NG_VALIDATORS, Validator, AbstractControl, ValidationErrors, NgControl, FormGroupDirective, NgForm } from '@angular/forms';
+import { ControlValueAccessor, NG_VALUE_ACCESSOR, NG_VALIDATORS, Validator, AbstractControl, ValidationErrors, NgControl, FormGroupDirective, NgForm, Validators } from '@angular/forms';
 import { ErrorStateMatcher } from '@angular/material/core';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
@@ -55,12 +55,15 @@ export class CodeListSelectBox<T = any> implements ControlValueAccessor, Validat
   private mtxSelectRef = viewChild(MtxSelect);
 
   readonly errorStateMatcher = new OuterControlErrorStateMatcher();
+  private _ngControl = signal<NgControl | null>(null);
 
   ngOnInit(): void {
     // Lazy injection avoids the circular dependency (NG_VALUE_ACCESSOR ↔ NgControl).
     // No { self: true } so it finds the FormControlName/formControl directive on our host element.
-    this.errorStateMatcher.ngControl = this.injector.get(NgControl, null, { optional: true });
+    const ngControl = this.injector.get(NgControl, null, { optional: true });
+    this.errorStateMatcher.ngControl = ngControl;
     this.errorStateMatcher.parentForm = this.parentFormGroup ?? this.parentForm;
+    this._ngControl.set(ngControl);
   }
 
   // MtxSelect.ngDoCheck only calls updateErrorState() when its own ngControl is set.
@@ -74,7 +77,7 @@ export class CodeListSelectBox<T = any> implements ControlValueAccessor, Validat
   displayMemberSelector = input<(item: T) => string>((item: T) => String(item));
   placeholder = input<string>($localize`:@@cn.code-list-select-box.placeholder:Select...`);
   label = input<string>('');
-  required = input<boolean>(false);
+  required = computed(() => this._ngControl()?.control?.hasValidator(Validators.required) ?? false);
   insertFormComponent = input<Type<FormBase<unknown>>>();
   insertFormResultMapper = input<(result: FormResult) => Promise<T | undefined>>();
   insertFormInputs = input<any>({});
@@ -117,7 +120,7 @@ export class CodeListSelectBox<T = any> implements ControlValueAccessor, Validat
   setDisabledState(isDisabled: boolean): void { this.isDisabled.set(isDisabled); }
 
   validate(_control: AbstractControl): ValidationErrors | null {
-    return this.required() && this.selectedItem() == null ? { required: true } : null;
+    return _control.hasValidator(Validators.required) && this.selectedItem() == null ? { required: true } : null;
   }
 
   onSelectionChange(item: T | null): void {
