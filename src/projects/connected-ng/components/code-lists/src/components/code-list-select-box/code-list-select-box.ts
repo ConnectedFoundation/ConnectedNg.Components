@@ -116,7 +116,10 @@ export class CodeListSelectBox<T = any> implements ControlValueAccessor, Validat
 
   registerOnChange(fn: any): void { this._onChange = fn; }
   registerOnTouched(fn: any): void { this._onTouched = fn; }
-  setDisabledState(isDisabled: boolean): void { this.isDisabled.set(isDisabled); }
+  setDisabledState(isDisabled: boolean): void {
+    this.isDisabled.set(isDisabled);
+    setTimeout(() => this.mtxSelectRef()?.stateChanges.next());
+  }
 
   validate(_control: AbstractControl): ValidationErrors | null {
     return _control.hasValidator(Validators.required) && !this._value() ? { required: true } : null;
