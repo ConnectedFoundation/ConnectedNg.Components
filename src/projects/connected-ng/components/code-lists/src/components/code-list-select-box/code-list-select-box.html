@@ -1,4 +1,7 @@
-<mat-form-field class="code-list-select-box" [floatLabel]="selectedItem() != null ? 'always' : 'auto'">
+<mat-form-field
+  class="code-list-select-box"
+  [floatLabel]="selectedItem() != null ? 'always' : 'auto'"
+>
   @if (label()) {
   <mat-label>{{ label() }}</mat-label>
   }
@@ -12,9 +15,10 @@
     [searchFn]="searchFn"
     [compareWith]="compareWithFn"
     [clearable]="!required()"
+    [errorStateMatcher]="errorStateMatcher"
     (change)="onSelectionChange($event)"
     (blur)="onTouched()"
-  > 
+  >
     <ng-template
       ng-label-tmp
       let-item="item"
@@ -37,9 +41,16 @@
       } @else { {{ displayMemberSelector()(item) }} }
     </ng-template>
   </mtx-select>
+  <mat-error>This field is required</mat-error>
 
   @if (insertFormComponent()) {
-  <button class="icon-btn-sm mr-3" matIconButton matIconSuffix type="button" (click)="openInsertDialog();$event.stopPropagation()">
+  <button
+    class="icon-btn-sm mr-3"
+    matIconButton
+    matIconSuffix
+    type="button"
+    (click)="openInsertDialog();$event.stopPropagation()"
+  >
     <mat-icon>add</mat-icon>
   </button>
   }
@@ -52,5 +63,4 @@
     >add</mat-icon
   >
   } -->
-
 </mat-form-field>

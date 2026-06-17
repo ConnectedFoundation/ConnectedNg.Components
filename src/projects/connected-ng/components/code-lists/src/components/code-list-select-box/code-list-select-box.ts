@@ -1,13 +1,24 @@
-import { Component, input, signal, computed, Type, ViewContainerRef, viewChild, forwardRef, inject, TemplateRef, AfterViewInit, ChangeDetectorRef, ViewChild } from '@angular/core';
-import { ControlValueAccessor, NG_VALUE_ACCESSOR, NG_VALIDATORS, Validator, AbstractControl, ValidationErrors } from '@angular/forms';
+import { Component, input, signal, computed, Type, ViewContainerRef, forwardRef, inject, TemplateRef, AfterViewInit, ChangeDetectorRef, ViewChild, OnInit, DoCheck, Injector, viewChild } from '@angular/core';
+import { ControlValueAccessor, NG_VALUE_ACCESSOR, NG_VALIDATORS, Validator, AbstractControl, ValidationErrors, NgControl, FormGroupDirective, NgForm } from '@angular/forms';
+import { ErrorStateMatcher } from '@angular/material/core';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatIconModule } from '@angular/material/icon';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialog, MatDialogModule, MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
 import { CommonModule } from '@angular/common';
-import { MtxSelectModule } from '@ng-matero/extensions/select';
+import { MtxSelect, MtxSelectModule } from '@ng-matero/extensions/select';
 import { FormBase, FormResult } from '@connected-ng/components/forms';
 import { firstValueFrom } from 'rxjs';
+
+class OuterControlErrorStateMatcher implements ErrorStateMatcher {
+  ngControl: NgControl | null = null;
+  parentForm: FormGroupDirective | NgForm | null = null;
+
+  isErrorState(): boolean {
+    if (!this.ngControl) return false;
+    return !!(this.ngControl.invalid && (this.ngControl.touched || this.parentForm?.submitted));
+  }
+}
 
 @Component({
   selector: 'cn-code-list-select-box',
@@ -35,8 +46,28 @@ import { firstValueFrom } from 'rxjs';
     }
   ]
 })
-export class CodeListSelectBox<T = any> implements ControlValueAccessor, Validator {
+export class CodeListSelectBox<T = any> implements ControlValueAccessor, Validator, OnInit, DoCheck {
   private dialog = inject(MatDialog);
+  private injector = inject(Injector);
+  private parentFormGroup = inject(FormGroupDirective, { optional: true });
+  private parentForm = inject(NgForm, { optional: true });
+
+  private mtxSelectRef = viewChild(MtxSelect);
+
+  readonly errorStateMatcher = new OuterControlErrorStateMatcher();
+
+  ngOnInit(): void {
+    // Lazy injection avoids the circular dependency (NG_VALUE_ACCESSOR ↔ NgControl).
+    // No { self: true } so it finds the FormControlName/formControl directive on our host element.
+    this.errorStateMatcher.ngControl = this.injector.get(NgControl, null, { optional: true });
+    this.errorStateMatcher.parentForm = this.parentFormGroup ?? this.parentForm;
+  }
+
+  // MtxSelect.ngDoCheck only calls updateErrorState() when its own ngControl is set.
+  // Since we use [value] binding (no ngModel/formControl on mtx-select), we must trigger it manually.
+  ngDoCheck(): void {
+    this.mtxSelectRef()?.updateErrorState();
+  }
 
   items = input.required<T[]>();
   keySelector = input.required<(item: T) => any>();
@@ -85,7 +116,7 @@ export class CodeListSelectBox<T = any> implements ControlValueAccessor, Validat
   registerOnTouched(fn: any): void { this._onTouched = fn; }
   setDisabledState(isDisabled: boolean): void { this.isDisabled.set(isDisabled); }
 
-  validate(control: AbstractControl): ValidationErrors | null {
+  validate(_control: AbstractControl): ValidationErrors | null {
     return this.required() && this.selectedItem() == null ? { required: true } : null;
   }
 
