@@ -12,7 +12,6 @@ export function useCodeListSelectBox(fieldName: string, component: Type<any>, co
           fieldConfig: context.fieldMetadata!.fieldConfig,
           inputs: {
             control: context.control,
-            required: context.fieldMetadata!.fieldConfig.required,
             ...componentInputs
           }
         },

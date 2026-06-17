@@ -58,16 +58,12 @@ export class CodeListSelectBox<T = any> implements ControlValueAccessor, Validat
   private _ngControl = signal<NgControl | null>(null);
 
   ngOnInit(): void {
-    // Lazy injection avoids the circular dependency (NG_VALUE_ACCESSOR ↔ NgControl).
-    // No { self: true } so it finds the FormControlName/formControl directive on our host element.
     const ngControl = this.injector.get(NgControl, null, { optional: true });
     this.errorStateMatcher.ngControl = ngControl;
     this.errorStateMatcher.parentForm = this.parentFormGroup ?? this.parentForm;
     this._ngControl.set(ngControl);
   }
 
-  // MtxSelect.ngDoCheck only calls updateErrorState() when its own ngControl is set.
-  // Since we use [value] binding (no ngModel/formControl on mtx-select), we must trigger it manually.
   ngDoCheck(): void {
     this.mtxSelectRef()?.updateErrorState();
   }
@@ -94,12 +90,15 @@ export class CodeListSelectBox<T = any> implements ControlValueAccessor, Validat
       return true;
     });
   });
+
   private _value = signal<any>(undefined);
+
   selectedItem = computed<T | null>(() => {
     let item = this._value() != null ? (this.allItems().find(i => this.keySelector()(i) == this._value()) ?? null) : null
     return item;
   }
   );
+
   isDisabled = signal(false);
 
   searchFn = (term: string, item: T): boolean =>
@@ -120,7 +119,7 @@ export class CodeListSelectBox<T = any> implements ControlValueAccessor, Validat
   setDisabledState(isDisabled: boolean): void { this.isDisabled.set(isDisabled); }
 
   validate(_control: AbstractControl): ValidationErrors | null {
-    return _control.hasValidator(Validators.required) && this._value() == null ? { required: true } : null;
+    return _control.hasValidator(Validators.required) && !this._value() ? { required: true } : null;
   }
 
   onSelectionChange(item: T | null): void {
