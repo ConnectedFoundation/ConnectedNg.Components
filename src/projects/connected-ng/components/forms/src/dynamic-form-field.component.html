@@ -97,5 +97,8 @@
     @if (control().touched && control().errors?.['email']) {
       <mat-error>Invalid email format</mat-error>
     }
+    @if (control().touched && customErrors().length > 0) {
+      <mat-error>{{ customErrors()[0] }}</mat-error>
+    }
   </mat-form-field>
 }
