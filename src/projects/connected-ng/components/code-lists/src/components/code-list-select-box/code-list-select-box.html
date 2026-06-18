@@ -15,6 +15,7 @@
     [searchFn]="searchFn"
     [compareWith]="compareWithFn"
     [clearable]="!required()"
+    [virtualScroll]="virtualScroll()"
     [errorStateMatcher]="errorStateMatcher"
     (change)="onSelectionChange($event)"
     (blur)="onTouched()"
