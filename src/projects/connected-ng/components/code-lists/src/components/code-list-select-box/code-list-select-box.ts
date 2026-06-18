@@ -72,6 +72,7 @@ export class CodeListSelectBox<T = any> implements ControlValueAccessor, Validat
   keySelector = input.required<(item: T) => any>();
   displayMemberSelector = input<(item: T) => string>((item: T) => String(item));
   placeholder = input<string>($localize`:@@cn.code-list-select-box.placeholder:Select...`);
+  notFoundText = input<string>($localize`:@@cn.select.no-items-found:No items found`);
   virtualScroll = input<boolean>(false);
   label = input<string>('');
   required = computed(() => this._ngControl()?.control?.hasValidator(Validators.required) ?? false);
