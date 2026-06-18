@@ -29,6 +29,7 @@ export class CodeListLinkForm<TItem extends Record<string, any>> {
   immutableItems = input<any[]>([]);
   itemTemplate = input.required<TemplateRef<{ $implicit: TItem }>>();
   keyField = input<string>('id');
+  filter = input<((item: TItem, query: string) => boolean) | null>(null);
   itemSize = input<number>(48);
   paginate = input(false);
   pageSize = input<number>(20);
@@ -49,7 +50,8 @@ export class CodeListLinkForm<TItem extends Record<string, any>> {
   private readonly immutableSet = computed(() => new Set(this.immutableItems()));
 
   readonly filteredItems = computed(() => {
-    const filter = this.filterValue().toLowerCase();
+    const filterValue = this.filterValue().toLowerCase();
+    const customFilter = this.filter();
     const onlySelected = this.showOnlySelected();
     const selected = this.selectedSet();
     const immutable = this.immutableSet();
@@ -57,8 +59,10 @@ export class CodeListLinkForm<TItem extends Record<string, any>> {
 
     return this.items().filter(item => {
       if (onlySelected && !selected.has(item[idField]) && !immutable.has(item[idField])) return false;
-      if (filter) {
-        return Object.values(item).some(v => String(v).toLowerCase().includes(filter));
+      if (filterValue) {
+        return customFilter
+          ? customFilter(item, filterValue)
+          : Object.values(item).some(v => String(v).toLowerCase().includes(filterValue));
       }
       return true;
     });
