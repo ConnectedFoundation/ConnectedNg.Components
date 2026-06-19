@@ -1,3 +1,4 @@
+/// <reference types="@angular/localize" />
 export * from './components/code-list-actions-container/code-list-actions'
 export * from './components/code-list-actions-container/code-list-actions-container'
 export * from './components/code-list-form-bases/code-list-insert-form-base'

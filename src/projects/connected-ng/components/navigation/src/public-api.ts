@@ -1,3 +1,4 @@
+/// <reference types="@angular/localize" />
 export * from "./navigation-list/navigation-list";
 export * from "./navigation-list/navigation-list-item/navigation-list-item";
 export * from "./navigation-list/navigation-list-context";

@@ -1,3 +1,4 @@
+/// <reference types="@angular/localize" />
 // IDE Components
 export * from './ide/ide';
 export * from './ide/ide-explorer/ide-explorer';

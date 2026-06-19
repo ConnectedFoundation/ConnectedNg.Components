@@ -7,7 +7,7 @@
     "declaration": true,
     "declarationMap": true,
     "sourceMap": true,
-		"types": ["@angular/localize"],
+		"types": [],
     "paths": {
       "@connected-ng/components": ["./src/public-api.ts"],
       "@connected-ng/components/code-lists": ["./code-lists/src/public-api.ts"],
