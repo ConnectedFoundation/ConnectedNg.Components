@@ -282,17 +282,32 @@ export class StackNavigationContext {
     // Determine if reconstruction was successful (all segments consumed, no holes)
     const success = holes.length === 0 && i >= segments.length;
 
+    // Restore the `navigatedFrom` links so the back button behaves the same after a
+    // URL reconstruction (e.g. page refresh) as it does during normal navigation.
+    // A detail/edit form (pattern with a `:param`) and the code-list page that follows
+    // it are pushed together as a pair, so going back from that following page should
+    // skip the form and return to the page that preceded it.
+    const linkedPath: StackPageNavigationInfo<unknown>[] = reconstructedPath.length > 0
+      ? [reconstructedPath[0]]
+      : [];
+    for (let idx = 1; idx < reconstructedPath.length; idx++) {
+      const prev = linkedPath[idx - 1];
+      const prevIsForm = !!prev.pattern && prev.pattern.includes(':');
+      const navigatedFrom = prevIsForm && idx - 2 >= 0 ? linkedPath[idx - 2] : prev;
+      linkedPath.push({ ...reconstructedPath[idx], navigatedFrom });
+    }
+
     // Always apply the reconstructed path (even partial), so the stack is never left empty.
     // On full success this is the complete path; on partial failure it navigates as deep as possible.
     this.skipUrlUpdate = true;
-    this.stack.set(reconstructedPath);
+    this.stack.set(linkedPath);
     this.skipUrlUpdate = false;
 
     return {
       success,
-      reconstructedPath,
+      reconstructedPath: linkedPath,
       holes,
-      partialPath: reconstructedPath.slice(1).map(p => p.key).join('/')
+      partialPath: linkedPath.slice(1).map(p => p.key).join('/')
     };
   }
 
