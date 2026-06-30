@@ -1,4 +1,4 @@
-<div class="gap-5 bt-1 mt-3 pt-3 d-flex flex-wrap">
+<!-- <div class="gap-5 bt-1 mt-3 pt-3 d-flex flex-wrap">
   @for(action of internalActions(); track action.label){
   <cn-action-tile
     [description]="action.description"
@@ -9,4 +9,18 @@
   >
   </cn-action-tile>
   }
-</div>
+</div> -->
+<div class="cn-list-action-wrapper bt-1">
+  <div class="cn-list-action-group">
+    @for(action of internalActions(); track action.label){
+    <cn-action-tile
+      [description]="action.description"
+      [icon]="action.icon"
+      [label]="action.label"
+      [url]="action.url"
+      (click)="handleItemClick(action, $event)"
+    >
+    </cn-action-tile>
+    }
+  </div>
+</div>  
