@@ -22,7 +22,7 @@
     (blur)="onTouched()"
   >
     <ng-template
-      ngSelectLabel
+      ng-label-tmp
       let-item="item"
     >
       @if (itemTemplate()) {
@@ -33,7 +33,7 @@
     </ng-template>
 
     <ng-template
-      ngSelectOption
+      ng-option-tmp
       let-item="item"
     >
       @if (itemTemplate()) {
