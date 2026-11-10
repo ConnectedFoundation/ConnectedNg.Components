@@ -38,12 +38,9 @@ export class IdeDocumentEditor implements OnInit, OnDestroy {
     // Update editorPortal when selectedEditorInstance changes
     effect(() => {
       const doc = this.selectedEditorInstance();
-      console.log('[IdeDocumentEditor] Effect 1: selectedEditorInstance changed to', doc?.id);
 
       if (doc) {
-        console.log('[IdeDocumentEditor] Calling resolveEditor for', doc.id);
         this.editorService.resolveEditor({ ...doc, context: this.context() }).subscribe((editor) => {
-          console.log('[IdeDocumentEditor] resolveEditor returned for', doc.id);
           if (editor) {
             const newPortal = new ComponentPortal(editor);
             this.editorPortal.set(newPortal);
@@ -60,10 +57,8 @@ export class IdeDocumentEditor implements OnInit, OnDestroy {
     effect(() => {
       const portal = this.editorPortal();
       const doc = this.selectedEditorInstance();
-      console.log('[IdeDocumentEditor] Effect 2: portal or doc changed. portal=', !!portal, 'doc=', doc?.id);
 
       if (portal && doc) {
-        console.log('[IdeDocumentEditor] Setting ideDocument input for', doc.id);
         // Wait for next tick to ensure portal is attached
         setTimeout(() => {
           const outlet = this.portalOutlet();
@@ -84,7 +79,6 @@ export class IdeDocumentEditor implements OnInit, OnDestroy {
     if (this.selectionService.$selected) {
       this.subscriptions.add(
         this.selectionService.$selected.subscribe((e: SelectedItem) => {
-          console.log('[IdeDocumentEditor] Received selection:', e.id, 'from', e.currentEditor);
           // Don't reprocess selections from ourselves to avoid loops
           if (e.currentEditor === 'IdeDocumentEditor') return;
           this.selectDocument(e);
@@ -113,19 +107,15 @@ export class IdeDocumentEditor implements OnInit, OnDestroy {
   }
 
   selectDocument(selectedItem: SelectedItem) {
-    console.log('[IdeDocumentEditor] selectDocument called for', selectedItem.id);
     this.documentService.select(selectedItem).subscribe((document) => {
-      console.log('[IdeDocumentEditor] documentService.select returned for', selectedItem.id);
       if (!document)
         return;
 
       let existing = this.activeEditorInstances().find(e => documentsEqual(e, document));
 
       if (existing) {
-        console.log('[IdeDocumentEditor] Setting existing instance');
         this.selectedEditorInstance.set(existing as IdeDocument);
       } else {
-        console.log('[IdeDocumentEditor] Adding new instance');
         this.activeEditorInstances.set([...this.activeEditorInstances(), document]);
         this.selectedEditorInstance.set(document);
       }
@@ -133,7 +123,6 @@ export class IdeDocumentEditor implements OnInit, OnDestroy {
   }
 
   onTabClick(document: IdeDocument) {
-    console.log('[IdeDocumentEditor] onTabClick for', document.id);
     this.selectedEditorInstance.set(document);
 
     // Notify the selection service

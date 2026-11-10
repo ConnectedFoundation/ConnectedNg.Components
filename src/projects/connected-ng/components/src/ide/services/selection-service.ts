@@ -32,7 +32,6 @@ export class SelectionService {
   $deselected?: Observable<DeselectDto> = this.deselectedSubject.asObservable();
 
   select(dto: SelectedItem): void {
-    console.log('[SelectionService] Broadcasting selection:', dto.id, 'from', dto.currentEditor);
     this.selectedSubject.next(dto);
   }
 
