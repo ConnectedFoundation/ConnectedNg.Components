@@ -20,7 +20,6 @@ export class CodeListContainer {
   childPath = computed(() => {
     const url = this.route.snapshot.url;
     const segments = url.map(segment => segment.path);
-    console.log('[CodeListContainer] childPath computed:', { fullUrl: url.map(s => s.path), childPath: segments });
     return segments;
   });
 }

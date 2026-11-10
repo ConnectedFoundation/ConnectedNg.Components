@@ -202,7 +202,6 @@ export class StackNavigationContext {
     }
 
     const url = this.getFullUrl();
-    console.log('[StackNavigationContext] updateUrl:', url, 'stack:', this.stack().map(p => p.key), 'managesUrl:', this._managesUrl);
 
     const currentPath = window.location.pathname;
 
@@ -228,14 +227,11 @@ export class StackNavigationContext {
       ? urlPath
       : urlPath.split('/').filter(s => s.length > 0);
 
-    console.log('[StackNavigationContext] reconstructFromUrl:', { segments, rootPageKey: rootPage.key });
-
     if (segments.length === 0) {
       // Empty path - just navigate to root
       this.skipUrlUpdate = true;
       this.stack.set([rootPage]);
       this.skipUrlUpdate = false;
-      console.log('[StackNavigationContext] Empty path, stack:', this.stack().map(p => p.key));
       return {
         success: true,
         reconstructedPath: [rootPage],
@@ -270,8 +266,6 @@ export class StackNavigationContext {
         // Can't continue navigation - path is broken
         break;
       }
-
-      console.log('[StackNavigationContext] Matched:', match.child.key, 'consumed:', match.consumed, 'segments');
 
       // Found matching page - add to path and advance
       reconstructedPath.push(match.child);
