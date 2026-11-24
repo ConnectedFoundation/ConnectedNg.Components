@@ -136,8 +136,26 @@ export class StackNavigationContext {
 
   push(...pages: StackPageInfo<unknown>[]) {
     let activePage = this.activePage();
-    this.stack.set([...this.stack(), ...pages.map(e => ({ ...e, navigatedFrom: activePage }))]);
+    this.stack.set([...this.stack(), ...pages.map(e => ({ ...this.bindPopMarkers(e), navigatedFrom: activePage }))]);
     this.updateUrl();
+  }
+
+  /**
+   * A page built by the caller and pushed (a form opened from a list's button) may carry POP_NAVIGATION as an output, as a page
+   * rebuilt from the address does (see findChildBySegments). Left as the raw symbol it is not a handler: the output fires and
+   * nothing happens, with no error (a Back or Save button that does nothing).
+   */
+  private bindPopMarkers(page: StackPageInfo<unknown>): StackPageInfo<unknown> {
+    if (!page.outputs || !Object.values(page.outputs).includes(POP_NAVIGATION)) {
+      return page;
+    }
+
+    const outputs: Record<string, ((...args: any[]) => void) | symbol> = {};
+    for (const [key, handler] of Object.entries(page.outputs)) {
+      outputs[key] = handler === POP_NAVIGATION ? () => this.pop() : handler;
+    }
+
+    return { ...page, outputs };
   }
 
   pop(count = 1) {
