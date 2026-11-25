@@ -11,6 +11,14 @@ export const STACK_BASE_PATH = new InjectionToken<string>('STACK_BASE_PATH');
  */
 export const POP_NAVIGATION = Symbol('POP_NAVIGATION');
 
+/**
+ * The marker is recognized by its description too: a second copy of the library (a duplicated bundle, the separately built
+ * dist package) has its own symbol, which is not the same instance.
+ */
+function isPopMarker(value: unknown): boolean {
+  return value === POP_NAVIGATION || (typeof value === 'symbol' && value.toString() === 'Symbol(POP_NAVIGATION)');
+}
+
 export interface StackPageNavigationInfo<T> extends StackPageInfo<T> {
   navigatedFrom?: StackPageInfo<unknown>;
 }
@@ -141,21 +149,45 @@ export class StackNavigationContext {
   }
 
   /**
-   * A page built by the caller and pushed (a form opened from a list's button) may carry POP_NAVIGATION as an output, as a page
-   * rebuilt from the address does (see findChildBySegments). Left as the raw symbol it is not a handler: the output fires and
-   * nothing happens, with no error (a Back or Save button that does nothing).
+   * A page built by the caller and pushed (a form opened from a list's button), or taken from a parent's child list when the
+   * page is rebuilt from the address, may carry POP_NAVIGATION as an output. Left as the raw symbol it is not a handler: the
+   * output fires and nothing happens, with no error (a Back or Save button that does nothing).
+   *
+   * Every page that enters the stack goes through here, so the same rule holds however it got there.
    */
   private bindPopMarkers(page: StackPageInfo<unknown>): StackPageInfo<unknown> {
-    if (!page.outputs || !Object.values(page.outputs).includes(POP_NAVIGATION)) {
+    if (!page.outputs || !Object.values(page.outputs).some(isPopMarker)) {
       return page;
     }
 
     const outputs: Record<string, ((...args: any[]) => void) | symbol> = {};
-    for (const [key, handler] of Object.entries(page.outputs)) {
-      outputs[key] = handler === POP_NAVIGATION ? () => this.pop() : handler;
+    for (const [name, handler] of Object.entries(page.outputs)) {
+      outputs[name] = isPopMarker(handler) ? () => this.closePage(page.key) : handler;
     }
 
     return { ...page, outputs };
+  }
+
+  /**
+   * Closes the page with the given key, the page that owns the output, and what is above it. The Back button's rules apply
+   * when it is the active page (the page it was navigated from, or its backStep). A page that is no longer in the stack
+   * (closed already, or the output fired late) is left alone: it must not pop whichever page is on top now.
+   */
+  private closePage(key: string) {
+    const stack = this.stack();
+    const index = stack.map((p) => p.key).lastIndexOf(key);
+
+    if (index < 1) {
+      return;
+    }
+
+    if (index === stack.length - 1) {
+      this.back();
+      return;
+    }
+
+    this.stack.update((s) => s.slice(0, index));
+    this.updateUrl();
   }
 
   pop(count = 1) {
@@ -362,14 +394,12 @@ export class StackNavigationContext {
                 ...(factoryResult.outputs || {})
               };
 
-              // Replace POP_NAVIGATION markers with actual pop handlers
+              // Replace POP_NAVIGATION markers with actual pop handlers (the same rule as for a pushed page)
+              const bound = this.bindPopMarkers({ ...factoryResult, outputs: mergedOutputs });
               const boundOutputs: Record<string, (...args: any[]) => void> = {};
-              for (const [key, handler] of Object.entries(mergedOutputs)) {
-                const handlerValue = handler as any;
-                if (handlerValue === POP_NAVIGATION || (typeof handlerValue === 'symbol' && handlerValue.toString() === 'Symbol(POP_NAVIGATION)')) {
-                  boundOutputs[key] = () => this.pop();
-                } else if (typeof handlerValue === 'function') {
-                  boundOutputs[key] = handlerValue;
+              for (const [name, handler] of Object.entries(bound.outputs ?? {})) {
+                if (typeof handler === 'function') {
+                  boundOutputs[name] = handler;
                 }
               }
 
@@ -386,17 +416,17 @@ export class StackNavigationContext {
           }
           // If no factory, return the child template with matched params in data
           return {
-            child: {
+            child: this.bindPopMarkers({
               ...child,
               key: this.buildKeyFromPattern(child.pattern, match.params),
               data: { ...child.data, ...match.params }
-            },
+            }),
             consumed: match.consumed
           };
         }
       } else if (child.key === currentSegment) {
         // Only use exact key match if there's no pattern (for static routes)
-        return { child, consumed: 1 };
+        return { child: this.bindPopMarkers(child), consumed: 1 };
       }
     }
 

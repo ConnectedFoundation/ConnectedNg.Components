@@ -34,4 +34,60 @@ describe('StackNavigationContext: POP_NAVIGATION on a pushed page', () => {
     service.push(page('other'));
     expect(service.activePage()!.outputs).toBeUndefined();
   });
+
+  it('closes its own page when it fires after another page was pushed on top', () => {
+    service.push(page('list'));
+    service.push(page('new', { formClose: POP_NAVIGATION }));
+    const formClose = service.activePage()!.outputs!['formClose'] as () => void;
+    service.push(page('other'));
+
+    formClose();
+
+    expect(service.stack().map((p) => p.key)).toEqual(['list']);
+  });
+
+  it('does nothing when its page is no longer in the stack', () => {
+    service.push(page('list'));
+    service.push(page('new', { formClose: POP_NAVIGATION }));
+    const formClose = service.activePage()!.outputs!['formClose'] as () => void;
+    service.pop();
+    service.push(page('other'));
+
+    formClose();
+
+    expect(service.stack().map((p) => p.key)).toEqual(['list', 'other']);
+  });
+
+  it('follows the Back rules of the page: it returns to the page it was navigated from', () => {
+    service.push(page('list'));
+    service.push(page('middle'));
+    const middle = service.activePage()!;
+    service.push({ ...page('new', { formClose: POP_NAVIGATION }) });
+    service.activePage()!.navigatedFrom = service.stack()[1];
+
+    (service.activePage()!.outputs!['formClose'] as () => void)();
+
+    expect(service.activePage()).toBe(middle);
+  });
+
+  it('is recognized by its description, as another copy of the library has its own symbol', () => {
+    service.push(page('list'));
+    service.push(page('new', { formClose: Symbol('POP_NAVIGATION') }));
+
+    expect(typeof service.activePage()!.outputs!['formClose']).toBe('function');
+  });
+
+  it('is bound on a child rebuilt from the address, with a static key or a pattern without a factory', () => {
+    const find = (parent: StackPageInfo<unknown>, segments: string[]) => (service as any).findChildBySegments(parent, segments, 0);
+    const root: StackPageInfo<unknown> = {
+      ...page('root'),
+      childPages: [
+        page('static', { formClose: POP_NAVIGATION }),
+        { ...page('item', { formClose: POP_NAVIGATION }), pattern: 'item/:id' },
+      ],
+    };
+
+    expect(typeof find(root, ['static']).child.outputs.formClose).toBe('function');
+    expect(typeof find(root, ['item', '7']).child.outputs.formClose).toBe('function');
+  });
 });
