@@ -246,3 +246,16 @@ export interface StackPageInfo<T> {
      formClose: (result: FormResult) => this.handleFormClose(result)
    }
    ```
+
+## POP_NAVIGATION
+
+An output may be set to `POP_NAVIGATION` instead of a handler. Every page that enters the stack gets a handler that closes **that page** (and what is above it): a page passed to `push()`, and a child rebuilt from the address. The Back rules apply when it is the active page (the page it was navigated from, or its `backStep`). When the page is no longer in the stack the output does nothing, so it never closes whichever page is on top now.
+
+```typescript
+this.navigationContext.push({
+  component: ItemFormComponent,
+  key: "new",
+  data: {},
+  outputs: { formClose: POP_NAVIGATION },
+});
+```
